@@ -33,7 +33,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
 
     private int roundNumber = -1;
 
-    /** use {@link #process(Set, RoundEnvironment, int)} */
+    /** use {@link #process(Round)} */
     @Override
     final public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         ++roundNumber;
@@ -41,7 +41,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         log.debug("begin round {} (final = {}) of {}", +roundNumber, roundEnv.processingOver(), name());
 
         try {
-            boolean claimed = process(annotations, roundEnv, roundNumber);
+            boolean claimed = process(new Round(messager(), roundEnv, roundNumber));
 
             log.debug("end round {} of {}", roundNumber, name());
 
@@ -60,7 +60,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         return getClass().getSimpleName();
     }
 
-    public abstract boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, int roundNumber) throws Exception;
+    public abstract boolean process(Round round) throws Exception;
 
     private String stackTrace(Exception e) {
         StringWriter writer = new StringWriter();
