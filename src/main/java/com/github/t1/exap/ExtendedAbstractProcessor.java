@@ -41,15 +41,11 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         log.debug("begin round {} (final = {}) of {}", +roundNumber, roundEnv.processingOver(), name());
 
         try {
-            boolean claimed = process(new Round(messager(), roundEnv, roundNumber));
+            boolean claimed = process(new Round(env, roundEnv, roundNumber));
 
             log.debug("end round {} of {}", roundNumber, name());
 
             return claimed;
-        } catch (AnnotationProcessingFailedException e) {
-            if (e.getMessage() != null)
-                error("annotation processing round " + roundNumber + " failed: " + e.getMessage(), null);
-            return true;
         } catch (Exception e) {
             error("annotation processing round " + roundNumber + " failed:\n" + stackTrace(e), null);
             return true;

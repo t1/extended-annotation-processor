@@ -2,17 +2,29 @@ package com.github.t1.exap.reflection;
 
 import java.lang.annotation.Annotation;
 
-public class ReflectionParameter extends Parameter {
+import javax.lang.model.element.VariableElement;
+
+public class ReflectionParameter extends Parameter implements ReflectionMessageTarget {
     private final java.lang.reflect.Parameter parameter;
 
-    public ReflectionParameter(java.lang.reflect.Parameter parameter) {
-        super(null);
+    public ReflectionParameter(Method method, java.lang.reflect.Parameter parameter) {
+        super(method, DummyProxy.of(VariableElement.class));
         this.parameter = parameter;
+    }
+
+    @Override
+    public String getName() {
+        return parameter.getName();
     }
 
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> type) {
         return parameter.getAnnotation(type);
+    }
+
+    @Override
+    public Type getType() {
+        return new ReflectionType(getProcessingEnv(), parameter.getType());
     }
 
     @Override

@@ -1,16 +1,17 @@
 package com.github.t1.exap.reflection;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
-import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 
-public class Method extends Messaged {
+public class Method extends Elemental {
+    private final Type type;
     private final ExecutableElement method;
 
-    public Method(Messager messager, ExecutableElement method) {
-        super(messager, method);
+    public Method(ProcessingEnvironment processingEnv, Type type, ExecutableElement method) {
+        super(processingEnv, method);
+        this.type = type;
         this.method = method;
     }
 
@@ -18,29 +19,28 @@ public class Method extends Messaged {
         return method.getSimpleName().toString();
     }
 
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (AnnotationMirror mirror : method.getAnnotationMirrors()) {
-            TypeElement annotation = (TypeElement) mirror.getAnnotationType().asElement();
-            result.add(new AnnotationType(annotation));
-        }
-        return result;
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
-        return method.getAnnotation(type);
-    }
-
     public List<Parameter> getParameters() {
         List<Parameter> result = new ArrayList<>();
         for (VariableElement param : method.getParameters()) {
-            result.add(new Parameter(param));
+            result.add(new Parameter(this, param));
         }
         return result;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override
     public String toString() {
-        return "Method:" + method.getEnclosingElement().getSimpleName() + "#" + method.getSimpleName();
+        return "Method:" + type.getQualifiedName() + "#" + method.getSimpleName();
+    }
+
+    public Class<?> getReturnType() {
+        try {
+            return Class.forName(method.getReturnType().toString());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

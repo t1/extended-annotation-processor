@@ -11,12 +11,12 @@ import javax.lang.model.element.*;
 import com.github.t1.exap.reflection.Type;
 
 public class Round {
-    private final Messager messager;
+    private final ProcessingEnvironment processingEnv;
     private final RoundEnvironment roundEnv;
     private final int roundNumber;
 
-    public Round(Messager messager, RoundEnvironment roundEnv, int roundNumber) {
-        this.messager = messager;
+    public Round(ProcessingEnvironment processingEnv, RoundEnvironment roundEnv, int roundNumber) {
+        this.processingEnv = processingEnv;
         this.roundEnv = roundEnv;
         this.roundNumber = roundNumber;
     }
@@ -25,7 +25,7 @@ public class Round {
         List<Type> result = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(type))
             if (element.getKind() == CLASS)
-                result.add(new Type(messager, (TypeElement) element));
+                result.add(new Type(processingEnv, (TypeElement) element));
         return result;
     }
 
