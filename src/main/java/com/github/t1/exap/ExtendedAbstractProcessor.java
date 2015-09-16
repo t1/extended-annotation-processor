@@ -47,6 +47,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
 
             return claimed;
         } catch (Exception e) {
+            log.error("annotation processing round " + roundNumber + " failed:", e);
             error("annotation processing round " + roundNumber + " failed:\n" + stackTrace(e), null);
             return true;
         }
