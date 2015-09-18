@@ -36,11 +36,7 @@ public class Method extends Elemental {
         return "Method:" + type.getQualifiedName() + "#" + method.getSimpleName();
     }
 
-    public Class<?> getReturnType() {
-        try {
-            return Class.forName(method.getReturnType().toString());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public Type getReturnType() {
+        return Type.of(method.getReturnType(), getProcessingEnv());
     }
 }
