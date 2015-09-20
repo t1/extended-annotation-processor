@@ -60,6 +60,21 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         return String.class.equals(type);
     }
 
+    @Override
+    public boolean isEnum() {
+        return type.isEnum();
+    }
+
+    @Override
+    public List<String> getEnumValues() {
+        if (!isEnum())
+            return null;
+        List<String> list = new ArrayList<>();
+        for (Object constant : type.getEnumConstants())
+            list.add(constant.toString());
+        return list;
+    }
+
     public List<ReflectionMethod> getMethods() {
         if (methods == null) {
             methods = new ArrayList<>();

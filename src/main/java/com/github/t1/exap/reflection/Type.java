@@ -3,6 +3,8 @@ package com.github.t1.exap.reflection;
 import static javax.lang.model.element.ElementKind.*;
 import static javax.lang.model.type.TypeKind.*;
 
+import java.util.*;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
@@ -57,6 +59,14 @@ public class Type extends Elemental {
         this.type = type;
     }
 
+    private TypeKind typeKind() {
+        return type.asType().getKind();
+    }
+
+    private ElementKind kind() {
+        return type.getKind();
+    }
+
     public void accept(TypeScanner scanner) {
         for (Element element : type.getEnclosedElements())
             if (element.getKind() == METHOD)
@@ -77,7 +87,7 @@ public class Type extends Elemental {
     }
 
     public boolean isBoolean() {
-        return kind() == BOOLEAN;
+        return typeKind() == BOOLEAN;
     }
 
     public boolean isNumber() {
@@ -85,18 +95,28 @@ public class Type extends Elemental {
     }
 
     public boolean isInteger() {
-        return kind() == BYTE || kind() == SHORT || kind() == INT || kind() == LONG;
+        return typeKind() == BYTE || typeKind() == SHORT || typeKind() == INT || typeKind() == LONG;
     }
 
     public boolean isDecimal() {
-        return kind() == FLOAT || kind() == DOUBLE;
-    }
-
-    private TypeKind kind() {
-        return type.asType().getKind();
+        return typeKind() == FLOAT || typeKind() == DOUBLE;
     }
 
     public boolean isString() {
         return type.getQualifiedName().contentEquals(String.class.getName());
+    }
+
+    public boolean isEnum() {
+        return kind() == ENUM;
+    }
+
+    public List<String> getEnumValues() {
+        if (!isEnum())
+            return null;
+        List<String> values = new ArrayList<>();
+        for (Element element : type.getEnclosedElements())
+            if (element.getKind() == ENUM_CONSTANT)
+                values.add(element.getSimpleName().toString());
+        return values;
     }
 }

@@ -23,7 +23,8 @@ public class DummyProxy {
                     return (args[0] == null) ? false : args[0].toString().equals(toString());
                 if (method.getParameterTypes().length == 0 && "hashCode".equals(method.getName()))
                     return id;
-                throw new UnsupportedOperationException("invoked unsupported proxy method: " + method);
+                throw new UnsupportedOperationException(
+                        "invoked unsupported proxy method: " + method + " on type" + type);
             }
 
             @Override
