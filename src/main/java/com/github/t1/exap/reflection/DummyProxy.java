@@ -20,7 +20,7 @@ public class DummyProxy {
                 if (method.getParameterTypes().length == 0 && "toString".equals(method.getName()))
                     return toString();
                 if (method.getParameterTypes().length == 1 && "equals".equals(method.getName()))
-                    return (args[0] == null) ? false : args[0].toString().equals(toString());
+                    return args[0] == this;
                 if (method.getParameterTypes().length == 0 && "hashCode".equals(method.getName()))
                     return id;
                 throw new UnsupportedOperationException(

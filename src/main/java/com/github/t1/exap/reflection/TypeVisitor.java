@@ -1,6 +1,6 @@
 package com.github.t1.exap.reflection;
 
-public abstract class TypeScanner {
-    @SuppressWarnings("unused")
+@SuppressWarnings("unused")
+public abstract class TypeVisitor {
     public void visit(Method method) {}
 }

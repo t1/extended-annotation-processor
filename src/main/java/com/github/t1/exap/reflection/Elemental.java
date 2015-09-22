@@ -8,7 +8,8 @@ import java.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.util.Elements;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.*;
 
 import com.github.t1.exap.JavaDoc;
 
@@ -31,6 +32,14 @@ class Elemental {
 
     protected Elements getElementUtils() {
         return processingEnv.getElementUtils();
+    }
+
+    protected Types getTypeUtils() {
+        return processingEnv.getTypeUtils();
+    }
+
+    protected Type toType(TypeMirror typeMirror) {
+        return new Type(getProcessingEnv(), (TypeElement) getTypeUtils().asElement(typeMirror));
     }
 
     public void error(CharSequence message) {

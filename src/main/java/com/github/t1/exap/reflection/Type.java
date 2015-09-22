@@ -67,7 +67,7 @@ public class Type extends Elemental {
         return type.getKind();
     }
 
-    public void accept(TypeScanner scanner) {
+    public void accept(TypeVisitor scanner) {
         for (Element element : type.getEnclosedElements())
             if (element.getKind() == METHOD)
                 scanner.visit(new Method(getProcessingEnv(), this, (ExecutableElement) element));
@@ -84,6 +84,10 @@ public class Type extends Elemental {
 
     public String getSimpleName() {
         return type.getSimpleName().toString();
+    }
+
+    public boolean isVoid() {
+        return typeKind() == VOID;
     }
 
     public boolean isBoolean() {
@@ -118,5 +122,54 @@ public class Type extends Elemental {
             if (element.getKind() == ENUM_CONSTANT)
                 values.add(element.getSimpleName().toString());
         return values;
+    }
+
+    public boolean isArray() {
+        return typeKind() == ARRAY;
+    }
+
+    public Type elementType() {
+        if (isArray())
+            return toType(((ArrayType) type.asType()).getComponentType());
+        return null;
+    }
+
+    public List<TypeParameter> getTypeParameters() {
+        List<TypeParameter> result = new ArrayList<>();
+        for (TypeParameterElement parameterElement : type.getTypeParameters()) {
+            List<Type> bounds = new ArrayList<>();
+            for (TypeMirror typeMirror : parameterElement.getBounds())
+                bounds.add(Type.of(typeMirror, getProcessingEnv()));
+            result.add(new TypeParameter(parameterElement.getSimpleName().toString(), bounds));
+        }
+        return result;
+    }
+
+    public boolean isSubclassOf(Class<?> type) {
+        try {
+            if (this.getQualifiedName().equals(type.getName()))
+                return true;
+            if (getSuperClass() != null)
+                if (getSuperClass().isSubclassOf(type))
+                    return true;
+            // TODO check interfaces
+            return false;
+        } catch (Error e) {
+            throw new Error(this.type + " isSubclassOf " + type, e);
+        }
+    }
+
+    private Type getSuperClass() {
+        if (type.getSuperclass().getKind() == NONE)
+            return null;
+        return toType(type.getSuperclass());
+    }
+
+    public List<Field> getFields() {
+        List<Field> fields = new ArrayList<>();
+        for (Element enclosedElement : type.getEnclosedElements())
+            if (enclosedElement instanceof VariableElement)
+                fields.add(new Field(getProcessingEnv(), (VariableElement) enclosedElement));
+        return fields;
     }
 }

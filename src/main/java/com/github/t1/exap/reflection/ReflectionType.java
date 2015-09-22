@@ -1,39 +1,59 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Arrays.*;
+
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
 public class ReflectionType extends Type implements ReflectionMessageTarget {
-    private final Class<?> type;
+    private final java.lang.reflect.Type type;
     private List<ReflectionMethod> methods;
 
-    public ReflectionType(ProcessingEnvironment env, Class<?> type) {
+    public ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
         super(env, DummyProxy.of(TypeElement.class));
         this.type = type;
     }
 
+    private boolean isClass() {
+        return type instanceof Class;
+    }
+
+    private Class<?> asClass() {
+        return (Class<?>) type;
+    }
+
+    private ParameterizedType asParameterizedType() {
+        return (ParameterizedType) this.type;
+    }
+
     @Override
     public boolean isPublic() {
-        return Modifier.isPublic(type.getModifiers());
+        return Modifier.isPublic(asClass().getModifiers());
     }
 
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
-        return type.getAnnotation(annotationType);
+        return asClass().getAnnotation(annotationType);
     }
 
     @Override
     public String getQualifiedName() {
-        return type.getName();
+        return type.getTypeName();
     }
 
     @Override
     public String getSimpleName() {
-        return type.getSimpleName();
+        return asClass().getSimpleName();
+    }
+
+    @Override
+    public boolean isVoid() {
+        return void.class.equals(type);
     }
 
     @Override
@@ -62,7 +82,7 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
 
     @Override
     public boolean isEnum() {
-        return type.isEnum();
+        return isClass() && asClass().isEnum();
     }
 
     @Override
@@ -70,15 +90,42 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         if (!isEnum())
             return null;
         List<String> list = new ArrayList<>();
-        for (Object constant : type.getEnumConstants())
+        for (Object constant : asClass().getEnumConstants())
             list.add(constant.toString());
+        return list;
+    }
+
+    @Override
+    public boolean isArray() {
+        return isClass() && asClass().isArray();
+    }
+
+    @Override
+    public Type elementType() {
+        if (isArray())
+            return new ReflectionType(getProcessingEnv(), asClass().getComponentType());
+        return null;
+    }
+
+    @Override
+    public boolean isSubclassOf(Class<?> type) {
+        if (isClass())
+            return type.isAssignableFrom(asClass());
+        return type.isAssignableFrom((Class<?>) asParameterizedType().getRawType());
+    }
+
+    @Override
+    public List<TypeParameter> getTypeParameters() {
+        List<TypeParameter> list = new ArrayList<>();
+        for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
+            list.add(new TypeParameter(type.getTypeName(), asList(new ReflectionType(getProcessingEnv(), type))));
         return list;
     }
 
     public List<ReflectionMethod> getMethods() {
         if (methods == null) {
             methods = new ArrayList<>();
-            for (java.lang.reflect.Method method : type.getDeclaredMethods())
+            for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
                 methods.add(new ReflectionMethod(getProcessingEnv(), this, method));
         }
         return methods;
@@ -92,13 +139,23 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
     }
 
     @Override
-    public void accept(TypeScanner scanner) {
+    public List<Field> getFields() {
+        List<Field> fields = new ArrayList<>();
+        if (isClass())
+            for (java.lang.reflect.Field field : asClass().getDeclaredFields())
+                if (!Modifier.isStatic(field.getModifiers()))
+                    fields.add(new ReflectionField(getProcessingEnv(), field));
+        return fields;
+    }
+
+    @Override
+    public void accept(TypeVisitor scanner) {
         for (Method method : getMethods())
             scanner.visit(method);
     }
 
     @Override
     public String toString() {
-        return "ReflectionType:" + type.getName();
+        return "ReflectionType:" + getQualifiedName();
     }
 }
