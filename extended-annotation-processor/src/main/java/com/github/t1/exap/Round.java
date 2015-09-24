@@ -29,6 +29,10 @@ public class Round {
         return result;
     }
 
+    public int number() {
+        return roundNumber;
+    }
+
     public boolean isLast() {
         return roundEnv.processingOver();
     }

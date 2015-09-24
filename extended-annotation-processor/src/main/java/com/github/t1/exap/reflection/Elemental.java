@@ -8,7 +8,6 @@ import java.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.*;
 
 import com.github.t1.exap.JavaDoc;
