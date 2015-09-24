@@ -49,7 +49,7 @@ public class ReflectionMethod extends Method implements ReflectionMessageTarget 
 
     @Override
     public Type getReturnType() {
-        return new ReflectionType(getProcessingEnv(), method.getReturnType());
+        return new ReflectionType(env(), method.getReturnType());
     }
 
     @Override

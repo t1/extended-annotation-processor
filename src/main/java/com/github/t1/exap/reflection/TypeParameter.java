@@ -21,6 +21,6 @@ public class TypeParameter {
 
     @Override
     public String toString() {
-        return "TypeParameter [" + name + ": " + bounds + "]";
+        return "<" + name + ": " + bounds + ">";
     }
 }

@@ -8,10 +8,10 @@ import javax.tools.Diagnostic.Kind;
 
 public interface ReflectionMessageTarget {
     public default List<String> getMessages(Kind kind) {
-        return ((ReflectionMessager) getProcessingEnv().getMessager()).getMessages(getElement(), kind);
+        return ((ReflectionMessager) env().getMessager()).getMessages(getElement(), kind);
     }
 
-    public ProcessingEnvironment getProcessingEnv();
+    public ProcessingEnvironment env();
 
     public Element getElement();
 }

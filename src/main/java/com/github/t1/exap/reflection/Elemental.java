@@ -22,7 +22,7 @@ class Elemental {
         this.element = element;
     }
 
-    public ProcessingEnvironment getProcessingEnv() {
+    public ProcessingEnvironment env() {
         return processingEnv;
     }
 
@@ -30,16 +30,16 @@ class Elemental {
         return element;
     }
 
-    protected Elements getElementUtils() {
+    protected Elements elements() {
         return processingEnv.getElementUtils();
     }
 
-    protected Types getTypeUtils() {
+    protected Types types() {
         return processingEnv.getTypeUtils();
     }
 
-    protected Type toType(TypeMirror typeMirror) {
-        return new Type(getProcessingEnv(), (TypeElement) getTypeUtils().asElement(typeMirror));
+    public Messager messager() {
+        return processingEnv.getMessager();
     }
 
     public void error(CharSequence message) {
@@ -54,10 +54,6 @@ class Elemental {
         messager().printMessage(NOTE, message, getElement());
     }
 
-    public Messager messager() {
-        return processingEnv.getMessager();
-    }
-
     public List<AnnotationType> getAnnotationTypes() {
         List<AnnotationType> result = new ArrayList<>();
         for (AnnotationMirror mirror : getElement().getAnnotationMirrors()) {
@@ -68,7 +64,19 @@ class Elemental {
     }
 
     public boolean isPublic() {
-        return getElement().getModifiers().contains(PUBLIC);
+        return is(PUBLIC);
+    }
+
+    public boolean isStatic() {
+        return is(STATIC);
+    }
+
+    public boolean isTransient() {
+        return is(TRANSIENT);
+    }
+
+    protected boolean is(Modifier modifier) {
+        return getElement().getModifiers().contains(modifier);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -84,7 +92,7 @@ class Elemental {
     }
 
     private String docComment() {
-        return getElementUtils().getDocComment(this.getElement());
+        return elements().getDocComment(this.getElement());
     }
 
     private JavaDoc javaDoc() {
@@ -109,5 +117,31 @@ class Elemental {
                 return docComment;
             }
         };
+    }
+
+    /**
+     * We can't extract annotation values of type class in an annotation processor, as the class object generally is not
+     * loaded, only the meta data as represented in the TypeMirrors. You'd get a
+     * {@link javax.lang.model.type.MirroredTypeException} with the message: Attempt to access Class object for
+     * TypeMirror.
+     * <p>
+     * This method returns the <b>fully qualified class name</b> of the annotation 'method' instead; or
+     * <code>null</code>, if there is no such 'method' on the annotation.
+     * 
+     * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">
+     *      this blog </a>
+     */
+    public <T extends Annotation> String getAnnotationClassAttribute(Class<T> annotationType, String name) {
+        for (AnnotationMirror annotationMirror : elements().getAllAnnotationMirrors(element))
+            if (annotationType.getName().contentEquals(annotationMirror.getAnnotationType().toString()))
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> annotationProperty //
+                : elements().getElementValuesWithDefaults(annotationMirror).entrySet())
+                    if (annotationProperty.getKey().getSimpleName().contentEquals(name)) {
+                        String className = annotationProperty.getValue().toString();
+                        if (className.endsWith(".class"))
+                            className = className.substring(0, className.length() - 6);
+                        return className;
+                    }
+        return null;
     }
 }

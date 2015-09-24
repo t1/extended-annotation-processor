@@ -9,35 +9,39 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
+import org.slf4j.*;
+
 public class Type extends Elemental {
-    public static Type of(TypeMirror type, ProcessingEnvironment processingEnvironment) {
+    private static final Logger log = LoggerFactory.getLogger(Type.class);
+
+    public static Type of(TypeMirror type, ProcessingEnvironment env) {
         TypeKind kind = type.getKind();
         switch (kind) {
             case BOOLEAN:
-                return new ReflectionType(processingEnvironment, boolean.class);
+                return new ReflectionType(env, boolean.class);
             case BYTE:
-                return new ReflectionType(processingEnvironment, byte.class);
+                return new ReflectionType(env, byte.class);
             case CHAR:
-                return new ReflectionType(processingEnvironment, char.class);
+                return new ReflectionType(env, char.class);
             case DOUBLE:
-                return new ReflectionType(processingEnvironment, double.class);
+                return new ReflectionType(env, double.class);
             case FLOAT:
-                return new ReflectionType(processingEnvironment, float.class);
+                return new ReflectionType(env, float.class);
             case INT:
-                return new ReflectionType(processingEnvironment, int.class);
+                return new ReflectionType(env, int.class);
             case LONG:
-                return new ReflectionType(processingEnvironment, long.class);
+                return new ReflectionType(env, long.class);
             case SHORT:
-                return new ReflectionType(processingEnvironment, short.class);
+                return new ReflectionType(env, short.class);
             case VOID:
-                return new ReflectionType(processingEnvironment, void.class);
+                return new ReflectionType(env, void.class);
 
             case ARRAY:
             case DECLARED:
-                TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
-                return new Type(processingEnvironment, typeElement);
+                TypeElement typeElement = (TypeElement) env.getTypeUtils().asElement(type);
+                return new Type(env, typeElement);
             case ERROR:
-                throw new RuntimeException("error parameter kind: " + kind + ": " + type);
+                throw new RuntimeException("error type kind: " + kind + ": " + type);
             case EXECUTABLE:
             case INTERSECTION:
             case NONE:
@@ -47,16 +51,16 @@ public class Type extends Elemental {
             case TYPEVAR:
             case UNION:
             case WILDCARD:
-                throw new RuntimeException("unexpected parameter kind: " + kind + ": " + type);
+                throw new RuntimeException("unexpected type kind: " + kind + ": " + type);
         }
-        throw new UnsupportedOperationException("unsupported parameter kind: " + kind + ": " + type);
+        throw new UnsupportedOperationException("unsupported type kind: " + kind + ": " + type);
     }
 
     private final TypeElement type;
 
     public Type(ProcessingEnvironment processingEnv, TypeElement type) {
         super(processingEnv, type);
-        this.type = type;
+        this.type = Objects.requireNonNull(type, "type");
     }
 
     private TypeKind typeKind() {
@@ -70,7 +74,7 @@ public class Type extends Elemental {
     public void accept(TypeVisitor scanner) {
         for (Element element : type.getEnclosedElements())
             if (element.getKind() == METHOD)
-                scanner.visit(new Method(getProcessingEnv(), this, (ExecutableElement) element));
+                scanner.visit(new Method(env(), this, (ExecutableElement) element));
     }
 
     @Override
@@ -79,7 +83,10 @@ public class Type extends Elemental {
     }
 
     public String getQualifiedName() {
-        return type.getQualifiedName().toString();
+        Name name = type.getQualifiedName();
+        if (name == null)
+            name = type.getSimpleName();
+        return name.toString();
     }
 
     public String getSimpleName() {
@@ -130,46 +137,52 @@ public class Type extends Elemental {
 
     public Type elementType() {
         if (isArray())
-            return toType(((ArrayType) type.asType()).getComponentType());
+            return Type.of(((ArrayType) type.asType()).getComponentType(), env());
         return null;
     }
 
     public List<TypeParameter> getTypeParameters() {
+        log.debug("type parameters of {}", type);
         List<TypeParameter> result = new ArrayList<>();
         for (TypeParameterElement parameterElement : type.getTypeParameters()) {
+            log.debug("    type parameter: {} generic: {}", parameterElement.getSimpleName(),
+                    parameterElement.getGenericElement());
             List<Type> bounds = new ArrayList<>();
-            for (TypeMirror typeMirror : parameterElement.getBounds())
-                bounds.add(Type.of(typeMirror, getProcessingEnv()));
+            for (TypeMirror bound : parameterElement.getBounds())
+                bounds.add(Type.of(bound, env()));
+            log.debug("    bounds: {}", bounds);
             result.add(new TypeParameter(parameterElement.getSimpleName().toString(), bounds));
         }
         return result;
     }
 
-    public boolean isSubclassOf(Class<?> type) {
+    public boolean isAssignableTo(Class<?> type) {
         try {
-            if (this.getQualifiedName().equals(type.getName()))
+            TypeMirror targetType = elements().getTypeElement(type.getName()).asType();
+            if (isSameType(this.type.asType(), targetType))
                 return true;
-            if (getSuperClass() != null)
-                if (getSuperClass().isSubclassOf(type))
+            for (TypeMirror supertype : types().directSupertypes(this.type.asType()))
+                if (isSameType(targetType, supertype))
                     return true;
-            // TODO check interfaces
             return false;
         } catch (Error e) {
             throw new Error(this.type + " isSubclassOf " + type, e);
         }
     }
 
-    private Type getSuperClass() {
-        if (type.getSuperclass().getKind() == NONE)
-            return null;
-        return toType(type.getSuperclass());
+    private boolean isSameType(TypeMirror left, TypeMirror right) {
+        // why do these return false for java.util.Collection<E>?
+        // types().isAssignable(left, right);
+        // types().isSameType(left, right)
+        // left.equals(right),
+        return left.toString().equals(right.toString());
     }
 
     public List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
         for (Element enclosedElement : type.getEnclosedElements())
             if (enclosedElement instanceof VariableElement)
-                fields.add(new Field(getProcessingEnv(), (VariableElement) enclosedElement));
+                fields.add(new Field(env(), (VariableElement) enclosedElement));
         return fields;
     }
 }

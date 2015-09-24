@@ -7,7 +7,7 @@ public class Parameter extends Elemental {
     private final Method method;
 
     public Parameter(Method method, VariableElement param) {
-        super(method.getProcessingEnv(), param);
+        super(method.env(), param);
         this.method = method;
         this.param = param;
     }
@@ -26,6 +26,6 @@ public class Parameter extends Elemental {
     }
 
     public Type getType() {
-        return Type.of(param.asType(), getProcessingEnv());
+        return Type.of(param.asType(), env());
     }
 }

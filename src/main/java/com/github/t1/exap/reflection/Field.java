@@ -16,6 +16,12 @@ public class Field extends Elemental {
     }
 
     public Type getType() {
-        return toType(field.asType());
+        try {
+            return Type.of(field.asType(), env());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("while getting type of field " + field.getSimpleName(), e);
+        } catch (Error e) {
+            throw new Error("while getting type of field " + field.getSimpleName(), e);
+        }
     }
 }

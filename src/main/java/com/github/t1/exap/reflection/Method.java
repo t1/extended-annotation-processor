@@ -37,6 +37,6 @@ public class Method extends Elemental {
     }
 
     public Type getReturnType() {
-        return Type.of(method.getReturnType(), getProcessingEnv());
+        return Type.of(method.getReturnType(), env());
     }
 }

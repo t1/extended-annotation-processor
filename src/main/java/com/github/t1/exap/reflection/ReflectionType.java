@@ -27,6 +27,10 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         return (Class<?>) type;
     }
 
+    private boolean isParameterizedType() {
+        return this.type instanceof ParameterizedType;
+    }
+
     private ParameterizedType asParameterizedType() {
         return (ParameterizedType) this.type;
     }
@@ -38,11 +42,33 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
 
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+        if (!isClass())
+            return null;
         return asClass().getAnnotation(annotationType);
     }
 
     @Override
+    public <T extends Annotation> String getAnnotationClassAttribute(Class<T> annotationType, String name) {
+        T annotation = getAnnotation(annotationType);
+        try {
+            java.lang.reflect.Method method = annotationType.getMethod(name);
+            Object value = method.invoke(annotation);
+            if (value == null)
+                return null;
+            if (!(value instanceof Class))
+                throw new RuntimeException("method " + name + " of annotation " + annotationType.getName()
+                        + " does not return a class object");
+            return ((Class<?>) value).getName();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("while getting method " + name + " of annotation " + annotationType.getName(),
+                    e);
+        }
+    }
+
+    @Override
     public String getQualifiedName() {
+        if (isParameterizedType())
+            return asParameterizedType().getRawType().getTypeName();
         return type.getTypeName();
     }
 
@@ -103,12 +129,12 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
     @Override
     public Type elementType() {
         if (isArray())
-            return new ReflectionType(getProcessingEnv(), asClass().getComponentType());
+            return new ReflectionType(env(), asClass().getComponentType());
         return null;
     }
 
     @Override
-    public boolean isSubclassOf(Class<?> type) {
+    public boolean isAssignableTo(Class<?> type) {
         if (isClass())
             return type.isAssignableFrom(asClass());
         return type.isAssignableFrom((Class<?>) asParameterizedType().getRawType());
@@ -116,9 +142,11 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
 
     @Override
     public List<TypeParameter> getTypeParameters() {
+        char A = 'A'; // the real type parameter name is not available by reflection
         List<TypeParameter> list = new ArrayList<>();
-        for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
-            list.add(new TypeParameter(type.getTypeName(), asList(new ReflectionType(getProcessingEnv(), type))));
+        if (isParameterizedType())
+            for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
+                list.add(new TypeParameter(Character.toString(A++), asList(new ReflectionType(env(), type))));
         return list;
     }
 
@@ -126,7 +154,7 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         if (methods == null) {
             methods = new ArrayList<>();
             for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
-                methods.add(new ReflectionMethod(getProcessingEnv(), this, method));
+                methods.add(new ReflectionMethod(env(), this, method));
         }
         return methods;
     }
@@ -144,7 +172,7 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         if (isClass())
             for (java.lang.reflect.Field field : asClass().getDeclaredFields())
                 if (!Modifier.isStatic(field.getModifiers()))
-                    fields.add(new ReflectionField(getProcessingEnv(), field));
+                    fields.add(new ReflectionField(env(), field));
         return fields;
     }
 

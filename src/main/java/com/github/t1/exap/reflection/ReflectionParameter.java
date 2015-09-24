@@ -24,7 +24,7 @@ public class ReflectionParameter extends Parameter implements ReflectionMessageT
 
     @Override
     public Type getType() {
-        return new ReflectionType(getProcessingEnv(), parameter.getType());
+        return new ReflectionType(env(), parameter.getType());
     }
 
     @Override
