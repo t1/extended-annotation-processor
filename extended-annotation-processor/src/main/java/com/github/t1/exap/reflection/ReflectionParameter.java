@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import java.lang.annotation.Annotation;
+import java.util.*;
 
 import javax.lang.model.element.VariableElement;
 
@@ -20,6 +21,14 @@ public class ReflectionParameter extends Parameter implements ReflectionMessageT
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> type) {
         return parameter.getAnnotation(type);
+    }
+
+    @Override
+    public List<AnnotationType> getAnnotationTypes() {
+        List<AnnotationType> result = new ArrayList<>();
+        for (Annotation annotation : parameter.getAnnotations())
+            result.add(new ReflectionAnnotationType(annotation.annotationType()));
+        return result;
     }
 
     @Override

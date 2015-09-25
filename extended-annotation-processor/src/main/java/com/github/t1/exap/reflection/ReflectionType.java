@@ -12,7 +12,6 @@ import javax.lang.model.element.TypeElement;
 
 public class ReflectionType extends Type implements ReflectionMessageTarget {
     private final java.lang.reflect.Type type;
-    private List<ReflectionMethod> methods;
 
     public ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
         super(env, DummyProxy.of(TypeElement.class));
@@ -150,20 +149,13 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
         return list;
     }
 
-    public List<ReflectionMethod> getMethods() {
-        if (methods == null) {
-            methods = new ArrayList<>();
+    @Override
+    public List<Method> getMethods() {
+        List<Method> methods = new ArrayList<>();
+        if (isClass())
             for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
                 methods.add(new ReflectionMethod(env(), this, method));
-        }
         return methods;
-    }
-
-    public ReflectionMethod getMethod(String name) {
-        for (ReflectionMethod method : getMethods())
-            if (method.getSimpleName().equals(name))
-                return method;
-        throw new RuntimeException("method not found: " + name + ".\n  Only knows: " + getMethods());
     }
 
     @Override
@@ -177,13 +169,22 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
     }
 
     @Override
-    public void accept(TypeVisitor scanner) {
-        for (Method method : getMethods())
-            scanner.visit(method);
+    public String toString() {
+        return "ReflectionType:" + getQualifiedName();
     }
 
     @Override
-    public String toString() {
-        return "ReflectionType:" + getQualifiedName();
+    public int hashCode() {
+        return type.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        ReflectionType that = (ReflectionType) obj;
+        return this.type == that.type;
     }
 }

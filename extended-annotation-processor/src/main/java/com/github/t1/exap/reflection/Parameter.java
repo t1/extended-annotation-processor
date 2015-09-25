@@ -22,7 +22,7 @@ public class Parameter extends Elemental {
 
     @Override
     public String toString() {
-        return "Parameter:" + getMethod().getSimpleName() + "#" + getName();
+        return "Parameter:" + getMethod().getName() + "#" + getName();
     }
 
     public Type getType() {

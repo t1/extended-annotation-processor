@@ -72,9 +72,25 @@ public class Type extends Elemental {
     }
 
     public void accept(TypeVisitor scanner) {
-        for (Element element : type.getEnclosedElements())
-            if (element.getKind() == METHOD)
-                scanner.visit(new Method(env(), this, (ExecutableElement) element));
+        for (Method method : getMethods())
+            scanner.visit(method);
+        for (Field field : getFields())
+            scanner.visit(field);
+    }
+
+    @Override
+    public int hashCode() {
+        return type.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Type that = (Type) obj;
+        return types().isSameType(this.type.asType(), that.type.asType());
     }
 
     @Override
@@ -178,11 +194,33 @@ public class Type extends Elemental {
         return left.toString().equals(right.toString());
     }
 
+    public List<Method> getMethods() {
+        List<Method> list = new ArrayList<>();
+        for (Element element : type.getEnclosedElements())
+            if (element.getKind() == METHOD)
+                list.add(new Method(env(), this, (ExecutableElement) element));
+        return list;
+    }
+
+    public Method getMethod(String name) {
+        for (Method method : getMethods())
+            if (method.getName().equals(name))
+                return method;
+        throw new RuntimeException("method not found: " + name + ".\n  Only knows: " + getMethods());
+    }
+
     public List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
         for (Element enclosedElement : type.getEnclosedElements())
             if (enclosedElement instanceof VariableElement)
                 fields.add(new Field(env(), (VariableElement) enclosedElement));
         return fields;
+    }
+
+    public Field getField(String name) {
+        for (Field field : getFields())
+            if (field.getName().equals(name))
+                return field;
+        throw new RuntimeException("field not found: " + name + ".\n  Only knows: " + getFields());
     }
 }

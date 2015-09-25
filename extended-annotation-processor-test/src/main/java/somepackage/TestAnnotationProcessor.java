@@ -8,30 +8,35 @@ import java.io.*;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.tools.FileObject;
 
-import org.slf4j.*;
-
 import com.github.t1.exap.*;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.reflection.*;
 
 @SupportedSourceVersion(RELEASE_8)
 @SupportedAnnotationClasses({ MarkerAnnotation.class })
 public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
-    private static final Logger log = LoggerFactory.getLogger(TestAnnotationProcessor.class);
-
     @Override
     public boolean process(Round round) throws IOException {
-        log.info("process {}", round);
-
-        for (Type type : round.typesAnnotatedWith(MarkerAnnotation.class)) {
-            type.warning("hi from round-" + round.number());
-        }
-
         FileObject fileObject = filer().createResource(CLASS_OUTPUT, "", "round-" + round.number());
-        log.debug("write {}", fileObject.getName());
         try (Writer writer = fileObject.openWriter()) {
-            writer.write("");
-        }
+            PrintWriter out = new PrintWriter(writer);
 
+            out.println(MarkerAnnotation.class.getName() + ":");
+            for (Type type : round.typesAnnotatedWith(MarkerAnnotation.class)) {
+                type.warning("marked warning in round-" + round.number());
+                out.println("- " + type.getQualifiedName());
+                out.println("    javadoc:");
+                out.println("        summary: " + type.getAnnotation(JavaDoc.class).summary());
+                out.println("        value: " + type.getAnnotation(JavaDoc.class).value());
+
+                out.println("    fields:");
+                for (Field field : type.getFields())
+                    out.println("    - " + field.getName());
+
+                out.println("    methods:");
+                for (Method method : type.getMethods())
+                    out.println("    - " + method.getName());
+            }
+        }
         return false;
     }
 }

@@ -16,7 +16,7 @@ public class ReflectionMethod extends Method implements ReflectionMessageTarget 
     }
 
     @Override
-    public String getSimpleName() {
+    public String getName() {
         return method.getName();
     }
 
@@ -33,10 +33,6 @@ public class ReflectionMethod extends Method implements ReflectionMessageTarget 
         return method.getAnnotation(type);
     }
 
-    public ReflectionParameter getParameter(int index) {
-        return (ReflectionParameter) getParameters().get(index);
-    }
-
     @Override
     public List<Parameter> getParameters() {
         if (parameters == null) {
@@ -45,6 +41,11 @@ public class ReflectionMethod extends Method implements ReflectionMessageTarget 
                 parameters.add(new ReflectionParameter(this, method.getParameters()[i]));
         }
         return parameters;
+    }
+
+    @Override
+    public Parameter getParameter(int index) {
+        return new ReflectionParameter(this, method.getParameters()[index]);
     }
 
     @Override

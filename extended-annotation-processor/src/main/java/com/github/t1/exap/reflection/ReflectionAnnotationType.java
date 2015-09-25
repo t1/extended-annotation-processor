@@ -17,6 +17,21 @@ public class ReflectionAnnotationType extends AnnotationType {
     }
 
     @Override
+    public int hashCode() {
+        return annotation.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        ReflectionAnnotationType that = (ReflectionAnnotationType) obj;
+        return this.annotation.equals(that.annotation);
+    }
+
+    @Override
     public String toString() {
         return "ReflectionAnnotationType:" + annotation.getName();
     }

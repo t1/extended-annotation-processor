@@ -1,6 +1,8 @@
 package com.github.t1.exap.reflection;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
@@ -40,6 +42,24 @@ public class ReflectionField extends Field implements ReflectionMessageTarget {
 
     private int getMember() {
         return field.getModifiers();
+    }
+
+    @Override
+    public <T extends Annotation> boolean isAnnotated(Class<T> type) {
+        return field.isAnnotationPresent(type);
+    }
+
+    @Override
+    public <T extends Annotation> T getAnnotation(Class<T> type) {
+        return field.getAnnotation(type);
+    }
+
+    @Override
+    public List<AnnotationType> getAnnotationTypes() {
+        List<AnnotationType> result = new ArrayList<>();
+        for (Annotation annotation : field.getAnnotations())
+            result.add(new ReflectionAnnotationType(annotation.annotationType()));
+        return result;
     }
 
     @Override

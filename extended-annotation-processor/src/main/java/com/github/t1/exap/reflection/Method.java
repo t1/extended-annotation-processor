@@ -6,37 +6,40 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 
 public class Method extends Elemental {
-    private final Type type;
+    private final Type containerType;
     private final ExecutableElement method;
 
-    public Method(ProcessingEnvironment processingEnv, Type type, ExecutableElement method) {
+    public Method(ProcessingEnvironment processingEnv, Type containerType, ExecutableElement method) {
         super(processingEnv, method);
-        this.type = type;
+        this.containerType = containerType;
         this.method = method;
     }
 
-    public String getSimpleName() {
+    public String getName() {
         return method.getSimpleName().toString();
     }
 
     public List<Parameter> getParameters() {
         List<Parameter> result = new ArrayList<>();
-        for (VariableElement param : method.getParameters()) {
+        for (VariableElement param : method.getParameters())
             result.add(new Parameter(this, param));
-        }
         return result;
     }
 
-    public Type getType() {
-        return type;
+    public Parameter getParameter(int index) {
+        return new Parameter(this, method.getParameters().get(index));
     }
 
-    @Override
-    public String toString() {
-        return "Method:" + type.getQualifiedName() + "#" + method.getSimpleName();
+    public Type getContainerType() {
+        return containerType;
     }
 
     public Type getReturnType() {
         return Type.of(method.getReturnType(), env());
+    }
+
+    @Override
+    public String toString() {
+        return "Method:" + containerType.getQualifiedName() + "#" + method.getSimpleName();
     }
 }

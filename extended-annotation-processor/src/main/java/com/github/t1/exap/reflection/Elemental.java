@@ -53,15 +53,6 @@ class Elemental {
         messager().printMessage(NOTE, message, getElement());
     }
 
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (AnnotationMirror mirror : getElement().getAnnotationMirrors()) {
-            TypeElement annotation = (TypeElement) mirror.getAnnotationType().asElement();
-            result.add(new AnnotationType(annotation));
-        }
-        return result;
-    }
-
     public boolean isPublic() {
         return is(PUBLIC);
     }
@@ -78,9 +69,8 @@ class Elemental {
         return getElement().getModifiers().contains(modifier);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public boolean isAnnotated(Class<?> type) {
-        return getAnnotation((Class) type) != null;
+    public <T extends Annotation> boolean isAnnotated(Class<T> type) {
+        return getAnnotation(type) != null;
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> type) {
@@ -88,6 +78,15 @@ class Elemental {
         if (annotation == null && JavaDoc.class.equals(type) && docComment() != null)
             return type.cast(javaDoc());
         return annotation;
+    }
+
+    public List<AnnotationType> getAnnotationTypes() {
+        List<AnnotationType> result = new ArrayList<>();
+        for (AnnotationMirror mirror : getElement().getAnnotationMirrors()) {
+            TypeElement annotation = (TypeElement) mirror.getAnnotationType().asElement();
+            result.add(new AnnotationType(annotation));
+        }
+        return result;
     }
 
     private String docComment() {
@@ -113,7 +112,7 @@ class Elemental {
 
             @Override
             public String value() {
-                return docComment;
+                return docComment.trim();
             }
         };
     }
