@@ -6,7 +6,7 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
 class ReflectionMethod extends Method {
@@ -54,6 +54,11 @@ class ReflectionMethod extends Method {
     @Override
     public Type getReturnType() {
         return Type.of(method.getReturnType());
+    }
+
+    @Override
+    protected boolean is(Modifier modifier) {
+        return Modifiers.on(method.getModifiers()).is(modifier);
     }
 
     @Override

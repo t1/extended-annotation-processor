@@ -20,7 +20,7 @@ public class ReflectionTest {
 
     @A("ttt")
     @JavaDoc(summary = "s", value = "v")
-    static class Pojo {
+    public static class Pojo {
         @A("fff")
         String string;
         boolean bool;
@@ -52,6 +52,10 @@ public class ReflectionTest {
         assertNull(type.elementType());
         assertTrue(type.getTypeParameters().isEmpty());
         assertFalse(type.isAssignableTo(String.class));
+
+        assertTrue(type.isPublic());
+        assertTrue(type.isStatic());
+        assertFalse(type.isTransient()); // doesn't make sense, but must work
     }
 
     @Test
@@ -68,6 +72,10 @@ public class ReflectionTest {
         AnnotationType annotation = stringField.getAnnotationTypes().get(0);
         assertNull(annotation.getAnnotation(A.class));
         assertEquals("fff", stringField.getAnnotation(A.class).value());
+
+        assertFalse(stringField.isPublic());
+        assertFalse(stringField.isStatic());
+        assertFalse(stringField.isTransient());
 
         Field boolField = fields.get(1);
         assertEquals("bool", boolField.getName());
@@ -88,6 +96,10 @@ public class ReflectionTest {
         assertEquals(type, method0.getContainerType());
         assertEquals(Type.of(void.class), method0.getReturnType());
         assertEquals(0, method0.getParameters().size());
+
+        assertTrue(method0.isPublic());
+        assertFalse(method0.isStatic());
+        assertFalse(method0.isTransient());
 
         assertTrue(method0.isAnnotated(A.class));
         assertEquals(1, method0.getAnnotationTypes().size());

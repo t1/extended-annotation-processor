@@ -5,7 +5,7 @@ import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
 class ReflectionParameter extends Parameter {
@@ -44,6 +44,16 @@ class ReflectionParameter extends Parameter {
     @Override
     public Type getType() {
         return Type.of(parameter.getType());
+    }
+
+    @Override
+    public boolean isType(Class<?> type) {
+        return parameter.getType().equals(type);
+    }
+
+    @Override
+    protected boolean is(Modifier modifier) {
+        return Modifiers.on(parameter.getModifiers()).is(modifier);
     }
 
     @Override

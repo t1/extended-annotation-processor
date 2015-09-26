@@ -4,12 +4,12 @@ import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.ArrayList;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
 class ReflectionType extends Type {
@@ -50,8 +50,8 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public boolean isPublic() {
-        return Modifier.isPublic(asClass().getModifiers());
+    protected boolean is(Modifier modifier) {
+        return Modifiers.on(asClass().getModifiers()).is(modifier);
     }
 
     @Override
@@ -181,8 +181,7 @@ class ReflectionType extends Type {
             fields = new ArrayList<>();
             if (isClass())
                 for (java.lang.reflect.Field field : asClass().getDeclaredFields())
-                    if (!Modifier.isStatic(field.getModifiers()))
-                        fields.add(new ReflectionField(env(), field));
+                    fields.add(new ReflectionField(env(), field));
         }
         return fields;
     }

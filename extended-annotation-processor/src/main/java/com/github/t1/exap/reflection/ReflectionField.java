@@ -3,11 +3,10 @@ package com.github.t1.exap.reflection;
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
 class ReflectionField extends Field {
@@ -29,22 +28,8 @@ class ReflectionField extends Field {
     }
 
     @Override
-    public boolean isPublic() {
-        return Modifier.isPublic(getMember());
-    }
-
-    @Override
-    public boolean isStatic() {
-        return Modifier.isStatic(getMember());
-    }
-
-    @Override
-    public boolean isTransient() {
-        return Modifier.isTransient(getMember());
-    }
-
-    private int getMember() {
-        return field.getModifiers();
+    protected boolean is(Modifier modifier) {
+        return Modifiers.on(field.getModifiers()).is(modifier);
     }
 
     @Override
