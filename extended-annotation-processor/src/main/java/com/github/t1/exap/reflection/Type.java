@@ -237,6 +237,8 @@ public class Type extends Elemental {
     }
 
     public Type getSuperType() {
+        if (type.getSuperclass().getKind() == NONE)
+            return null;
         return Type.of(type.getSuperclass(), env());
     }
 }
