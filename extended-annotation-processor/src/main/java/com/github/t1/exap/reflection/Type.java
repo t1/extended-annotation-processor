@@ -227,4 +227,16 @@ public class Type extends Elemental {
                 return field;
         throw new RuntimeException("field not found: " + name + ".\n  Only knows: " + getFields());
     }
+
+    public List<Method> getAllMethods() {
+        List<Method> methods = new ArrayList<>();
+        methods.addAll(getMethods());
+        if (getSuperType() != null)
+            methods.addAll(getSuperType().getAllMethods());
+        return methods;
+    }
+
+    public Type getSuperType() {
+        return Type.of(type.getSuperclass(), env());
+    }
 }

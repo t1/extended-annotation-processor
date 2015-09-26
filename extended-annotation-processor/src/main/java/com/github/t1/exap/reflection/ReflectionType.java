@@ -192,6 +192,11 @@ class ReflectionType extends Type {
     }
 
     @Override
+    public Type getSuperType() {
+        return isClass() ? Type.of(asClass().getSuperclass()) : null;
+    }
+
+    @Override
     public String toString() {
         return "ReflectionType:" + getQualifiedName();
     }
