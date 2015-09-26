@@ -2,7 +2,7 @@ package com.github.t1.exap;
 
 import static javax.tools.Diagnostic.Kind.*;
 
-import java.io.*;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -47,8 +47,8 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
 
             return claimed;
         } catch (Exception e) {
-            log.error("annotation processing round " + roundNumber + " failed:", e);
-            error("annotation processing round " + roundNumber + " failed:\n" + stackTrace(e));
+            log.error("annotation processing round " + roundNumber + " failed", e);
+            error("annotation processing round " + roundNumber + " failed: " + e.getMessage());
             return true;
         }
     }
@@ -58,12 +58,6 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     }
 
     public abstract boolean process(Round round) throws Exception;
-
-    private String stackTrace(Exception e) {
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
-    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {

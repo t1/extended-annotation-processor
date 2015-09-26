@@ -6,7 +6,7 @@ import java.nio.file.*;
 
 import org.junit.Test;
 
-public class AnnotationProcessorTest {
+public class AnnotationProcessorIT {
     private static final Path EXPECTED_FOLDER = Paths.get("src/test/resources");
     private static final Path ACTUAL_FOLDER = Paths.get("target/test-classes");
 

@@ -1,11 +1,18 @@
-somepackage.MarkerAnnotation:
-- somepackage.Primitves
-    javadoc:
-        summary: javadoc summary
-        value: javadoc summary. second sentence.
-    fields:
-    - string
-    - bool
-    methods:
-    - method0
-    - method1
+
+[
+    {
+        "type":"somepackage.Primitves",
+        "javadoc":{
+            "summary":"javadoc summary",
+            "value":"javadoc summary. second sentence."
+        },
+        "fields":[
+            "string",
+            "bool"
+        ],
+        "methods":[
+            "method0",
+            "method1"
+        ]
+    }
+]
