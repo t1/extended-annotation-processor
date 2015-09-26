@@ -1,16 +1,26 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+
 import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 
-public class ReflectionParameter extends Parameter implements ReflectionMessageTarget {
+class ReflectionParameter extends Parameter {
+    private final Method method;
     private final java.lang.reflect.Parameter parameter;
 
     public ReflectionParameter(Method method, java.lang.reflect.Parameter parameter) {
         super(method, DummyProxy.of(VariableElement.class));
+        this.method = method;
         this.parameter = parameter;
+    }
+
+    @Override
+    public Method getMethod() {
+        return method;
     }
 
     @Override
@@ -33,11 +43,17 @@ public class ReflectionParameter extends Parameter implements ReflectionMessageT
 
     @Override
     public Type getType() {
-        return new ReflectionType(env(), parameter.getType());
+        return Type.of(parameter.getType());
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override
     public String toString() {
-        return "ReflectionParameter:" + parameter;
+        return "ReflectionParameter:" + parameter + "@" + parameter.getDeclaringExecutable().getName() + "@"
+                + parameter.getDeclaringExecutable().getDeclaringClass();
     }
 }

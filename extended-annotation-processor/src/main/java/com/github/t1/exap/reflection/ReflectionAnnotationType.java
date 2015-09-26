@@ -2,7 +2,7 @@ package com.github.t1.exap.reflection;
 
 import java.lang.annotation.Annotation;
 
-public class ReflectionAnnotationType extends AnnotationType {
+class ReflectionAnnotationType extends AnnotationType {
 
     private final Class<? extends Annotation> annotation;
 

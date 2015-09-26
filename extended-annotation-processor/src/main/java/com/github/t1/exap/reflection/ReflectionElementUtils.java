@@ -6,7 +6,7 @@ import java.util.*;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 
-public class ReflectionElementUtils implements Elements {
+class ReflectionElementUtils implements Elements {
 
     @Override
     public PackageElement getPackageElement(CharSequence name) {

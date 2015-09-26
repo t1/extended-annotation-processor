@@ -1,12 +1,15 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+
 import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
+import javax.tools.Diagnostic;
 
-public class ReflectionMethod extends Method implements ReflectionMessageTarget {
+class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;
     private List<Parameter> parameters;
 
@@ -45,12 +48,17 @@ public class ReflectionMethod extends Method implements ReflectionMessageTarget 
 
     @Override
     public Parameter getParameter(int index) {
-        return new ReflectionParameter(this, method.getParameters()[index]);
+        return getParameters().get(index);
     }
 
     @Override
     public Type getReturnType() {
-        return new ReflectionType(env(), method.getReturnType());
+        return Type.of(method.getReturnType());
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override

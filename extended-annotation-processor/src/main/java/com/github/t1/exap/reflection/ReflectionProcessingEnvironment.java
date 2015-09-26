@@ -5,18 +5,22 @@ import java.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.util.*;
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
-    private final ReflectionMessager messager = new ReflectionMessager();
-    private final Map<Class<?>, ReflectionType> types = new HashMap<>();
+    public static final ReflectionProcessingEnvironment ENV = new ReflectionProcessingEnvironment();
 
-    public ReflectionType type(Class<?> type) {
-        ReflectionType reflectionType = types.get(type);
-        if (reflectionType == null) {
-            reflectionType = new ReflectionType(this, type);
-            types.put(type, reflectionType);
-        }
-        return reflectionType;
+    private ReflectionProcessingEnvironment() {}
+
+    private final ReflectionMessager messager = new ReflectionMessager();
+
+    public List<Message> getMessages() {
+        return messager.getMessages();
+    }
+
+    public List<String> getMessages(Elemental target, Kind messageKind) {
+        return messager.getMessages(target, messageKind);
     }
 
     @Override
@@ -56,5 +60,9 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     @Override
     public Locale getLocale() {
         return Locale.getDefault();
+    }
+
+    public void message(Elemental elemental, Diagnostic.Kind kind, CharSequence message) {
+        messager.message(elemental, kind, message);
     }
 }

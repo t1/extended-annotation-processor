@@ -48,7 +48,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
             return claimed;
         } catch (Exception e) {
             log.error("annotation processing round " + roundNumber + " failed:", e);
-            error("annotation processing round " + roundNumber + " failed:\n" + stackTrace(e), null);
+            error("annotation processing round " + roundNumber + " failed:\n" + stackTrace(e));
             return true;
         }
     }
@@ -78,7 +78,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         return result;
     }
 
-    public Messager messager() {
+    private Messager messager() {
         return env.getMessager();
     }
 
@@ -86,28 +86,20 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         messager().printMessage(ERROR, message);
     }
 
-    public void error(CharSequence message, Element element) {
-        messager().printMessage(ERROR, message, element);
-    }
-
     public void warning(CharSequence message) {
         messager().printMessage(WARNING, message);
-    }
-
-    public void warning(CharSequence message, Element element) {
-        messager().printMessage(WARNING, message, element);
     }
 
     public void mandatoryWarning(CharSequence message) {
         messager().printMessage(MANDATORY_WARNING, message);
     }
 
-    public void mandatoryWarning(CharSequence message, Element element) {
-        messager().printMessage(MANDATORY_WARNING, message, element);
-    }
-
     public void note(CharSequence message) {
         messager().printMessage(NOTE, message);
+    }
+
+    public void otherMessage(CharSequence message) {
+        messager().printMessage(OTHER, message);
     }
 
     public Filer filer() {

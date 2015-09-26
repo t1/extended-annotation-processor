@@ -9,33 +9,36 @@ import java.lang.reflect.Method;
  * reference instance.
  */
 public class DummyProxy {
-    private static int nextId = 0;
+    private static final class DummyProxyInvocationHandler implements InvocationHandler {
+        private static int nextId = 0;
 
-    private static final InvocationHandler createHander(Class<?> type) {
-        return new InvocationHandler() {
-            private final int id = nextId++;
+        private final Class<?> type;
+        private final int id = nextId++;
 
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                if (method.getParameterTypes().length == 0 && "toString".equals(method.getName()))
-                    return toString();
-                if (method.getParameterTypes().length == 1 && "equals".equals(method.getName()))
-                    return args[0] == this;
-                if (method.getParameterTypes().length == 0 && "hashCode".equals(method.getName()))
-                    return id;
-                throw new UnsupportedOperationException(
-                        "invoked unsupported proxy method: " + method + " on type" + type);
-            }
+        private DummyProxyInvocationHandler(Class<?> type) {
+            this.type = type;
+        }
 
-            @Override
-            public String toString() {
-                return "DummyProxy#" + id + ":" + type.getSimpleName();
-            }
-        };
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (method.getParameterTypes().length == 0 && "toString".equals(method.getName()))
+                return toString();
+            if (method.getParameterTypes().length == 1 && "equals".equals(method.getName()))
+                return args[0] == this;
+            if (method.getParameterTypes().length == 0 && "hashCode".equals(method.getName()))
+                return id;
+            throw new UnsupportedOperationException("invoked unsupported proxy method: " + method + " on type" + type);
+        }
+
+        @Override
+        public String toString() {
+            return "DummyProxy#" + id + ":" + type.getSimpleName();
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T of(Class<T> type) {
-        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type }, createHander(type));
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
+                new DummyProxyInvocationHandler(type));
     }
 }

@@ -1,19 +1,34 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
-public class ReflectionType extends Type implements ReflectionMessageTarget {
+class ReflectionType extends Type {
+    private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
+
+    static ReflectionType type(java.lang.reflect.Type type) {
+        ReflectionType reflectionType = types.get(type);
+        if (reflectionType == null) {
+            reflectionType = new ReflectionType(ENV, type);
+            types.put(type, reflectionType);
+        }
+        return reflectionType;
+    }
+
     private final java.lang.reflect.Type type;
+    private List<Method> methods = null;
+    private List<Field> fields = null;
 
-    public ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
+    private ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
         super(env, DummyProxy.of(TypeElement.class));
         this.type = type;
     }
@@ -128,7 +143,7 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
     @Override
     public Type elementType() {
         if (isArray())
-            return new ReflectionType(env(), asClass().getComponentType());
+            return Type.of(asClass().getComponentType());
         return null;
     }
 
@@ -141,31 +156,40 @@ public class ReflectionType extends Type implements ReflectionMessageTarget {
 
     @Override
     public List<TypeParameter> getTypeParameters() {
-        char A = 'A'; // the real type parameter name is not available by reflection
+        char A = 'A'; // the real type parameter name is not available by reflection; assume <= 26 type params
         List<TypeParameter> list = new ArrayList<>();
         if (isParameterizedType())
             for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
-                list.add(new TypeParameter(Character.toString(A++), asList(new ReflectionType(env(), type))));
+                list.add(new TypeParameter(Character.toString(A++), asList(Type.of(type))));
         return list;
     }
 
     @Override
     public List<Method> getMethods() {
-        List<Method> methods = new ArrayList<>();
-        if (isClass())
-            for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
-                methods.add(new ReflectionMethod(env(), this, method));
+        if (methods == null) {
+            methods = new ArrayList<>();
+            if (isClass())
+                for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
+                    methods.add(new ReflectionMethod(env(), this, method));
+        }
         return methods;
     }
 
     @Override
     public List<Field> getFields() {
-        List<Field> fields = new ArrayList<>();
-        if (isClass())
-            for (java.lang.reflect.Field field : asClass().getDeclaredFields())
-                if (!Modifier.isStatic(field.getModifiers()))
-                    fields.add(new ReflectionField(env(), field));
+        if (fields == null) {
+            fields = new ArrayList<>();
+            if (isClass())
+                for (java.lang.reflect.Field field : asClass().getDeclaredFields())
+                    if (!Modifier.isStatic(field.getModifiers()))
+                        fields.add(new ReflectionField(env(), field));
+        }
         return fields;
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override

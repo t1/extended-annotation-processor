@@ -4,13 +4,11 @@ import static java.lang.annotation.RetentionPolicy.*;
 
 import java.lang.annotation.Retention;
 
-import com.github.t1.exap.reflection.ReflectionType;
-
 /**
  * An annotation processor can access the javadoc, so we could provide this for all types. But it also should be
- * possible to test your annotation processors with the {@link ReflectionType} and friends. So we don't provide an extra
- * api for javadoc, but simulate it with this annotation. Of course, this also allow you to use this annotation instead
- * of the 'real' javadoc... and it works even for parameters, which are not supported by the java compiler.
+ * possible to unit test your annotation processors using reflection. So we don't provide an extra api for javadoc, but
+ * simulate it with this annotation. Of course, this also allow you to use this annotation instead of the 'real'
+ * javadoc... and it works even for parameters, which are not supported by the java compiler.
  */
 @Retention(RUNTIME)
 public @interface JavaDoc {

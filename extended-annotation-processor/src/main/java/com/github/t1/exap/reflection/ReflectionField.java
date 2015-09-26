@@ -1,13 +1,16 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 
-public class ReflectionField extends Field implements ReflectionMessageTarget {
+class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
     public ReflectionField(ProcessingEnvironment env, java.lang.reflect.Field field) {
@@ -22,7 +25,7 @@ public class ReflectionField extends Field implements ReflectionMessageTarget {
 
     @Override
     public Type getType() {
-        return new ReflectionType(env(), field.getGenericType());
+        return Type.of(field.getGenericType());
     }
 
     @Override
@@ -60,6 +63,11 @@ public class ReflectionField extends Field implements ReflectionMessageTarget {
         for (Annotation annotation : field.getAnnotations())
             result.add(new ReflectionAnnotationType(annotation.annotationType()));
         return result;
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override

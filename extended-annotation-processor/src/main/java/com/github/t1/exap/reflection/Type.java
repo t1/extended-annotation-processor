@@ -18,23 +18,23 @@ public class Type extends Elemental {
         TypeKind kind = type.getKind();
         switch (kind) {
             case BOOLEAN:
-                return new ReflectionType(env, boolean.class);
+                return of(boolean.class);
             case BYTE:
-                return new ReflectionType(env, byte.class);
+                return of(byte.class);
             case CHAR:
-                return new ReflectionType(env, char.class);
+                return of(char.class);
             case DOUBLE:
-                return new ReflectionType(env, double.class);
+                return of(double.class);
             case FLOAT:
-                return new ReflectionType(env, float.class);
+                return of(float.class);
             case INT:
-                return new ReflectionType(env, int.class);
+                return of(int.class);
             case LONG:
-                return new ReflectionType(env, long.class);
+                return of(long.class);
             case SHORT:
-                return new ReflectionType(env, short.class);
+                return of(short.class);
             case VOID:
-                return new ReflectionType(env, void.class);
+                return of(void.class);
 
             case ARRAY:
             case DECLARED:
@@ -54,6 +54,10 @@ public class Type extends Elemental {
                 throw new RuntimeException("unexpected type kind: " + kind + ": " + type);
         }
         throw new UnsupportedOperationException("unsupported type kind: " + kind + ": " + type);
+    }
+
+    public static Type of(java.lang.reflect.Type type) {
+        return ReflectionType.type(type);
     }
 
     private final TypeElement type;

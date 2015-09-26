@@ -6,13 +6,14 @@ import static javax.tools.Diagnostic.Kind.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
+import javax.tools.Diagnostic;
 
 import com.github.t1.exap.JavaDoc;
 
-class Elemental {
+public class Elemental {
     private final ProcessingEnvironment processingEnv;
     private final Element element;
 
@@ -37,20 +38,28 @@ class Elemental {
         return processingEnv.getTypeUtils();
     }
 
-    public Messager messager() {
-        return processingEnv.getMessager();
+    public void error(CharSequence message) {
+        message(ERROR, message);
     }
 
-    public void error(CharSequence message) {
-        messager().printMessage(ERROR, message, getElement());
+    public void mandatoryWarning(CharSequence message) {
+        message(MANDATORY_WARNING, message);
     }
 
     public void warning(CharSequence message) {
-        messager().printMessage(WARNING, message, getElement());
+        message(WARNING, message);
     }
 
     public void note(CharSequence message) {
-        messager().printMessage(NOTE, message, getElement());
+        message(NOTE, message);
+    }
+
+    public void otherMessage(CharSequence message) {
+        message(OTHER, message);
+    }
+
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        processingEnv.getMessager().printMessage(kind, message, getElement());
     }
 
     public boolean isPublic() {

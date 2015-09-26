@@ -13,8 +13,6 @@ import org.junit.Test;
 import com.github.t1.exap.reflection.*;
 
 public class ReflectionTest {
-    ReflectionProcessingEnvironment env = new ReflectionProcessingEnvironment();
-
     @Retention(RUNTIME)
     public @interface A {
         String value();
@@ -36,7 +34,7 @@ public class ReflectionTest {
         }
     }
 
-    private final Type type = new ReflectionType(env, Pojo.class);
+    private final Type type = Type.of(Pojo.class);
 
     @Test
     public void shouldGetType() {
@@ -88,7 +86,7 @@ public class ReflectionTest {
         Method method0 = type.getMethod("method0");
         assertEquals("method0", method0.getName());
         assertEquals(type, method0.getContainerType());
-        assertEquals(new ReflectionType(env, void.class), method0.getReturnType());
+        assertEquals(Type.of(void.class), method0.getReturnType());
         assertEquals(0, method0.getParameters().size());
 
         assertTrue(method0.isAnnotated(A.class));
@@ -100,7 +98,7 @@ public class ReflectionTest {
         Method method1 = type.getMethod("method1");
         assertEquals("method1", method1.getName());
         assertEquals(type, method1.getContainerType());
-        assertEquals(new ReflectionType(env, String.class), method1.getReturnType());
+        assertEquals(Type.of(String.class), method1.getReturnType());
         List<Parameter> parameters = method1.getParameters();
 
         assertEquals(2, parameters.size());
@@ -108,12 +106,12 @@ public class ReflectionTest {
         Parameter parameter0 = parameters.get(0);
         assertEquals(method1, parameter0.getMethod());
         assertEquals("string", parameter0.getName());
-        assertEquals(new ReflectionType(env, String.class), parameter0.getType());
+        assertEquals(Type.of(String.class), parameter0.getType());
 
         Parameter parameter1 = parameters.get(1);
         assertEquals(method1, parameter1.getMethod());
         assertEquals("bool", parameter1.getName());
-        assertEquals(new ReflectionType(env, boolean.class), parameter1.getType());
+        assertEquals(Type.of(boolean.class), parameter1.getType());
 
         assertTrue(parameter1.isAnnotated(A.class));
         assertEquals(1, parameter1.getAnnotationTypes().size());
