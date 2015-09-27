@@ -2,8 +2,8 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
+import static java.util.Collections.*;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.ArrayList;
@@ -55,14 +55,15 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> annotationType) {
         if (!isClass())
             return null;
         return asClass().getAnnotation(annotationType);
     }
 
     @Override
-    public <T extends Annotation> String getAnnotationClassAttribute(Class<T> annotationType, String name) {
+    public <T extends java.lang.annotation.Annotation> String getAnnotationClassAttribute(Class<T> annotationType,
+            String name) {
         T annotation = getAnnotation(annotationType);
         try {
             java.lang.reflect.Method method = annotationType.getMethod(name);
@@ -77,6 +78,11 @@ class ReflectionType extends Type {
             throw new RuntimeException("while getting method " + name + " of annotation " + annotationType.getName(),
                     e);
         }
+    }
+
+    @Override
+    public List<Annotation> getAnnotations() {
+        return isClass() ? ReflectionAnnotation.allOn(asClass().getAnnotations()) : emptyList();
     }
 
     @Override

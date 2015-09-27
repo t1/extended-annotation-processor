@@ -2,7 +2,6 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -24,15 +23,12 @@ class ReflectionMethod extends Method {
     }
 
     @Override
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (Annotation annotation : method.getAnnotations())
-            result.add(new ReflectionAnnotationType(annotation.annotationType()));
-        return result;
+    public List<Annotation> getAnnotations() {
+        return ReflectionAnnotation.allOn(method.getAnnotations());
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
         return method.getAnnotation(type);
     }
 

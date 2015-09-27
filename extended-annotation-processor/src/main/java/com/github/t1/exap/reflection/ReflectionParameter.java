@@ -2,8 +2,7 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.List;
 
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
@@ -29,16 +28,13 @@ class ReflectionParameter extends Parameter {
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
         return parameter.getAnnotation(type);
     }
 
     @Override
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (Annotation annotation : parameter.getAnnotations())
-            result.add(new ReflectionAnnotationType(annotation.annotationType()));
-        return result;
+    public List<Annotation> getAnnotations() {
+        return ReflectionAnnotation.allOn(parameter.getAnnotations());
     }
 
     @Override

@@ -15,6 +15,11 @@ public class Method extends Elemental {
         this.method = method;
     }
 
+    @Override
+    protected ExecutableElement getElement() {
+        return method;
+    }
+
     public String getName() {
         return method.getSimpleName().toString();
     }

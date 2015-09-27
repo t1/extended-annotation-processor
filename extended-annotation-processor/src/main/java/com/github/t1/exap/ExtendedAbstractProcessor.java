@@ -47,8 +47,9 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
 
             return claimed;
         } catch (Exception e) {
+            String message = e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage()));
+            error("annotation processing round " + roundNumber + " failed: " + message);
             log.error("annotation processing round " + roundNumber + " failed", e);
-            error("annotation processing round " + roundNumber + " failed: " + e.getMessage());
             return true;
         }
     }

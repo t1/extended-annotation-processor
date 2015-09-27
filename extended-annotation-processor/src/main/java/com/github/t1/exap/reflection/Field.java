@@ -11,6 +11,11 @@ public class Field extends Elemental {
         this.field = field;
     }
 
+    @Override
+    protected VariableElement getElement() {
+        return field;
+    }
+
     public String getName() {
         return field.getSimpleName().toString();
     }

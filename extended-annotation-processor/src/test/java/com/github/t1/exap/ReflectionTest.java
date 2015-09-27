@@ -56,6 +56,21 @@ public class ReflectionTest {
         assertTrue(type.isPublic());
         assertTrue(type.isStatic());
         assertFalse(type.isTransient()); // doesn't make sense, but must work
+
+        assertTrue(type.isAnnotated(A.class));
+        assertEquals("ttt", type.getAnnotation(A.class).value());
+        assertEquals(2, type.getAnnotations().size());
+
+        Annotation a0 = type.getAnnotations().get(0);
+        assertEquals(A.class.getName(), a0.getAnnotationType().getQualifiedName());
+        assertEquals(1, a0.getElementValues().size());
+        assertEquals("ttt", a0.getElementValues().get("value"));
+
+        Annotation a1 = type.getAnnotations().get(1);
+        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getQualifiedName());
+        assertEquals(2, a1.getElementValues().size());
+        assertEquals("s", a1.getElementValues().get("summary"));
+        assertEquals("v", a1.getElementValues().get("value"));
     }
 
     @Test
@@ -68,10 +83,13 @@ public class ReflectionTest {
         assertEquals("string", stringField.getName());
         assertEquals("java.lang.String", stringField.getType().getQualifiedName());
         assertTrue(stringField.isAnnotated(A.class));
-        assertEquals(1, stringField.getAnnotationTypes().size());
-        AnnotationType annotation = stringField.getAnnotationTypes().get(0);
-        assertNull(annotation.getAnnotation(A.class));
         assertEquals("fff", stringField.getAnnotation(A.class).value());
+        assertEquals(1, stringField.getAnnotations().size());
+
+        Annotation a0 = stringField.getAnnotations().get(0);
+        assertEquals(A.class.getName(), a0.getAnnotationType().getQualifiedName());
+        assertEquals(1, a0.getElementValues().size());
+        assertEquals("fff", a0.getElementValues().get("value"));
 
         assertFalse(stringField.isPublic());
         assertFalse(stringField.isStatic());
@@ -82,7 +100,7 @@ public class ReflectionTest {
         assertEquals("boolean", boolField.getType().getQualifiedName());
         assertFalse(boolField.isAnnotated(A.class));
         assertNull(boolField.getAnnotation(A.class));
-        assertEquals(0, boolField.getAnnotationTypes().size());
+        assertEquals(0, boolField.getAnnotations().size());
     }
 
     @Test
@@ -102,10 +120,13 @@ public class ReflectionTest {
         assertFalse(method0.isTransient());
 
         assertTrue(method0.isAnnotated(A.class));
-        assertEquals(1, method0.getAnnotationTypes().size());
-        AnnotationType annotation = method0.getAnnotationTypes().get(0);
-        assertNull(annotation.getAnnotation(A.class));
         assertEquals("mmm", method0.getAnnotation(A.class).value());
+        assertEquals(1, method0.getAnnotations().size());
+
+        Annotation a0 = method0.getAnnotations().get(0);
+        assertEquals(A.class.getName(), a0.getAnnotationType().getQualifiedName());
+        assertEquals(1, a0.getElementValues().size());
+        assertEquals("mmm", a0.getElementValues().get("value"));
 
         Method method1 = type.getMethod("method1");
         assertEquals("method1", method1.getName());
@@ -126,10 +147,13 @@ public class ReflectionTest {
         assertEquals(Type.of(boolean.class), parameter1.getType());
 
         assertTrue(parameter1.isAnnotated(A.class));
-        assertEquals(1, parameter1.getAnnotationTypes().size());
-        AnnotationType parameterAnnotationType = parameter1.getAnnotationTypes().get(0);
-        assertNull(parameterAnnotationType.getAnnotation(A.class));
         assertEquals("ppp", parameter1.getAnnotation(A.class).value());
+        assertEquals(1, parameter1.getAnnotations().size());
+
+        Annotation p1a0 = parameter1.getAnnotations().get(0);
+        assertEquals(A.class.getName(), p1a0.getAnnotationType().getQualifiedName());
+        assertEquals(1, p1a0.getElementValues().size());
+        assertEquals("ppp", p1a0.getElementValues().get("value"));
     }
 
     @Test

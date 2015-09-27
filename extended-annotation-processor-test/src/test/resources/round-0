@@ -2,17 +2,92 @@
 [
     {
         "type":"somepackage.Primitves",
-        "javadoc":{
-            "summary":"javadoc summary",
-            "value":"javadoc summary. second sentence."
-        },
-        "fields":[
-            "string",
-            "bool"
+        "simpleName":"Primitves",
+        "void":false,
+        "boolean":false,
+        "number":false,
+        "integer":false,
+        "decimal":false,
+        "string":false,
+        "enum":false,
+        "enumValues":[
         ],
+        "array":false,
+        "elementType":null,
+        "typeParameters":[
+            {
+                "name":"T",
+                "bounds":"[Type:java.lang.Number]"
+            }
+        ],
+        "public":true,
+        "static":false,
+        "transient":false,
+        "annotations":{
+            "A":{
+                "value":"ppp"
+            },
+            "MarkerAnnotation":{
+            },
+            "SuppressWarnings":{
+                "value":"\"unused\""
+            }
+        },
+        "fields":{
+            "string":{
+                "type":"java.lang.String",
+                "public":false,
+                "static":false,
+                "transient":false,
+                "annotations":{
+                    "A":{
+                        "value":"fff"
+                    }
+                }
+            },
+            "bool":{
+                "type":"boolean",
+                "public":false,
+                "static":false,
+                "transient":false,
+                "annotations":{
+                }
+            }
+        },
         "methods":[
-            "method0",
-            "method1"
+            {
+                "name":"method0",
+                "containerType":"Type:somepackage.Primitves",
+                "returnType":"ReflectionType:void",
+                "parameters":[
+                ],
+                "annotations":{
+                    "A":{
+                        "value":"mmm"
+                    }
+                }
+            },
+            {
+                "name":"method1",
+                "containerType":"Type:somepackage.Primitves",
+                "returnType":"Type:java.lang.String",
+                "parameters":[
+                    {
+                        "name":"method1",
+                        "method":"method1",
+                        "name":"string",
+                        "type":"java.lang.String"
+                    },
+                    {
+                        "name":"method1",
+                        "method":"method1",
+                        "name":"bool",
+                        "type":"boolean"
+                    }
+                ],
+                "annotations":{
+                }
+            }
         ]
     }
 ]

@@ -2,8 +2,7 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
@@ -33,21 +32,18 @@ class ReflectionField extends Field {
     }
 
     @Override
-    public <T extends Annotation> boolean isAnnotated(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> boolean isAnnotated(Class<T> type) {
         return field.isAnnotationPresent(type);
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
         return field.getAnnotation(type);
     }
 
     @Override
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (Annotation annotation : field.getAnnotations())
-            result.add(new ReflectionAnnotationType(annotation.annotationType()));
-        return result;
+    public List<Annotation> getAnnotations() {
+        return ReflectionAnnotation.allOn(field.getAnnotations());
     }
 
     @Override

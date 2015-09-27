@@ -3,7 +3,6 @@ package com.github.t1.exap.reflection;
 import static javax.lang.model.element.Modifier.*;
 import static javax.tools.Diagnostic.Kind.*;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -26,7 +25,7 @@ public class Elemental {
         return processingEnv;
     }
 
-    public Element getElement() {
+    protected Element getElement() {
         return element;
     }
 
@@ -78,23 +77,21 @@ public class Elemental {
         return getElement().getModifiers().contains(modifier);
     }
 
-    public <T extends Annotation> boolean isAnnotated(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> boolean isAnnotated(Class<T> type) {
         return getAnnotation(type) != null;
     }
 
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
         T annotation = this.getElement().getAnnotation(type);
         if (annotation == null && JavaDoc.class.equals(type) && docComment() != null)
             return type.cast(javaDoc());
         return annotation;
     }
 
-    public List<AnnotationType> getAnnotationTypes() {
-        List<AnnotationType> result = new ArrayList<>();
-        for (AnnotationMirror mirror : getElement().getAnnotationMirrors()) {
-            TypeElement annotation = (TypeElement) mirror.getAnnotationType().asElement();
-            result.add(new AnnotationType(annotation));
-        }
+    public List<Annotation> getAnnotations() {
+        List<Annotation> result = new ArrayList<>();
+        for (AnnotationMirror mirror : getElement().getAnnotationMirrors())
+            result.add(Annotation.of(mirror, env()));
         return result;
     }
 
@@ -110,7 +107,7 @@ public class Elemental {
             private final int firstSentence = docComment.indexOf('.');
 
             @Override
-            public Class<? extends Annotation> annotationType() {
+            public Class<? extends java.lang.annotation.Annotation> annotationType() {
                 return JavaDoc.class;
             }
 
@@ -138,7 +135,8 @@ public class Elemental {
      * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">
      *      this blog </a>
      */
-    public <T extends Annotation> String getAnnotationClassAttribute(Class<T> annotationType, String name) {
+    public <T extends java.lang.annotation.Annotation> String getAnnotationClassAttribute(Class<T> annotationType,
+            String name) {
         for (AnnotationMirror annotationMirror : elements().getAllAnnotationMirrors(element))
             if (annotationType.getName().contentEquals(annotationMirror.getAnnotationType().toString()))
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> annotationProperty //

@@ -67,6 +67,11 @@ public class Type extends Elemental {
         this.type = Objects.requireNonNull(type, "type");
     }
 
+    @Override
+    protected TypeElement getElement() {
+        return type;
+    }
+
     private TypeKind typeKind() {
         return type.asType().getKind();
     }
