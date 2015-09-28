@@ -11,7 +11,7 @@
 
     <artifactId>extended-annotation-processor-test</artifactId>
 
-    <name>exap - Extended Annotation Processor Test</name>
+    <name>ExAP - Extended Annotation Processor Test</name>
 
     <build>
         <plugins>

@@ -18,19 +18,6 @@ import org.slf4j.*;
 public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     private static final Logger log = LoggerFactory.getLogger(ExtendedAbstractProcessor.class);
 
-    private ProcessingEnvironment env;
-
-    /**
-     * This is the poor man's constructor that the designers of the annotation processor API chose, so they can rely on
-     * a no-arg constructor and then call this method. It would have been more conventional to simply have a constructor
-     * with the env argument.
-     */
-    @Override
-    public synchronized void init(ProcessingEnvironment env) {
-        this.env = env;
-        super.init(env);
-    }
-
     private int roundNumber = -1;
 
     /** use {@link #process(Round)} */
@@ -41,7 +28,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         log.debug("begin round {} (final = {}) of {}", +roundNumber, roundEnv.processingOver(), name());
 
         try {
-            boolean claimed = process(new Round(env, roundEnv, roundNumber));
+            boolean claimed = process(new Round(processingEnv, roundEnv, roundNumber));
 
             log.debug("end round {} of {}", roundNumber, name());
 
@@ -74,7 +61,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     }
 
     private Messager messager() {
-        return env.getMessager();
+        return processingEnv.getMessager();
     }
 
     public void error(CharSequence message) {
@@ -98,18 +85,18 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     }
 
     public Filer filer() {
-        return env.getFiler();
+        return processingEnv.getFiler();
     }
 
     public String getDocComment(Element e) {
-        return env.getElementUtils().getDocComment(e);
+        return processingEnv.getElementUtils().getDocComment(e);
     }
 
     public List<? extends Element> getAllMembers(TypeElement type) {
-        return env.getElementUtils().getAllMembers(type);
+        return processingEnv.getElementUtils().getAllMembers(type);
     }
 
     public void printElements(Writer writer, Element... elements) {
-        env.getElementUtils().printElements(writer, elements);
+        processingEnv.getElementUtils().printElements(writer, elements);
     }
 }

@@ -5,8 +5,8 @@
     <artifactId>extended-annotation-processor-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>exap - Extended Annotation Processor Parent</name>
-    <description>Extention for the Java Annotation Processor</description>
+    <name>ExAP - Extended Annotation Processor Parent</name>
+    <description>Makes the Java Annotation Processor easier to use</description>
     <url>https://github.com/t1/extended-annotation-processor</url>
     <packaging>pom</packaging>
 
