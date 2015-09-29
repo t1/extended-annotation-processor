@@ -9,11 +9,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
-import org.slf4j.*;
-
 public class Type extends Elemental {
-    private static final Logger log = LoggerFactory.getLogger(Type.class);
-
     public static Type of(TypeMirror type, ProcessingEnvironment env) {
         TypeKind kind = type.getKind();
         switch (kind) {
@@ -62,7 +58,7 @@ public class Type extends Elemental {
 
     private final TypeElement type;
 
-    public Type(ProcessingEnvironment processingEnv, TypeElement type) {
+    protected Type(ProcessingEnvironment processingEnv, TypeElement type) {
         super(processingEnv, type);
         this.type = Objects.requireNonNull(type, "type");
     }
@@ -166,16 +162,20 @@ public class Type extends Elemental {
         return null;
     }
 
+    public List<Type> getTypeArguments() {
+        List<Type> result = new ArrayList<>();
+        if (type.asType() instanceof DeclaredType)
+            for (TypeMirror typeMirror : ((DeclaredType) type.asType()).getTypeArguments())
+                result.add(Type.of(typeMirror, env()));
+        return result;
+    }
+
     public List<TypeParameter> getTypeParameters() {
-        log.debug("type parameters of {}", type);
         List<TypeParameter> result = new ArrayList<>();
         for (TypeParameterElement parameterElement : type.getTypeParameters()) {
-            log.debug("    type parameter: {} generic: {}", parameterElement.getSimpleName(),
-                    parameterElement.getGenericElement());
             List<Type> bounds = new ArrayList<>();
             for (TypeMirror bound : parameterElement.getBounds())
                 bounds.add(Type.of(bound, env()));
-            log.debug("    bounds: {}", bounds);
             result.add(new TypeParameter(parameterElement.getSimpleName().toString(), bounds));
         }
         return result;

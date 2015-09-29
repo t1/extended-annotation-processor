@@ -1,13 +1,16 @@
 package somepackage;
 
+import java.util.Map;
+
 /** javadoc summary. second sentence. */
 @A("ppp")
 @MarkerAnnotation
 @SuppressWarnings("unused") // retention SOURCE
-public class Primitves<T extends Number> {
+public class AnnotatedClass<T extends Number> {
     @A("fff")
     String string;
     boolean bool;
+    Map<String, Number> map;
 
     @A("mmm")
     public void method0() {}

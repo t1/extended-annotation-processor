@@ -2,8 +2,13 @@ package com.github.t1.exap.reflection;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+
+import org.slf4j.*;
 
 public class Field extends Elemental {
+    private static final Logger log = LoggerFactory.getLogger(Field.class);
+
     private final VariableElement field;
 
     public Field(ProcessingEnvironment processingEnv, VariableElement field) {
@@ -21,6 +26,8 @@ public class Field extends Elemental {
     }
 
     public Type getType() {
+        if (field.asType() instanceof DeclaredType)
+            log.debug("########### {} : {}", ((DeclaredType) field.asType()).getTypeArguments(), field.asType());
         try {
             return Type.of(field.asType(), env());
         } catch (RuntimeException e) {

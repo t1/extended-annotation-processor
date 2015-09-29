@@ -1,12 +1,10 @@
 package com.github.t1.exap;
 
-import static javax.lang.model.element.ElementKind.*;
-
 import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.*;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
 
 import com.github.t1.exap.reflection.Type;
 
@@ -24,8 +22,7 @@ public class Round {
     public List<Type> typesAnnotatedWith(Class<? extends Annotation> type) {
         List<Type> result = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(type))
-            if (element.getKind() == CLASS)
-                result.add(new Type(processingEnv, (TypeElement) element));
+            result.add(Type.of(element.asType(), processingEnv));
         return result;
     }
 

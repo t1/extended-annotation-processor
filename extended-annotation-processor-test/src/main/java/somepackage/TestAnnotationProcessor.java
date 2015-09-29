@@ -28,7 +28,6 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         try (JsonGenerator json = createJsonGenerator(fileObject.openWriter())) {
             json.writeStartArray();
             for (Type type : round.typesAnnotatedWith(MarkerAnnotation.class)) {
-                log.info("process {}", type);
                 type.warning("marked warning in round-" + round.number());
                 json.writeStartObject();
                 writeType(json, type);
@@ -49,6 +48,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void writeType(JsonGenerator json, Type type) {
+        log.debug("write type {}", type.getQualifiedName());
         json.write("type", type.getQualifiedName());
         json.write("simpleName", type.getSimpleName());
         json.write("void", type.isVoid());
@@ -68,20 +68,70 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             json.writeNull("elementType");
         else
             json.write("elementType", type.elementType().getQualifiedName());
-
-        json.writeStartArray("typeParameters");
-        for (TypeParameter typeParameter : type.getTypeParameters()) {
-            json.writeStartObject();
-            json.write("name", typeParameter.getName());
-            json.write("bounds", typeParameter.getBounds().toString());
-            json.writeEnd();
-        }
-        json.writeEnd();
+        writeTypeParameters(json, type);
         json.write("public", type.isPublic());
         json.write("static", type.isStatic());
         json.write("transient", type.isTransient());
 
         writeAnnotations(json, type);
+    }
+
+    private void writeFields(JsonGenerator json, Type type) {
+        json.writeStartObject("fields");
+        for (Field field : type.getFields()) {
+            log.debug("write field {}", field.getName());
+            json.writeStartObject(field.getName());
+            json.write("type", field.getType().getQualifiedName());
+            writeTypeParameters(json, field.getType());
+            writeTypeArguments(json, field.getType());
+            json.write("public", field.isPublic());
+            json.write("static", field.isStatic());
+            json.write("transient", field.isTransient());
+            writeAnnotations(json, field);
+            json.writeEnd();
+        }
+        json.writeEnd();
+    }
+
+    private void writeMethods(JsonGenerator json, Type type) {
+        json.writeStartArray("methods");
+        for (Method method : type.getMethods()) {
+            log.debug("write method {}", method.getName());
+            json.writeStartObject();
+            json.write("name", method.getName());
+            json.write("containerType", method.getContainerType().toString());
+            json.write("returnType", method.getReturnType().toString());
+            writeTypeParameters(json, method.getReturnType());
+    
+            json.writeStartArray("parameters");
+            for (Parameter parameter : method.getParameters()) {
+                json.writeStartObject();
+                json.write("name", method.getName());
+                json.write("method", parameter.getMethod().getName());
+                json.write("name", parameter.getName());
+                json.write("type", parameter.getType().getQualifiedName());
+                json.writeEnd();
+            }
+            json.writeEnd();
+    
+            writeAnnotations(json, method);
+            json.writeEnd();
+        }
+        json.writeEnd();
+    }
+
+    private void writeTypeParameters(JsonGenerator json, Type type) {
+        json.writeStartObject("typeParameters");
+        for (TypeParameter typeParameter : type.getTypeParameters())
+            json.write(typeParameter.getName(), typeParameter.getBoundsString());
+        json.writeEnd();
+    }
+
+    private void writeTypeArguments(JsonGenerator json, Type type) {
+        json.writeStartArray("typeArguments");
+        for (Type typeArgument : type.getTypeArguments())
+            json.write(typeArgument.getQualifiedName());
+        json.writeEnd();
     }
 
     private void writeAnnotations(JsonGenerator json, Elemental type) {
@@ -98,45 +148,6 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             json.writeEnd();
         }
 
-        json.writeEnd();
-    }
-
-    private void writeFields(JsonGenerator json, Type type) {
-        json.writeStartObject("fields");
-        for (Field field : type.getFields()) {
-            json.writeStartObject(field.getName());
-            json.write("type", field.getType().getQualifiedName());
-            json.write("public", field.isPublic());
-            json.write("static", field.isStatic());
-            json.write("transient", field.isTransient());
-            writeAnnotations(json, field);
-            json.writeEnd();
-        }
-        json.writeEnd();
-    }
-
-    private void writeMethods(JsonGenerator json, Type type) {
-        json.writeStartArray("methods");
-        for (Method method : type.getMethods()) {
-            json.writeStartObject();
-            json.write("name", method.getName());
-            json.write("containerType", method.getContainerType().toString());
-            json.write("returnType", method.getReturnType().toString());
-
-            json.writeStartArray("parameters");
-            for (Parameter parameter : method.getParameters()) {
-                json.writeStartObject();
-                json.write("name", method.getName());
-                json.write("method", parameter.getMethod().getName());
-                json.write("name", parameter.getName());
-                json.write("type", parameter.getType().getQualifiedName());
-                json.writeEnd();
-            }
-            json.writeEnd();
-
-            writeAnnotations(json, method);
-            json.writeEnd();
-        }
         json.writeEnd();
     }
 }

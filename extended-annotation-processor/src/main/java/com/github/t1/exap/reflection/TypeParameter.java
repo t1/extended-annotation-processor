@@ -23,4 +23,14 @@ public class TypeParameter {
     public String toString() {
         return "<" + name + ": " + bounds + ">";
     }
+
+    public String getBoundsString() {
+        StringBuilder out = new StringBuilder();
+        for (Type bound : bounds) {
+            if (out.length() > 0)
+                out.append(", ");
+            out.append(bound.getQualifiedName());
+        }
+        return out.toString();
+    }
 }

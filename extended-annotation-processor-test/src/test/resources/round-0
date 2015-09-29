@@ -1,8 +1,8 @@
 
 [
     {
-        "type":"somepackage.Primitves",
-        "simpleName":"Primitves",
+        "type":"somepackage.AnnotatedClass",
+        "simpleName":"AnnotatedClass",
         "void":false,
         "boolean":false,
         "number":false,
@@ -14,12 +14,9 @@
         ],
         "array":false,
         "elementType":null,
-        "typeParameters":[
-            {
-                "name":"T",
-                "bounds":"[Type:java.lang.Number]"
-            }
-        ],
+        "typeParameters":{
+            "T":"java.lang.Number"
+        },
         "public":true,
         "static":false,
         "transient":false,
@@ -36,6 +33,10 @@
         "fields":{
             "string":{
                 "type":"java.lang.String",
+                "typeParameters":{
+                },
+                "typeArguments":[
+                ],
                 "public":false,
                 "static":false,
                 "transient":false,
@@ -47,6 +48,26 @@
             },
             "bool":{
                 "type":"boolean",
+                "typeParameters":{
+                },
+                "typeArguments":[
+                ],
+                "public":false,
+                "static":false,
+                "transient":false,
+                "annotations":{
+                }
+            },
+            "map":{
+                "type":"java.util.Map",
+                "typeParameters":{
+                    "K":"java.lang.Object",
+                    "V":"java.lang.Object"
+                },
+                "typeArguments":[
+                    "java.lang.String",
+                    "java.lang.Number"
+                ],
                 "public":false,
                 "static":false,
                 "transient":false,
@@ -57,8 +78,10 @@
         "methods":[
             {
                 "name":"method0",
-                "containerType":"Type:somepackage.Primitves",
+                "containerType":"Type:somepackage.AnnotatedClass",
                 "returnType":"ReflectionType:void",
+                "typeParameters":{
+                },
                 "parameters":[
                 ],
                 "annotations":{
@@ -69,8 +92,10 @@
             },
             {
                 "name":"method1",
-                "containerType":"Type:somepackage.Primitves",
+                "containerType":"Type:somepackage.AnnotatedClass",
                 "returnType":"Type:java.lang.String",
+                "typeParameters":{
+                },
                 "parameters":[
                     {
                         "name":"method1",
