@@ -4,6 +4,7 @@ import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.ArrayList;
@@ -55,34 +56,20 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> annotationType) {
+    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
         if (!isClass())
             return null;
         return asClass().getAnnotation(annotationType);
     }
 
     @Override
-    public <T extends java.lang.annotation.Annotation> String getAnnotationClassAttribute(Class<T> annotationType,
-            String name) {
-        T annotation = getAnnotation(annotationType);
-        try {
-            java.lang.reflect.Method method = annotationType.getMethod(name);
-            Object value = method.invoke(annotation);
-            if (value == null)
-                return null;
-            if (!(value instanceof Class))
-                throw new RuntimeException("method " + name + " of annotation " + annotationType.getName()
-                        + " does not return a class object");
-            return ((Class<?>) value).getName();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("while getting method " + name + " of annotation " + annotationType.getName(),
-                    e);
-        }
+    public List<AnnotationWrapper> getAnnotationWrappers() {
+        return isClass() ? ReflectionAnnotationWrapper.allOn(asClass()) : emptyList();
     }
 
     @Override
-    public List<Annotation> getAnnotations() {
-        return isClass() ? ReflectionAnnotation.allOn(asClass().getAnnotations()) : emptyList();
+    public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
+        return isClass() ? ReflectionAnnotationWrapper.ofTypeOn(asClass(), type) : emptyList();
     }
 
     @Override
@@ -176,7 +163,7 @@ class ReflectionType extends Type {
             methods = new ArrayList<>();
             if (isClass())
                 for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
-                    methods.add(new ReflectionMethod(env(), this, method));
+                    methods.add(new ReflectionMethod(this, method));
         }
         return methods;
     }
@@ -187,7 +174,7 @@ class ReflectionType extends Type {
             fields = new ArrayList<>();
             if (isClass())
                 for (java.lang.reflect.Field field : asClass().getDeclaredFields())
-                    fields.add(new ReflectionField(env(), field));
+                    fields.add(new ReflectionField(field));
         }
         return fields;
     }

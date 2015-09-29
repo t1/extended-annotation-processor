@@ -3,9 +3,11 @@ package com.github.t1.exap.reflection;
 import static javax.lang.model.element.Modifier.*;
 import static javax.tools.Diagnostic.Kind.*;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic;
@@ -14,19 +16,19 @@ import com.github.t1.exap.JavaDoc;
 
 public class Elemental {
     private final ProcessingEnvironment processingEnv;
-    private final Element element;
+    private final AnnotatedConstruct element;
 
-    public Elemental(ProcessingEnvironment processingEnv, Element element) {
+    public Elemental(ProcessingEnvironment processingEnv, AnnotatedConstruct element) {
         this.processingEnv = processingEnv;
         this.element = element;
     }
 
-    public ProcessingEnvironment env() {
+    protected ProcessingEnvironment env() {
         return processingEnv;
     }
 
     protected Element getElement() {
-        return element;
+        return (Element) element;
     }
 
     protected Elements elements() {
@@ -77,22 +79,49 @@ public class Elemental {
         return getElement().getModifiers().contains(modifier);
     }
 
-    public <T extends java.lang.annotation.Annotation> boolean isAnnotated(Class<T> type) {
+    public <T extends Annotation> boolean isAnnotated(Class<T> type) {
         return getAnnotation(type) != null;
     }
 
-    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
+    public <T extends Annotation> T getAnnotation(Class<T> type) {
         T annotation = this.getElement().getAnnotation(type);
         if (annotation == null && JavaDoc.class.equals(type) && docComment() != null)
             return type.cast(javaDoc());
         return annotation;
     }
 
-    public List<Annotation> getAnnotations() {
-        List<Annotation> result = new ArrayList<>();
+    public List<AnnotationWrapper> getAnnotationWrappers() {
+        List<AnnotationWrapper> result = new ArrayList<>();
         for (AnnotationMirror mirror : getElement().getAnnotationMirrors())
-            result.add(Annotation.of(mirror, env()));
+            result.addAll(AnnotationWrapper.allOn(mirror, processingEnv));
         return result;
+    }
+
+    public <T extends Annotation> AnnotationWrapper getAnnotationWrapper(Class<T> type) {
+        List<AnnotationWrapper> result = getAnnotationWrappers(type);
+        if (result.size() == 0)
+            return null;
+        if (result.size() > 1)
+            throw new IllegalArgumentException(
+                    "Found " + result.size() + " annotations of type " + type.getName() + " when expecting only one");
+        return result.get(0);
+    }
+
+    public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
+        List<AnnotationWrapper> result = new ArrayList<>();
+        for (AnnotationMirror annotationMirror : getAnnotationMirrors())
+            if (equals(type, annotationMirror))
+                result.addAll(AnnotationWrapper.allOn(annotationMirror, processingEnv));
+        return result;
+    }
+
+    private List<? extends AnnotationMirror> getAnnotationMirrors() {
+        return (element instanceof Element) ? elements().getAllAnnotationMirrors((Element) element)
+                : element.getAnnotationMirrors();
+    }
+
+    private <T extends Annotation> boolean equals(Class<T> type, AnnotationMirror annotationMirror) {
+        return annotationMirror.getAnnotationType().toString().equals(type.getName());
     }
 
     private String docComment() {
@@ -107,7 +136,7 @@ public class Elemental {
             private final int firstSentence = docComment.indexOf('.');
 
             @Override
-            public Class<? extends java.lang.annotation.Annotation> annotationType() {
+            public Class<? extends Annotation> annotationType() {
                 return JavaDoc.class;
             }
 
@@ -121,32 +150,5 @@ public class Elemental {
                 return docComment.trim();
             }
         };
-    }
-
-    /**
-     * We can't extract annotation values of type class in an annotation processor, as the class object generally is not
-     * loaded, only the meta data as represented in the TypeMirrors. You'd get a
-     * {@link javax.lang.model.type.MirroredTypeException} with the message: Attempt to access Class object for
-     * TypeMirror.
-     * <p>
-     * This method returns the <b>fully qualified class name</b> of the annotation 'method' instead; or
-     * <code>null</code>, if there is no such 'method' on the annotation.
-     * 
-     * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">
-     *      this blog </a>
-     */
-    public <T extends java.lang.annotation.Annotation> String getAnnotationClassAttribute(Class<T> annotationType,
-            String name) {
-        for (AnnotationMirror annotationMirror : elements().getAllAnnotationMirrors(element))
-            if (annotationType.getName().contentEquals(annotationMirror.getAnnotationType().toString()))
-                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> annotationProperty //
-                : elements().getElementValuesWithDefaults(annotationMirror).entrySet())
-                    if (annotationProperty.getKey().getSimpleName().contentEquals(name)) {
-                        String className = annotationProperty.getValue().toString();
-                        if (className.endsWith(".class"))
-                            className = className.substring(0, className.length() - 6);
-                        return className;
-                    }
-        return null;
     }
 }

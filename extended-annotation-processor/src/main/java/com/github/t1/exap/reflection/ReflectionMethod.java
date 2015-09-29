@@ -2,9 +2,9 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
@@ -12,8 +12,8 @@ class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;
     private List<Parameter> parameters;
 
-    public ReflectionMethod(ProcessingEnvironment processingEnv, Type type, java.lang.reflect.Method method) {
-        super(processingEnv, type, DummyProxy.of(ExecutableElement.class));
+    public ReflectionMethod(Type type, java.lang.reflect.Method method) {
+        super(ENV, type, DummyProxy.of(ExecutableElement.class));
         this.method = method;
     }
 
@@ -23,13 +23,18 @@ class ReflectionMethod extends Method {
     }
 
     @Override
-    public List<Annotation> getAnnotations() {
-        return ReflectionAnnotation.allOn(method.getAnnotations());
+    public List<AnnotationWrapper> getAnnotationWrappers() {
+        return ReflectionAnnotationWrapper.allOn(method);
     }
 
     @Override
-    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
+    public <T extends Annotation> T getAnnotation(Class<T> type) {
         return method.getAnnotation(type);
+    }
+
+    @Override
+    public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
+        return ReflectionAnnotationWrapper.ofTypeOn(method, type);
     }
 
     @Override

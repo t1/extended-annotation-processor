@@ -2,10 +2,9 @@ package somepackage;
 
 import static java.lang.annotation.RetentionPolicy.*;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Retention;
 
-@Repeatable(AA.class)
 @Retention(RUNTIME)
-public @interface A {
-    String value();
+public @interface AA {
+    A[]value();
 }

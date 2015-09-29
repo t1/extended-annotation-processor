@@ -76,6 +76,23 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         writeAnnotations(json, type);
     }
 
+    private void writeAnnotations(JsonGenerator json, Elemental type) {
+        json.writeStartObject("annotations");
+
+        for (AnnotationWrapper annotation : type.getAnnotationWrappers()) {
+            json.writeStartObject(annotation.getAnnotationType().getSimpleName());
+            for (Map.Entry<String, Object> value : annotation.getElementValues().entrySet()) {
+                if (value.getValue() == null)
+                    json.writeNull(value.getKey());
+                else
+                    json.write(value.getKey(), value.getValue().toString());
+            }
+            json.writeEnd();
+        }
+
+        json.writeEnd();
+    }
+
     private void writeFields(JsonGenerator json, Type type) {
         json.writeStartObject("fields");
         for (Field field : type.getFields()) {
@@ -102,7 +119,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             json.write("containerType", method.getContainerType().toString());
             json.write("returnType", method.getReturnType().toString());
             writeTypeParameters(json, method.getReturnType());
-    
+
             json.writeStartArray("parameters");
             for (Parameter parameter : method.getParameters()) {
                 json.writeStartObject();
@@ -113,7 +130,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
                 json.writeEnd();
             }
             json.writeEnd();
-    
+
             writeAnnotations(json, method);
             json.writeEnd();
         }
@@ -131,23 +148,6 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         json.writeStartArray("typeArguments");
         for (Type typeArgument : type.getTypeArguments())
             json.write(typeArgument.getQualifiedName());
-        json.writeEnd();
-    }
-
-    private void writeAnnotations(JsonGenerator json, Elemental type) {
-        json.writeStartObject("annotations");
-
-        for (Annotation annotation : type.getAnnotations()) {
-            json.writeStartObject(annotation.getAnnotationType().getSimpleName());
-            for (Map.Entry<String, Object> value : annotation.getElementValues().entrySet()) {
-                if (value.getValue() == null)
-                    json.writeNull(value.getKey());
-                else
-                    json.write(value.getKey(), value.getValue().toString());
-            }
-            json.writeEnd();
-        }
-
         json.writeEnd();
     }
 }

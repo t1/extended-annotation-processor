@@ -20,16 +20,19 @@
         "public":true,
         "static":false,
         "transient":false,
-        "annotations":{
-            "A":{
+        "annotations":[
+            {
+                "name":"A",
                 "value":"ppp"
             },
-            "MarkerAnnotation":{
+            {
+                "name":"MarkerAnnotation"
             },
-            "SuppressWarnings":{
+            {
+                "name":"SuppressWarnings",
                 "value":"\"unused\""
             }
-        },
+        ],
         "fields":{
             "string":{
                 "type":"java.lang.String",
@@ -40,11 +43,12 @@
                 "public":false,
                 "static":false,
                 "transient":false,
-                "annotations":{
-                    "A":{
+                "annotations":[
+                    {
+                        "name":"A",
                         "value":"fff"
                     }
-                }
+                ]
             },
             "bool":{
                 "type":"boolean",
@@ -71,8 +75,8 @@
                 "public":false,
                 "static":false,
                 "transient":false,
-                "annotations":{
-                }
+                "annotations":[
+                ]
             }
         },
         "methods":[
@@ -84,11 +88,16 @@
                 },
                 "parameters":[
                 ],
-                "annotations":{
-                    "A":{
+                "annotations":[
+                    {
+                        "name":"A",
                         "value":"mmm"
+                    },
+                    {
+                        "name":"A",
+                        "value":"nnn"
                     }
-                }
+                ]
             },
             {
                 "name":"method1",
@@ -110,8 +119,8 @@
                         "type":"boolean"
                     }
                 ],
-                "annotations":{
-                }
+                "annotations":[
+                ]
             }
         ]
     }
