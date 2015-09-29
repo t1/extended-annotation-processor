@@ -87,7 +87,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     private void writeAnnotations(JsonGenerator json, Elemental type) {
         json.writeStartObject("annotations");
 
-        for (Annotation annotation : type.getAnnotations()) {
+        for (AnnotationWrapper annotation : type.getAnnotationWrappers()) {
             json.writeStartObject(annotation.getAnnotationType().getSimpleName());
             for (Map.Entry<String, Object> value : annotation.getElementValues().entrySet()) {
                 if (value.getValue() == null)

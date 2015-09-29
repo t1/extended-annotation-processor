@@ -10,6 +10,7 @@ public class Primitves<T extends Number> {
     boolean bool;
 
     @A("mmm")
+    @A("nnn")
     public void method0() {}
 
     public String method1(String string, @A("ppp") boolean bool) {

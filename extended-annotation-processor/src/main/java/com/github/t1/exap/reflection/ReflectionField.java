@@ -2,17 +2,17 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
 class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
-    public ReflectionField(ProcessingEnvironment env, java.lang.reflect.Field field) {
-        super(env, DummyProxy.of(VariableElement.class));
+    public ReflectionField(java.lang.reflect.Field field) {
+        super(ENV, DummyProxy.of(VariableElement.class));
         this.field = field;
     }
 
@@ -32,18 +32,18 @@ class ReflectionField extends Field {
     }
 
     @Override
-    public <T extends java.lang.annotation.Annotation> boolean isAnnotated(Class<T> type) {
-        return field.isAnnotationPresent(type);
-    }
-
-    @Override
-    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> type) {
+    public <T extends Annotation> T getAnnotation(Class<T> type) {
         return field.getAnnotation(type);
     }
 
     @Override
-    public List<Annotation> getAnnotations() {
-        return ReflectionAnnotation.allOn(field.getAnnotations());
+    public List<AnnotationWrapper> getAnnotationWrappers() {
+        return ReflectionAnnotationWrapper.allOn(field);
+    }
+
+    @Override
+    public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
+        return ReflectionAnnotationWrapper.ofTypeOn(field, type);
     }
 
     @Override
