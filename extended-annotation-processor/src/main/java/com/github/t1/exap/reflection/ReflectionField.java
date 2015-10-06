@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+import static java.util.Arrays.*;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -32,8 +33,8 @@ class ReflectionField extends Field {
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
-        return field.getAnnotation(type);
+    public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
+        return asList(field.getAnnotationsByType(type));
     }
 
     @Override

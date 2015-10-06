@@ -14,8 +14,11 @@ public class AnnotatedClass<T extends Number> {
 
     @A("mmm")
     @A("nnn")
+    @B("bbb")
     public void method0() {}
 
+    @A("ooo")
+    @BB({ @B("b0"), @B("b1") })
     public String method1(String string, @A("ppp") boolean bool) {
         return null;
     }

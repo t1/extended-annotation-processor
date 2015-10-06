@@ -1,10 +1,11 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Arrays.*;
 import static javax.lang.model.element.Modifier.*;
 import static javax.tools.Diagnostic.Kind.*;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.AnnotatedConstruct;
@@ -80,48 +81,42 @@ public class Elemental {
     }
 
     public <T extends Annotation> boolean isAnnotated(Class<T> type) {
-        return getAnnotation(type) != null;
+        return !getAnnotations(type).isEmpty();
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> type) {
-        T annotation = this.getElement().getAnnotation(type);
-        if (annotation == null && JavaDoc.class.equals(type) && docComment() != null)
-            return type.cast(javaDoc());
-        return annotation;
+        List<T> list = getAnnotations(type);
+        if (list.size() == 0)
+            return null;
+        if (list.size() > 1)
+            throw new IllegalArgumentException(
+                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+        return list.get(0);
     }
 
-    public List<AnnotationWrapper> getAnnotationWrappers() {
-        List<AnnotationWrapper> result = new ArrayList<>();
-        for (AnnotationMirror mirror : getElement().getAnnotationMirrors())
-            result.addAll(AnnotationWrapper.allOn(mirror, processingEnv));
-        return result;
+    public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
+        T[] annotations = this.getElement().getAnnotationsByType(type);
+        if (annotations.length == 0 && JavaDoc.class.equals(type) && docComment() != null)
+            return asList(type.cast(javaDoc()));
+        return asList(annotations);
     }
 
     public <T extends Annotation> AnnotationWrapper getAnnotationWrapper(Class<T> type) {
-        List<AnnotationWrapper> result = getAnnotationWrappers(type);
-        if (result.size() == 0)
+        List<AnnotationWrapper> list = getAnnotationWrappers(type);
+        if (list.size() == 0)
             return null;
-        if (result.size() > 1)
+        if (list.size() > 1)
             throw new IllegalArgumentException(
-                    "Found " + result.size() + " annotations of type " + type.getName() + " when expecting only one");
-        return result.get(0);
+                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+        return list.get(0);
+    }
+
+    public List<AnnotationWrapper> getAnnotationWrappers() {
+        return AnnotationWrapper.allOn(getElement(), processingEnv);
     }
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        List<AnnotationWrapper> result = new ArrayList<>();
-        for (AnnotationMirror annotationMirror : getAnnotationMirrors())
-            if (equals(type, annotationMirror))
-                result.addAll(AnnotationWrapper.allOn(annotationMirror, processingEnv));
-        return result;
-    }
-
-    private List<? extends AnnotationMirror> getAnnotationMirrors() {
-        return (element instanceof Element) ? elements().getAllAnnotationMirrors((Element) element)
-                : element.getAnnotationMirrors();
-    }
-
-    private <T extends Annotation> boolean equals(Class<T> type, AnnotationMirror annotationMirror) {
-        return annotationMirror.getAnnotationType().toString().equals(type.getName());
+        return AnnotationWrapper.ofTypeOn(getElement(), type.getName(), processingEnv);
     }
 
     private String docComment() {

@@ -59,8 +59,8 @@
                 "public":false,
                 "static":false,
                 "transient":false,
-                "annotations":{
-                }
+                "annotations":[
+                ]
             },
             "map":{
                 "type":"java.util.Map",
@@ -69,8 +69,6 @@
                     "V":"java.lang.Object"
                 },
                 "typeArguments":[
-                    "java.lang.String",
-                    "java.lang.Number"
                 ],
                 "public":false,
                 "static":false,
@@ -86,8 +84,6 @@
                 "returnType":"ReflectionType:void",
                 "typeParameters":{
                 },
-                "parameters":[
-                ],
                 "annotations":[
                     {
                         "name":"A",
@@ -96,7 +92,13 @@
                     {
                         "name":"A",
                         "value":"nnn"
+                    },
+                    {
+                        "name":"B",
+                        "value":"bbb"
                     }
+                ],
+                "parameters":[
                 ]
             },
             {
@@ -105,6 +107,16 @@
                 "returnType":"Type:java.lang.String",
                 "typeParameters":{
                 },
+                "annotations":[
+                    {
+                        "name":"A",
+                        "value":"ooo"
+                    },
+                    {
+                        "name":"BB",
+                        "value":"@somepackage.B(\"b0\"),@somepackage.B(\"b1\")"
+                    }
+                ],
                 "parameters":[
                     {
                         "name":"method1",
@@ -118,8 +130,6 @@
                         "name":"bool",
                         "type":"boolean"
                     }
-                ],
-                "annotations":[
                 ]
             }
         ]

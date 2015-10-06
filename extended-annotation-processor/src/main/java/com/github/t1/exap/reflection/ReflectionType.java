@@ -51,15 +51,24 @@ class ReflectionType extends Type {
     }
 
     @Override
+    public List<Type> getTypeArguments() {
+        List<Type> result = new ArrayList<>();
+        if (type instanceof ParameterizedType)
+            for (java.lang.reflect.Type paramType : ((ParameterizedType) type).getActualTypeArguments())
+                result.add(Type.of(paramType));
+        return result;
+    }
+
+    @Override
     protected boolean is(Modifier modifier) {
         return Modifiers.on(asClass().getModifiers()).is(modifier);
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+    public <T extends Annotation> List<T> getAnnotations(Class<T> annotationType) {
         if (!isClass())
-            return null;
-        return asClass().getAnnotation(annotationType);
+            return emptyList();
+        return asList(asClass().getAnnotationsByType(annotationType));
     }
 
     @Override

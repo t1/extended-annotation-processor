@@ -25,6 +25,16 @@ public class ReflectionTest {
         A[]value();
     }
 
+    @Retention(RUNTIME)
+    public @interface B {
+        String value();
+    }
+
+    @Retention(RUNTIME)
+    public @interface BB {
+        B[]value();
+    }
+
     @A("ttt")
     @JavaDoc(summary = "s", value = "v")
     public static class Pojo {
@@ -34,8 +44,11 @@ public class ReflectionTest {
 
         @A("mmm")
         @A("nnn")
+        @B("bbb")
         public void method0() {}
 
+        @A("ooo")
+        @BB({ @B("b0"), @B("b1") })
         @SuppressWarnings("unused")
         public String method1(String string, @A("ppp") boolean bool) {
             return null;
@@ -73,14 +86,15 @@ public class ReflectionTest {
 
     private void assertTypeAnnotations() {
         assertTrue(type.isAnnotated(A.class));
-        assertEquals("ttt", type.getAnnotation(A.class).value());
+        assertEquals(1, type.getAnnotations(A.class).size());
+        assertEquals("ttt", type.getAnnotations(A.class).get(0).value());
         assertEquals(1, type.getAnnotationWrappers(A.class).size());
-        assertEquals("ttt", type.getAnnotationWrappers(A.class).get(0).get("value"));
+        assertEquals("ttt", type.getAnnotationWrappers(A.class).get(0).getValue());
 
         assertTrue(type.isAnnotated(JavaDoc.class));
         assertEquals(1, type.getAnnotationWrappers(JavaDoc.class).size());
-        assertEquals("s", type.getAnnotationWrappers(JavaDoc.class).get(0).get("summary"));
-        assertEquals("v", type.getAnnotationWrappers(JavaDoc.class).get(0).get("value"));
+        assertEquals("s", type.getAnnotationWrappers(JavaDoc.class).get(0).getValue("summary"));
+        assertEquals("v", type.getAnnotationWrappers(JavaDoc.class).get(0).getValue());
 
         List<AnnotationWrapper> wrappers = type.getAnnotationWrappers();
         assertEquals(2, wrappers.size());
@@ -114,9 +128,10 @@ public class ReflectionTest {
         assertFalse(stringField.isTransient()); // doesn't make sense, but must not lie
 
         assertTrue(stringField.isAnnotated(A.class));
-        assertEquals("fff", stringField.getAnnotation(A.class).value());
+        assertEquals(1, stringField.getAnnotations(A.class).size());
+        assertEquals("fff", stringField.getAnnotations(A.class).get(0).value());
         assertEquals(1, stringField.getAnnotationWrappers(A.class).size());
-        assertEquals("fff", stringField.getAnnotationWrappers(A.class).get(0).get("value"));
+        assertEquals("fff", stringField.getAnnotationWrappers(A.class).get(0).getValue());
 
         assertEquals(1, stringField.getAnnotationWrappers().size());
 
@@ -130,7 +145,7 @@ public class ReflectionTest {
         assertEquals("bool", boolField.getName());
         assertEquals("boolean", boolField.getType().getQualifiedName());
         assertFalse(boolField.isAnnotated(A.class));
-        assertNull(boolField.getAnnotation(A.class));
+        assertEquals(0, boolField.getAnnotations(A.class).size());
         assertEquals(0, boolField.getAnnotationWrappers(A.class).size());
         assertEquals(0, boolField.getAnnotationWrappers().size());
     }
@@ -158,26 +173,38 @@ public class ReflectionTest {
     }
 
     private void assertMethod0Annotations(Method method) {
-        assertFalse(method.isAnnotated(A.class));
-        assertTrue(method.isAnnotated(AA.class));
+        assertTrue(method.isAnnotated(AA.class)); // TODO shouldn't we 'hide' the repeater?
         assertEquals(2, method.getAnnotation(AA.class).value().length);
-        assertEquals("mmm", method.getAnnotation(AA.class).value()[0].value());
-        assertEquals("nnn", method.getAnnotation(AA.class).value()[1].value());
+        assertEquals(1, method.getAnnotations(AA.class).size());
+        assertEquals(1, method.getAnnotationWrappers(AA.class).size());
+        assertEquals(2, ((A[]) method.getAnnotationWrapper(AA.class).getValue()).length);
+
+        assertTrue(method.isAnnotated(A.class));
+        assertEquals(2, method.getAnnotations(A.class).size());
+        assertEquals("mmm", method.getAnnotations(A.class).get(0).value());
+        assertEquals("nnn", method.getAnnotations(A.class).get(1).value());
 
         assertEquals(2, method.getAnnotationWrappers(A.class).size());
-        assertEquals("mmm", method.getAnnotationWrappers(A.class).get(0).get("value"));
-        assertEquals("nnn", method.getAnnotationWrappers(A.class).get(1).get("value"));
+        assertEquals("mmm", method.getAnnotationWrappers(A.class).get(0).getValue());
+        assertEquals("nnn", method.getAnnotationWrappers(A.class).get(1).getValue());
         assertThat(catchThrowable(() -> method.getAnnotationWrapper(A.class)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Found 2 annotations of type " + A.class.getName() + " when expecting only one");
 
-        assertEquals(2, method.getAnnotationWrappers().size());
-        assertRepeatedAnnotation("mmm", method.getAnnotationWrappers().get(0));
-        assertRepeatedAnnotation("nnn", method.getAnnotationWrappers().get(1));
+        assertTrue(method.isAnnotated(B.class));
+        assertEquals(1, method.getAnnotations(B.class).size());
+        assertEquals("bbb", method.getAnnotations(B.class).get(0).value());
+        assertEquals(1, method.getAnnotationWrappers(B.class).size());
+        assertEquals("bbb", method.getAnnotationWrappers(B.class).get(0).getStringValue());
+
+        assertEquals(3, method.getAnnotationWrappers().size());
+        assertRepeatedAnnotation("mmm", method.getAnnotationWrappers().get(0), A.class);
+        assertRepeatedAnnotation("nnn", method.getAnnotationWrappers().get(1), A.class);
+        assertRepeatedAnnotation("bbb", method.getAnnotationWrappers().get(2), B.class);
     }
 
-    private void assertRepeatedAnnotation(String value, AnnotationWrapper annotation) {
-        assertEquals(A.class.getName(), annotation.getAnnotationType().getQualifiedName());
+    private void assertRepeatedAnnotation(String value, AnnotationWrapper annotation, Class<?> type) {
+        assertEquals(type.getName(), annotation.getAnnotationType().getQualifiedName());
         assertEquals(1, annotation.getElementValues().size());
         assertEquals(value, annotation.getElementValues().get("value"));
     }
@@ -188,9 +215,40 @@ public class ReflectionTest {
         assertEquals(Type.of(String.class), method.getReturnType());
         List<Parameter> parameters = method.getParameters();
 
-        // @SuppressWarnings is RetentionPolicy.SOURCE, so it's not visible in reflection
-        assertEquals(0, method.getAnnotationWrappers().size());
+        assertMethod1Annotations(method);
+        assertMethod1Parameters(method, parameters);
+    }
 
+    private void assertMethod1Annotations(Method method) {
+        // @SuppressWarnings is RetentionPolicy.SOURCE, so it's not visible in reflection
+        assertEquals(2, method.getAnnotationWrappers().size());
+        assertMethod1AnnotationA(method);
+        assertMethod1AnnotationBB(method);
+    }
+
+    private void assertMethod1AnnotationA(Method method) {
+        assertTrue(method.isAnnotated(A.class));
+        assertEquals(1, method.getAnnotations(A.class).size());
+        assertEquals("ooo", method.getAnnotation(A.class).value());
+        assertEquals(1, method.getAnnotationWrappers(A.class).size());
+        assertEquals("ooo", method.getAnnotationWrappers(A.class).get(0).getStringValue());
+        assertFalse(method.isAnnotated(AA.class));
+        assertEquals(0, method.getAnnotationWrappers(AA.class).size());
+    }
+
+    private void assertMethod1AnnotationBB(Method method) {
+        assertFalse(method.isAnnotated(B.class)); // not @Repeatable
+        assertTrue(method.isAnnotated(BB.class));
+        assertEquals(0, method.getAnnotations(B.class).size());
+        assertEquals(1, method.getAnnotations(BB.class).size());
+        assertEquals(2, method.getAnnotation(BB.class).value().length);
+        assertEquals(1, method.getAnnotationWrappers(BB.class).size());
+        List<AnnotationWrapper> bb = method.getAnnotationWrapper(BB.class).getAnnotationsValue();
+        assertEquals("b0", bb.get(0).getStringValue());
+        assertEquals("b1", bb.get(1).getStringValue());
+    }
+
+    private void assertMethod1Parameters(Method method, List<Parameter> parameters) {
         assertEquals(2, parameters.size());
         assertMethod1Parameter0(method, parameters.get(0));
         assertMethod1Parameter1(method, parameters.get(1));
@@ -202,7 +260,7 @@ public class ReflectionTest {
         assertEquals(Type.of(String.class), parameter.getType());
 
         assertFalse(parameter.isAnnotated(A.class));
-        assertNull(parameter.getAnnotation(A.class));
+        assertEquals(0, parameter.getAnnotations(A.class).size());
         assertEquals(0, parameter.getAnnotationWrappers().size());
     }
 
@@ -212,7 +270,8 @@ public class ReflectionTest {
         assertEquals(Type.of(boolean.class), parameter1.getType());
 
         assertTrue(parameter1.isAnnotated(A.class));
-        assertEquals("ppp", parameter1.getAnnotation(A.class).value());
+        assertEquals(1, parameter1.getAnnotations(A.class).size());
+        assertEquals("ppp", parameter1.getAnnotations(A.class).get(0).value());
         assertEquals(1, parameter1.getAnnotationWrappers().size());
 
         AnnotationWrapper p1a0 = parameter1.getAnnotationWrappers().get(0);

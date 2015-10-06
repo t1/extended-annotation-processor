@@ -18,8 +18,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
             if (repeatedType == null)
                 result.add(wrapped(annotation));
             else
-                for (Annotation repeated : annotated.getAnnotationsByType(repeatedType))
-                    result.add(wrapped(repeated));
+                result.addAll(ofTypeOn(annotated, repeatedType));
         }
         return result;
     }
@@ -29,16 +28,19 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         Method method = valueMethod(annotation.annotationType());
         if (method == null)
             return null;
-        Class<?> valueType = method.getReturnType().getComponentType();
-        if (valueType == null)
+        Class<?> returnType = method.getReturnType();
+        if (!returnType.isArray())
             return null;
+        Class<?> valueType = returnType.getComponentType();
         @SuppressWarnings({ "unchecked" })
         Class<? extends Annotation> repeatedType = (Class<? extends Annotation>) valueType;
         Repeatable repeatable = repeatedType.getAnnotation(Repeatable.class);
         if (repeatable == null)
             return null;
         Class<? extends Annotation> repeatableValue = repeatable.value();
-        return (annotation.annotationType().equals(repeatableValue)) ? repeatedType : null;
+        if (!annotation.annotationType().equals(repeatableValue))
+            return null;
+        return repeatedType;
     }
 
     private static Method valueMethod(Class<?> type) {
@@ -55,8 +57,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         return result;
     }
 
-    private static ReflectionAnnotationWrapper wrapped(Annotation repeated) {
-        return new ReflectionAnnotationWrapper(repeated);
+    private static ReflectionAnnotationWrapper wrapped(Annotation annotation) {
+        return new ReflectionAnnotationWrapper(annotation);
     }
 
     private final Annotation annotation;
@@ -77,8 +79,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public <T extends Annotation> T getAnnotation(Class<T> type) {
-        return getAnnotationType().getAnnotation(type);
+    public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
+        return getAnnotationType().getAnnotations(type);
     }
 
     @Override
@@ -111,13 +113,28 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Object get(String name) {
+    public Object getValue(String name) {
         try {
             Method method = annotation.annotationType().getMethod(name);
             return invoke(method);
         } catch (NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Type getTypeValue(String name) {
+        Object value = getValue(name);
+        return (value == null) ? null : Type.of((Class<?>) value);
+    }
+
+    @Override
+    public List<AnnotationWrapper> getAnnotationsValue(String name) {
+        List<AnnotationWrapper> list = new ArrayList<>();
+        Object[] values = (Object[]) getValue(name);
+        for (Object value : values)
+            list.add(new ReflectionAnnotationWrapper((Annotation) value));
+        return list;
     }
 
     @Override
