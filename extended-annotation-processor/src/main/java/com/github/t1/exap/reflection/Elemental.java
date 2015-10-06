@@ -18,10 +18,12 @@ import com.github.t1.exap.JavaDoc;
 public class Elemental {
     private final ProcessingEnvironment processingEnv;
     private final AnnotatedConstruct element;
+    private final AnnotationWrapperBuilder annotationWrapperBuilder;
 
     public Elemental(ProcessingEnvironment processingEnv, AnnotatedConstruct element) {
         this.processingEnv = processingEnv;
         this.element = element;
+        this.annotationWrapperBuilder = new AnnotationWrapperBuilder(processingEnv);
     }
 
     protected ProcessingEnvironment env() {
@@ -112,11 +114,11 @@ public class Elemental {
     }
 
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return AnnotationWrapper.allOn(getElement(), processingEnv);
+        return annotationWrapperBuilder.allOn(getElement());
     }
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return AnnotationWrapper.ofTypeOn(getElement(), type.getName(), processingEnv);
+        return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
     }
 
     private String docComment() {
