@@ -95,7 +95,7 @@ class ReflectionType extends Type {
 
     @Override
     public boolean isVoid() {
-        return void.class.equals(type);
+        return void.class.equals(type) || Void.class.equals(type);
     }
 
     @Override
