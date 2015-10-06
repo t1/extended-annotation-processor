@@ -115,7 +115,8 @@ public class Type extends Elemental {
     }
 
     public boolean isVoid() {
-        return typeKind() == VOID;
+        return typeKind() == VOID
+                || (typeKind() == DECLARED && type.getQualifiedName().contentEquals(Void.class.getName()));
     }
 
     public boolean isBoolean() {
