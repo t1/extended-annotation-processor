@@ -104,9 +104,10 @@ public class AnnotationWrapper extends Elemental {
 
     public List<AnnotationWrapper> getAnnotationsValue(String name) {
         List<AnnotationWrapper> list = new ArrayList<>();
-        Object[] values = (Object[]) getValue(name);
-        for (Object value : values)
-            list.add(new AnnotationWrapper((AnnotationMirror) value, env()));
+        @SuppressWarnings("unchecked")
+        List<AnnotationMirror> values = (List<AnnotationMirror>) getValue(name);
+        for (AnnotationMirror value : values)
+            list.add(new AnnotationWrapper(value, env()));
         return list;
     }
 
