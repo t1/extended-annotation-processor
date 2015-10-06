@@ -166,8 +166,23 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public String getStringValue(String name) {
-        Object value = getValue(name);
-        return (value == null) ? null : value.toString();
+        return (String) getValue(name);
+    }
+
+    public int getIntValue() {
+        return getIntValue("value");
+    }
+
+    public int getIntValue(String name) {
+        return (int) getValue(name);
+    }
+
+    public boolean getBooleanValue() {
+        return getBooleanValue("value");
+    }
+
+    public boolean getBooleanValue(String name) {
+        return (boolean) getValue(name);
     }
 
     public Type getTypeValue() {
