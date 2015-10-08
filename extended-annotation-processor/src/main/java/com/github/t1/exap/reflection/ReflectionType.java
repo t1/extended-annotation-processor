@@ -10,7 +10,8 @@ import java.util.*;
 import java.util.ArrayList;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 class ReflectionType extends Type {
@@ -30,7 +31,7 @@ class ReflectionType extends Type {
     private List<Field> fields = null;
 
     private ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
-        super(env, DummyProxy.of(TypeElement.class));
+        super(env, DummyProxy.of(TypeMirror.class));
         this.type = type;
     }
 
@@ -48,15 +49,6 @@ class ReflectionType extends Type {
 
     private ParameterizedType asParameterizedType() {
         return (ParameterizedType) this.type;
-    }
-
-    @Override
-    public List<Type> getTypeArguments() {
-        List<Type> result = new ArrayList<>();
-        if (type instanceof ParameterizedType)
-            for (java.lang.reflect.Type paramType : ((ParameterizedType) type).getActualTypeArguments())
-                result.add(Type.of(paramType));
-        return result;
     }
 
     @Override
@@ -82,15 +74,15 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public String getQualifiedName() {
-        if (isParameterizedType())
-            return asParameterizedType().getRawType().getTypeName();
-        return type.getTypeName();
+    public String getSimpleName() {
+        if (type instanceof ParameterizedType)
+            return ((Class<?>) ((ParameterizedType) type).getRawType()).getSimpleName();
+        return isClass() ? asClass().getSimpleName() : type.toString();
     }
 
     @Override
-    public String getSimpleName() {
-        return asClass().getSimpleName();
+    public String getFullName() {
+        return type.getTypeName();
     }
 
     @Override
@@ -150,19 +142,18 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public boolean isAssignableTo(Class<?> type) {
+    public boolean isA(Class<?> type) {
         if (isClass())
             return type.isAssignableFrom(asClass());
         return type.isAssignableFrom((Class<?>) asParameterizedType().getRawType());
     }
 
     @Override
-    public List<TypeParameter> getTypeParameters() {
-        char A = 'A'; // the real type parameter name is not available by reflection; assume <= 26 type params
-        List<TypeParameter> list = new ArrayList<>();
+    public List<Type> getTypeParameters() {
+        List<Type> list = new ArrayList<>();
         if (isParameterizedType())
             for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
-                list.add(new TypeParameter(Character.toString(A++), asList(Type.of(type))));
+                list.add(Type.of(type));
         return list;
     }
 
@@ -200,7 +191,7 @@ class ReflectionType extends Type {
 
     @Override
     public String toString() {
-        return "ReflectionType:" + getQualifiedName();
+        return "ReflectionType:" + getFullName();
     }
 
     @Override

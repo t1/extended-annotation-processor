@@ -46,12 +46,7 @@ class ReflectionParameter extends Parameter {
 
     @Override
     public Type getType() {
-        return Type.of(parameter.getType());
-    }
-
-    @Override
-    public boolean isType(Class<?> type) {
-        return parameter.getType().equals(type);
+        return Type.of(parameter.getParameterizedType());
     }
 
     @Override

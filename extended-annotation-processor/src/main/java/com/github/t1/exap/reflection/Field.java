@@ -1,7 +1,12 @@
 package com.github.t1.exap.reflection;
 
+import static javax.lang.model.type.TypeKind.*;
+
+import java.util.*;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.*;
 
 public class Field extends Elemental {
     private final VariableElement field;
@@ -28,6 +33,14 @@ public class Field extends Elemental {
         } catch (Error e) {
             throw new Error("while getting type of field " + field.getSimpleName(), e);
         }
+    }
+
+    public List<Type> getTypeParameters() {
+        List<Type> list = new ArrayList<>();
+        if (field.asType().getKind() == DECLARED)
+            for (TypeMirror typeMirror : ((DeclaredType) field.asType()).getTypeArguments())
+                list.add(Type.of(typeMirror, env()));
+        return list;
     }
 
     @Override

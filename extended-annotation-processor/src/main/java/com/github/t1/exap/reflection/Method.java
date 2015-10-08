@@ -45,6 +45,6 @@ public class Method extends Elemental {
 
     @Override
     public String toString() {
-        return "Method:" + containerType.getQualifiedName() + "#" + method.getSimpleName();
+        return "Method:" + containerType.getFullName() + "#" + method.getSimpleName();
     }
 }

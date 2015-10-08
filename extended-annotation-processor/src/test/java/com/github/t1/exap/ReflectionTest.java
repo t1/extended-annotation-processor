@@ -6,7 +6,7 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.junit.Assert.*;
 
 import java.lang.annotation.*;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class ReflectionTest {
 
     @Retention(RUNTIME)
     public @interface AA {
-        A[]value();
+        A[] value();
     }
 
     @Retention(RUNTIME)
@@ -32,7 +32,7 @@ public class ReflectionTest {
 
     @Retention(RUNTIME)
     public @interface BB {
-        B[]value();
+        B[] value();
     }
 
     @A("ttt")
@@ -41,6 +41,7 @@ public class ReflectionTest {
         @A("fff")
         String string;
         boolean bool;
+        Map<String, Number> map;
 
         @A("mmm")
         @A("nnn")
@@ -50,7 +51,7 @@ public class ReflectionTest {
         @A("ooo")
         @BB({ @B("b0"), @B("b1") })
         @SuppressWarnings("unused")
-        public String method1(String string, @A("ppp") boolean bool) {
+        public String method1(String string, @A("ppp") boolean bool, List<String> strings) {
             return null;
         }
     }
@@ -64,8 +65,8 @@ public class ReflectionTest {
     }
 
     private void assertType() {
-        assertEquals(Pojo.class.getName(), type.getQualifiedName());
         assertEquals("Pojo", type.getSimpleName());
+        assertEquals(Pojo.class.getName(), type.getFullName());
         assertFalse(type.isVoid());
         assertFalse(type.isBoolean());
         assertFalse(type.isNumber());
@@ -77,7 +78,7 @@ public class ReflectionTest {
         assertFalse(type.isArray());
         assertNull(type.elementType());
         assertTrue(type.getTypeParameters().isEmpty());
-        assertFalse(type.isAssignableTo(String.class));
+        assertFalse(type.isA(String.class));
 
         assertTrue(type.isPublic());
         assertTrue(type.isStatic());
@@ -100,12 +101,14 @@ public class ReflectionTest {
         assertEquals(2, wrappers.size());
 
         AnnotationWrapper a0 = wrappers.get(0);
-        assertEquals(A.class.getName(), a0.getAnnotationType().getQualifiedName());
+        assertEquals("A", a0.getAnnotationType().getSimpleName());
+        assertEquals(A.class.getName(), a0.getAnnotationType().getFullName());
         assertEquals(1, a0.getElementValues().size());
         assertEquals("ttt", a0.getElementValues().get("value"));
 
         AnnotationWrapper a1 = wrappers.get(1);
-        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getQualifiedName());
+        assertEquals("JavaDoc", a1.getAnnotationType().getSimpleName());
+        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getFullName());
         assertEquals(2, a1.getElementValues().size());
         assertEquals("s", a1.getElementValues().get("summary"));
         assertEquals("v", a1.getElementValues().get("value"));
@@ -115,14 +118,16 @@ public class ReflectionTest {
     public void shouldGetFields() {
         List<Field> fields = type.getFields();
 
-        assertEquals("fields size", 2, fields.size());
+        assertEquals("fields size", 3, fields.size());
         assertStringField(fields.get(0));
         assertBoolField(fields.get(1));
+        assertMapField(fields.get(2));
     }
 
     private void assertStringField(Field stringField) {
         assertEquals("string", stringField.getName());
-        assertEquals("java.lang.String", stringField.getType().getQualifiedName());
+        assertEquals("String", stringField.getType().getSimpleName());
+        assertEquals("java.lang.String", stringField.getType().getFullName());
         assertFalse(stringField.isPublic());
         assertFalse(stringField.isStatic());
         assertFalse(stringField.isTransient()); // doesn't make sense, but must not lie
@@ -136,18 +141,37 @@ public class ReflectionTest {
         assertEquals(1, stringField.getAnnotationWrappers().size());
 
         AnnotationWrapper a0 = stringField.getAnnotationWrappers().get(0);
-        assertEquals(A.class.getName(), a0.getAnnotationType().getQualifiedName());
+        assertEquals("A", a0.getAnnotationType().getSimpleName());
+        assertEquals(A.class.getName(), a0.getAnnotationType().getFullName());
         assertEquals(1, a0.getElementValues().size());
         assertEquals("fff", a0.getElementValues().get("value"));
     }
 
     private void assertBoolField(Field boolField) {
         assertEquals("bool", boolField.getName());
-        assertEquals("boolean", boolField.getType().getQualifiedName());
+        assertEquals("boolean", boolField.getType().getSimpleName());
+        assertEquals("boolean", boolField.getType().getFullName());
         assertFalse(boolField.isAnnotated(A.class));
         assertEquals(0, boolField.getAnnotations(A.class).size());
         assertEquals(0, boolField.getAnnotationWrappers(A.class).size());
         assertEquals(0, boolField.getAnnotationWrappers().size());
+    }
+
+    private void assertMapField(Field mapField) {
+        assertEquals("map", mapField.getName());
+        assertEquals("Map", mapField.getType().getSimpleName());
+        assertEquals("java.util.Map<java.lang.String, java.lang.Number>", mapField.getType().getFullName());
+        assertTrue(mapField.getType().isA(Map.class));
+        assertEquals(2, mapField.getType().getTypeParameters().size());
+        assertEquals("String", mapField.getType().getTypeParameters().get(0).getSimpleName());
+        assertEquals("java.lang.String", mapField.getType().getTypeParameters().get(0).getFullName());
+        assertEquals("Number", mapField.getType().getTypeParameters().get(1).getSimpleName());
+        assertEquals("java.lang.Number", mapField.getType().getTypeParameters().get(1).getFullName());
+
+        assertFalse(mapField.isAnnotated(A.class));
+        assertEquals(0, mapField.getAnnotations(A.class).size());
+        assertEquals(0, mapField.getAnnotationWrappers(A.class).size());
+        assertEquals(0, mapField.getAnnotationWrappers().size());
     }
 
     @Test
@@ -204,7 +228,8 @@ public class ReflectionTest {
     }
 
     private void assertRepeatedAnnotation(String value, AnnotationWrapper annotation, Class<?> type) {
-        assertEquals(type.getName(), annotation.getAnnotationType().getQualifiedName());
+        assertEquals(type.getSimpleName(), annotation.getAnnotationType().getSimpleName());
+        assertEquals(type.getName(), annotation.getAnnotationType().getFullName());
         assertEquals(1, annotation.getElementValues().size());
         assertEquals(value, annotation.getElementValues().get("value"));
     }
@@ -213,9 +238,10 @@ public class ReflectionTest {
         assertEquals("method1", method.getName());
         assertEquals(type, method.getContainerType());
         assertEquals(Type.of(String.class), method.getReturnType());
-        List<Parameter> parameters = method.getParameters();
 
         assertMethod1Annotations(method);
+
+        List<Parameter> parameters = method.getParameters();
         assertMethod1Parameters(method, parameters);
     }
 
@@ -249,9 +275,10 @@ public class ReflectionTest {
     }
 
     private void assertMethod1Parameters(Method method, List<Parameter> parameters) {
-        assertEquals(2, parameters.size());
+        assertEquals(3, parameters.size());
         assertMethod1Parameter0(method, parameters.get(0));
         assertMethod1Parameter1(method, parameters.get(1));
+        assertMethod1Parameter2(method, parameters.get(2));
     }
 
     private void assertMethod1Parameter0(Method method, Parameter parameter) {
@@ -275,9 +302,23 @@ public class ReflectionTest {
         assertEquals(1, parameter1.getAnnotationWrappers().size());
 
         AnnotationWrapper p1a0 = parameter1.getAnnotationWrappers().get(0);
-        assertEquals(A.class.getName(), p1a0.getAnnotationType().getQualifiedName());
+        assertEquals("A", p1a0.getAnnotationType().getSimpleName());
+        assertEquals(A.class.getName(), p1a0.getAnnotationType().getFullName());
         assertEquals(1, p1a0.getElementValues().size());
         assertEquals("ppp", p1a0.getElementValues().get("value"));
+    }
+
+    private void assertMethod1Parameter2(Method method, Parameter parameter) {
+        assertEquals(method, parameter.getMethod());
+        assertEquals("strings", parameter.getName());
+
+        assertEquals("List", parameter.getType().getSimpleName());
+        assertEquals("java.util.List<java.lang.String>", parameter.getType().getFullName());
+        assertTrue(parameter.getType().isA(List.class));
+        assertTrue(parameter.getType().isA(Collection.class));
+        assertEquals(1, parameter.getType().getTypeParameters().size());
+        assertEquals("String", parameter.getType().getTypeParameters().get(0).getSimpleName());
+        assertEquals("java.lang.String", parameter.getType().getTypeParameters().get(0).getFullName());
     }
 
     @Test
@@ -293,11 +334,11 @@ public class ReflectionTest {
 
             @Override
             public void visit(Field field) {
-                assertThat(field.getName()).matches("string|bool");
+                assertThat(field.getName()).matches("string|bool|map");
                 count.getAndIncrement();
             }
         });
 
-        assertEquals(4, count.get());
+        assertEquals(5, count.get());
     }
 }

@@ -11,69 +11,27 @@ import javax.lang.model.type.*;
 
 public class Type extends Elemental {
     public static Type of(TypeMirror type, ProcessingEnvironment env) {
-        TypeKind kind = type.getKind();
-        switch (kind) {
-            case BOOLEAN:
-                return of(boolean.class);
-            case BYTE:
-                return of(byte.class);
-            case CHAR:
-                return of(char.class);
-            case DOUBLE:
-                return of(double.class);
-            case FLOAT:
-                return of(float.class);
-            case INT:
-                return of(int.class);
-            case LONG:
-                return of(long.class);
-            case SHORT:
-                return of(short.class);
-            case VOID:
-                return of(void.class);
-
-            case ARRAY:
-            case DECLARED:
-                TypeElement typeElement = (TypeElement) env.getTypeUtils().asElement(type);
-                return new Type(env, typeElement);
-            case ERROR:
-                throw new RuntimeException("error type kind: " + kind + ": " + type);
-            case EXECUTABLE:
-            case INTERSECTION:
-            case NONE:
-            case NULL:
-            case OTHER:
-            case PACKAGE:
-            case TYPEVAR:
-            case UNION:
-            case WILDCARD:
-                throw new RuntimeException("unexpected type kind: " + kind + ": " + type);
-        }
-        throw new UnsupportedOperationException("unsupported type kind: " + kind + ": " + type);
+        return new Type(env, type);
     }
 
     public static Type of(java.lang.reflect.Type type) {
         return ReflectionType.type(type);
     }
 
-    private final TypeElement type;
+    private final TypeMirror type;
 
-    protected Type(ProcessingEnvironment processingEnv, TypeElement type) {
+    protected Type(ProcessingEnvironment processingEnv, TypeMirror type) {
         super(processingEnv, type);
         this.type = Objects.requireNonNull(type, "type");
     }
 
     @Override
     protected TypeElement getElement() {
-        return type;
+        return (TypeElement) types().asElement(type);
     }
 
-    private TypeKind typeKind() {
-        return type.asType().getKind();
-    }
-
-    private ElementKind kind() {
-        return type.getKind();
+    private boolean isKind(TypeKind kind) {
+        return type.getKind() == kind;
     }
 
     public void accept(TypeVisitor scanner) {
@@ -95,32 +53,41 @@ public class Type extends Elemental {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Type that = (Type) obj;
-        return types().isSameType(this.type.asType(), that.type.asType());
+        return types().isSameType(this.type, that.type);
     }
 
     @Override
     public String toString() {
-        return "Type:" + getQualifiedName();
-    }
-
-    public String getQualifiedName() {
-        Name name = type.getQualifiedName();
-        if (name == null)
-            name = type.getSimpleName();
-        return name.toString();
+        return "Type:" + type;
     }
 
     public String getSimpleName() {
-        return type.getSimpleName().toString();
+        if (getElement() == null)
+            return type.toString();
+        return getElement().getSimpleName().toString();
+    }
+
+    /**
+     * The fully qualified name plus the fully qualified type parameters, e.g.
+     * <code>java.util.List&lt;java.lang.String&gt;</code>.
+     */
+    public String getFullName() {
+        if (isKind(TYPEVAR)) {
+            return ((TypeVariable) type).getUpperBound().toString();
+        }
+        return type.toString();
+    }
+
+    private boolean isType(Class<?> type) {
+        return isKind(DECLARED) && getFullName().equals(type.getName());
     }
 
     public boolean isVoid() {
-        return typeKind() == VOID
-                || (typeKind() == DECLARED && type.getQualifiedName().contentEquals(Void.class.getName()));
+        return isKind(VOID) || isType(Void.class);
     }
 
     public boolean isBoolean() {
-        return typeKind() == BOOLEAN;
+        return isKind(BOOLEAN) || isType(Boolean.class);
     }
 
     public boolean isNumber() {
@@ -128,67 +95,65 @@ public class Type extends Elemental {
     }
 
     public boolean isInteger() {
-        return typeKind() == BYTE || typeKind() == SHORT || typeKind() == INT || typeKind() == LONG;
+        return isKind(BYTE) || isType(Byte.class)//
+                || isKind(SHORT) || isType(Short.class)//
+                || isKind(INT) || isType(Integer.class)//
+                || isKind(LONG) || isType(Long.class);
     }
 
     public boolean isDecimal() {
-        return typeKind() == FLOAT || typeKind() == DOUBLE;
+        return isKind(FLOAT) || isType(Float.class)//
+                || isKind(DOUBLE) || isType(Double.class);
     }
 
     public boolean isString() {
-        return type.getQualifiedName().contentEquals(String.class.getName());
+        return isType(String.class);
     }
 
     public boolean isEnum() {
-        return kind() == ENUM;
+        return (getElement() == null) ? false : getElement().getKind() == ENUM;
     }
 
     public List<String> getEnumValues() {
         if (!isEnum())
             return null;
         List<String> values = new ArrayList<>();
-        for (Element element : type.getEnclosedElements())
+        for (Element element : getElement().getEnclosedElements())
             if (element.getKind() == ENUM_CONSTANT)
                 values.add(element.getSimpleName().toString());
         return values;
     }
 
     public boolean isArray() {
-        return typeKind() == ARRAY;
+        return isKind(ARRAY);
     }
 
     public Type elementType() {
         if (isArray())
-            return Type.of(((ArrayType) type.asType()).getComponentType(), env());
+            return Type.of(((ArrayType) type).getComponentType(), env());
         return null;
     }
 
-    public List<Type> getTypeArguments() {
+    public List<Type> getTypeParameters() {
         List<Type> result = new ArrayList<>();
-        if (type.asType() instanceof DeclaredType)
-            for (TypeMirror typeMirror : ((DeclaredType) type.asType()).getTypeArguments())
-                result.add(Type.of(typeMirror, env()));
+        if (isKind(DECLARED))
+            for (TypeMirror arg : ((DeclaredType) type).getTypeArguments())
+                result.add(Type.of(arg, env()));
         return result;
     }
 
-    public List<TypeParameter> getTypeParameters() {
-        List<TypeParameter> result = new ArrayList<>();
-        for (TypeParameterElement parameterElement : type.getTypeParameters()) {
-            List<Type> bounds = new ArrayList<>();
-            for (TypeMirror bound : parameterElement.getBounds())
-                bounds.add(Type.of(bound, env()));
-            result.add(new TypeParameter(parameterElement.getSimpleName().toString(), bounds));
-        }
-        return result;
+    public boolean isA(Class<?> type) {
+        TypeMirror targetType = elements().getTypeElement(type.getName()).asType();
+        return isA(targetType);
     }
 
-    public boolean isAssignableTo(Class<?> type) {
+    private boolean isA(TypeMirror type) {
+        // TODO in here, we could also check the type arguments, i.e. if a List<String> is a List<Number>
         try {
-            TypeMirror targetType = elements().getTypeElement(type.getName()).asType();
-            if (isSameType(this.type.asType(), targetType))
+            if (isSameRawType(this.type, type))
                 return true;
-            for (TypeMirror supertype : types().directSupertypes(this.type.asType()))
-                if (isSameType(targetType, supertype))
+            for (TypeMirror supertype : types().directSupertypes(this.type))
+                if (isSameRawType(type, supertype))
                     return true;
             return false;
         } catch (Error e) {
@@ -196,17 +161,34 @@ public class Type extends Elemental {
         }
     }
 
-    private boolean isSameType(TypeMirror left, TypeMirror right) {
-        // why do these return false for java.util.Collection<E>?
+    private boolean isSameRawType(TypeMirror leftMirror, TypeMirror rightMirror) {
+        // The following methods return false for java.util.Collection<E>, as they have different type arguments
         // types().isAssignable(left, right);
         // types().isSameType(left, right)
-        // left.equals(right),
-        return left.toString().equals(right.toString());
+        // types().isSubtype(right, left)
+        String left = toRawString(leftMirror);
+        String right = toRawString(rightMirror);
+        return left.equals(right);
+    }
+
+    private String toRawString(TypeMirror mirror) {
+        String string = mirror.toString();
+        if (string.contains("<"))
+            string = string.substring(0, string.indexOf('<'));
+        return string;
+    }
+
+    public List<Method> getAllMethods() {
+        List<Method> methods = new ArrayList<>();
+        methods.addAll(getMethods());
+        if (getSuperType() != null)
+            methods.addAll(getSuperType().getAllMethods());
+        return methods;
     }
 
     public List<Method> getMethods() {
         List<Method> list = new ArrayList<>();
-        for (Element element : type.getEnclosedElements())
+        for (Element element : getElement().getEnclosedElements())
             if (element.getKind() == METHOD)
                 list.add(new Method(env(), this, (ExecutableElement) element));
         return list;
@@ -221,7 +203,7 @@ public class Type extends Elemental {
 
     public List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
-        for (Element enclosedElement : type.getEnclosedElements())
+        for (Element enclosedElement : getElement().getEnclosedElements())
             if (enclosedElement instanceof VariableElement)
                 fields.add(new Field(env(), (VariableElement) enclosedElement));
         return fields;
@@ -234,17 +216,9 @@ public class Type extends Elemental {
         throw new RuntimeException("field not found: " + name + ".\n  Only knows: " + getFields());
     }
 
-    public List<Method> getAllMethods() {
-        List<Method> methods = new ArrayList<>();
-        methods.addAll(getMethods());
-        if (getSuperType() != null)
-            methods.addAll(getSuperType().getAllMethods());
-        return methods;
-    }
-
     public Type getSuperType() {
-        if (type.getSuperclass().getKind() == NONE)
+        if (getElement().getSuperclass().getKind() == NONE)
             return null;
-        return Type.of(type.getSuperclass(), env());
+        return Type.of(getElement().getSuperclass(), env());
     }
 }

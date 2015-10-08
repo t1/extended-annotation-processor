@@ -48,9 +48,11 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void writeType(JsonGenerator json, Type type) {
-        log.debug("write type {}", type.getQualifiedName());
-        json.write("type", type.getQualifiedName());
-        json.write("simpleName", type.getSimpleName());
+        log.debug("write type {}", type.getFullName());
+        json.write("name", type.getSimpleName());
+        json.write("fullName", type.getFullName());
+        writeTypeParameters(json, type);
+        json.write("isCollection", type.isA(Collection.class));
         json.write("void", type.isVoid());
         json.write("boolean", type.isBoolean());
         json.write("number", type.isNumber());
@@ -67,8 +69,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         if (type.elementType() == null)
             json.writeNull("elementType");
         else
-            json.write("elementType", type.elementType().getQualifiedName());
-        writeTypeParameters(json, type);
+            json.write("elementType", type.elementType().getFullName());
         json.write("public", type.isPublic());
         json.write("static", type.isStatic());
         json.write("transient", type.isTransient());
@@ -84,6 +85,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             log.debug("write annotation {} on {}", annotation, type);
             json.writeStartObject();
             json.write("name", annotation.getAnnotationType().getSimpleName());
+            json.write("fullName", annotation.getAnnotationType().getFullName());
             for (Map.Entry<String, Object> value : annotation.getElementValues().entrySet()) {
                 if (value.getValue() == null)
                     json.writeNull(value.getKey());
@@ -101,9 +103,14 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         for (Field field : type.getFields()) {
             log.debug("write field {}", field.getName());
             json.writeStartObject(field.getName());
-            json.write("type", field.getType().getQualifiedName());
+
+            json.writeStartObject("type");
+            json.write("name", field.getType().getSimpleName());
+            json.write("fullName", field.getType().getFullName());
             writeTypeParameters(json, field.getType());
-            writeTypeArguments(json, field.getType());
+            json.write("isCollection", field.getType().isA(Collection.class));
+            json.writeEnd();
+
             json.write("public", field.isPublic());
             json.write("static", field.isStatic());
             json.write("transient", field.isTransient());
@@ -121,9 +128,8 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
 
             json.write("name", method.getName());
             json.write("containerType", method.getContainerType().toString());
-            json.write("returnType", method.getReturnType().toString());
 
-            writeTypeParameters(json, method.getReturnType());
+            writeReturnType(json, method.getReturnType());
             writeAnnotations(json, method);
             writeParameters(json, method);
 
@@ -132,10 +138,19 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         json.writeEnd();
     }
 
+    private void writeReturnType(JsonGenerator json, Type returnType) {
+        json.writeStartObject("returnType");
+        json.write("name", returnType.getSimpleName());
+        json.write("fullName", returnType.getFullName());
+        writeTypeParameters(json, returnType);
+        json.write("isCollection", returnType.isA(Collection.class));
+        json.writeEnd();
+    }
+
     private void writeTypeParameters(JsonGenerator json, Type type) {
-        json.writeStartObject("typeParameters");
-        for (TypeParameter typeParameter : type.getTypeParameters())
-            json.write(typeParameter.getName(), typeParameter.getBoundsString());
+        json.writeStartArray("typeParameters");
+        for (Type typeParameter : type.getTypeParameters())
+            json.write(typeParameter.getFullName());
         json.writeEnd();
     }
 
@@ -143,19 +158,13 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         json.writeStartArray("parameters");
         for (Parameter parameter : method.getParameters()) {
             json.writeStartObject();
-            json.write("name", method.getName());
-            json.write("method", parameter.getMethod().getName());
             json.write("name", parameter.getName());
-            json.write("type", parameter.getType().getQualifiedName());
+            json.write("method", parameter.getMethod().getName());
+            json.write("type", parameter.getType().getFullName());
+            writeTypeParameters(json, parameter.getType());
+            json.write("isCollection", parameter.getType().isA(Collection.class));
             json.writeEnd();
         }
-        json.writeEnd();
-    }
-
-    private void writeTypeArguments(JsonGenerator json, Type type) {
-        json.writeStartArray("typeArguments");
-        // FIXME for (Type typeArgument : type.getTypeArguments())
-        // json.write(typeArgument.getQualifiedName());
         json.writeEnd();
     }
 }

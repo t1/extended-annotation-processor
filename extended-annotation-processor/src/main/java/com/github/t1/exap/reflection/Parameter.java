@@ -24,10 +24,6 @@ public class Parameter extends Elemental {
         return Type.of(param.asType(), env());
     }
 
-    public boolean isType(Class<?> type) {
-        return Type.of(type).equals(getType());
-    }
-
     @Override
     public String toString() {
         return "Parameter:" + getMethod().getName() + "#" + getName();

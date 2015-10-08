@@ -1,8 +1,12 @@
 
 [
     {
-        "type":"somepackage.AnnotatedClass",
-        "simpleName":"AnnotatedClass",
+        "name":"AnnotatedClass",
+        "fullName":"somepackage.AnnotatedClass<T>",
+        "typeParameters":[
+            "java.lang.Number"
+        ],
+        "isCollection":false,
         "void":false,
         "boolean":false,
         "number":false,
@@ -14,48 +18,53 @@
         ],
         "array":false,
         "elementType":null,
-        "typeParameters":{
-            "T":"java.lang.Number"
-        },
         "public":true,
         "static":false,
         "transient":false,
         "annotations":[
             {
                 "name":"A",
+                "fullName":"somepackage.A",
                 "value":"ppp"
             },
             {
-                "name":"MarkerAnnotation"
+                "name":"MarkerAnnotation",
+                "fullName":"somepackage.MarkerAnnotation"
             },
             {
                 "name":"SuppressWarnings",
+                "fullName":"java.lang.SuppressWarnings",
                 "value":"\"unused\""
             }
         ],
         "fields":{
             "string":{
-                "type":"java.lang.String",
-                "typeParameters":{
+                "type":{
+                    "name":"String",
+                    "fullName":"java.lang.String",
+                    "typeParameters":[
+                    ],
+                    "isCollection":false
                 },
-                "typeArguments":[
-                ],
                 "public":false,
                 "static":false,
                 "transient":false,
                 "annotations":[
                     {
                         "name":"A",
+                        "fullName":"somepackage.A",
                         "value":"fff"
                     }
                 ]
             },
             "bool":{
-                "type":"boolean",
-                "typeParameters":{
+                "type":{
+                    "name":"boolean",
+                    "fullName":"boolean",
+                    "typeParameters":[
+                    ],
+                    "isCollection":false
                 },
-                "typeArguments":[
-                ],
                 "public":false,
                 "static":false,
                 "transient":false,
@@ -63,13 +72,15 @@
                 ]
             },
             "map":{
-                "type":"java.util.Map",
-                "typeParameters":{
-                    "K":"java.lang.Object",
-                    "V":"java.lang.Object"
+                "type":{
+                    "name":"Map",
+                    "fullName":"java.util.Map<java.lang.String,java.lang.Number>",
+                    "typeParameters":[
+                        "java.lang.String",
+                        "java.lang.Number"
+                    ],
+                    "isCollection":false
                 },
-                "typeArguments":[
-                ],
                 "public":false,
                 "static":false,
                 "transient":false,
@@ -80,21 +91,28 @@
         "methods":[
             {
                 "name":"method0",
-                "containerType":"Type:somepackage.AnnotatedClass",
-                "returnType":"ReflectionType:void",
-                "typeParameters":{
+                "containerType":"Type:somepackage.AnnotatedClass<T>",
+                "returnType":{
+                    "name":"void",
+                    "fullName":"void",
+                    "typeParameters":[
+                    ],
+                    "isCollection":false
                 },
                 "annotations":[
                     {
                         "name":"A",
+                        "fullName":"somepackage.A",
                         "value":"mmm"
                     },
                     {
                         "name":"A",
+                        "fullName":"somepackage.A",
                         "value":"nnn"
                     },
                     {
                         "name":"B",
+                        "fullName":"somepackage.B",
                         "value":"bbb"
                     }
                 ],
@@ -103,32 +121,52 @@
             },
             {
                 "name":"method1",
-                "containerType":"Type:somepackage.AnnotatedClass",
-                "returnType":"Type:java.lang.String",
-                "typeParameters":{
+                "containerType":"Type:somepackage.AnnotatedClass<T>",
+                "returnType":{
+                    "name":"List",
+                    "fullName":"java.util.List<java.lang.String>",
+                    "typeParameters":[
+                        "java.lang.String"
+                    ],
+                    "isCollection":true
                 },
                 "annotations":[
                     {
                         "name":"A",
+                        "fullName":"somepackage.A",
                         "value":"ooo"
                     },
                     {
                         "name":"BB",
+                        "fullName":"somepackage.BB",
                         "value":"@somepackage.B(\"b0\"),@somepackage.B(\"b1\")"
                     }
                 ],
                 "parameters":[
                     {
-                        "name":"method1",
-                        "method":"method1",
                         "name":"string",
-                        "type":"java.lang.String"
+                        "method":"method1",
+                        "type":"java.lang.String",
+                        "typeParameters":[
+                        ],
+                        "isCollection":false
                     },
                     {
-                        "name":"method1",
-                        "method":"method1",
                         "name":"bool",
-                        "type":"boolean"
+                        "method":"method1",
+                        "type":"boolean",
+                        "typeParameters":[
+                        ],
+                        "isCollection":false
+                    },
+                    {
+                        "name":"strings",
+                        "method":"method1",
+                        "type":"java.util.List<java.lang.String>",
+                        "typeParameters":[
+                            "java.lang.String"
+                        ],
+                        "isCollection":true
                     }
                 ]
             }

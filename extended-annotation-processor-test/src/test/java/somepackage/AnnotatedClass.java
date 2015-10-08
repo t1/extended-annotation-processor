@@ -1,6 +1,6 @@
 package somepackage;
 
-import java.util.Map;
+import java.util.*;
 
 /** javadoc summary. second sentence. */
 @A("ppp")
@@ -19,7 +19,7 @@ public class AnnotatedClass<T extends Number> {
 
     @A("ooo")
     @BB({ @B("b0"), @B("b1") })
-    public String method1(String string, @A("ppp") boolean bool) {
+    public List<String> method1(String string, @A("ppp") boolean bool, List<String> strings) {
         return null;
     }
 }
