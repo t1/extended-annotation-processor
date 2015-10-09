@@ -118,9 +118,10 @@ public class Type extends Elemental {
         if (!isEnum())
             return null;
         List<String> values = new ArrayList<>();
-        for (Element element : getElement().getEnclosedElements())
-            if (element.getKind() == ENUM_CONSTANT)
-                values.add(element.getSimpleName().toString());
+        if (getElement() != null)
+            for (Element element : getElement().getEnclosedElements())
+                if (element.getKind() == ENUM_CONSTANT)
+                    values.add(element.getSimpleName().toString());
         return values;
     }
 
@@ -188,9 +189,10 @@ public class Type extends Elemental {
 
     public List<Method> getMethods() {
         List<Method> list = new ArrayList<>();
-        for (Element element : getElement().getEnclosedElements())
-            if (element.getKind() == METHOD)
-                list.add(new Method(env(), this, (ExecutableElement) element));
+        if (getElement() != null)
+            for (Element element : getElement().getEnclosedElements())
+                if (element.getKind() == METHOD)
+                    list.add(new Method(env(), this, (ExecutableElement) element));
         return list;
     }
 
@@ -203,9 +205,10 @@ public class Type extends Elemental {
 
     public List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
-        for (Element enclosedElement : getElement().getEnclosedElements())
-            if (enclosedElement instanceof VariableElement)
-                fields.add(new Field(env(), (VariableElement) enclosedElement));
+        if (getElement() != null)
+            for (Element enclosedElement : getElement().getEnclosedElements())
+                if (enclosedElement instanceof VariableElement)
+                    fields.add(new Field(env(), (VariableElement) enclosedElement));
         return fields;
     }
 
@@ -217,7 +220,7 @@ public class Type extends Elemental {
     }
 
     public Type getSuperType() {
-        if (getElement().getSuperclass().getKind() == NONE)
+        if (getElement() == null || getElement().getSuperclass().getKind() == NONE)
             return null;
         return Type.of(getElement().getSuperclass(), env());
     }

@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import static java.util.Arrays.*;
+import static java.util.Collections.*;
 import static javax.lang.model.element.Modifier.*;
 import static javax.tools.Diagnostic.Kind.*;
 
@@ -97,6 +98,8 @@ public class Elemental {
     }
 
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
+        if (this.getElement() == null)
+            return emptyList();
         T[] annotations = this.getElement().getAnnotationsByType(type);
         if (annotations.length == 0 && JavaDoc.class.equals(type) && docComment() != null)
             return asList(type.cast(javaDoc()));
