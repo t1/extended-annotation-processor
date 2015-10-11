@@ -9,6 +9,7 @@ import java.util.*;
 
 import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.AnnotationMirror;
+import javax.tools.Diagnostic;
 
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
     public static List<AnnotationWrapper> allOn(AnnotatedElement annotated) {
@@ -135,6 +136,11 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         for (Object value : values)
             list.add(new ReflectionAnnotationWrapper((Annotation) value));
         return list;
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override
