@@ -12,16 +12,22 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.tools.Diagnostic;
 
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
+    private static Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
+    private static final Map<AnnotatedElement, Map<Class<?>, List<AnnotationWrapper>>> annotationsByType =
+            new HashMap<>();
+
     public static List<AnnotationWrapper> allOn(AnnotatedElement annotated) {
-        List<AnnotationWrapper> result = new ArrayList<>();
-        for (Annotation annotation : annotated.getAnnotations()) {
-            Class<? extends Annotation> repeatedType = getRepeatedType(annotation);
-            if (repeatedType == null)
-                result.add(wrapped(annotation));
-            else
-                result.addAll(ofTypeOn(annotated, repeatedType));
-        }
-        return result;
+        return annotationsOnType.computeIfAbsent(annotated, (k) -> {
+            List<AnnotationWrapper> result = new ArrayList<>();
+            for (Annotation annotation : annotated.getAnnotations()) {
+                Class<? extends Annotation> repeatedType = getRepeatedType(annotation);
+                if (repeatedType == null)
+                    result.add(wrapped(annotation));
+                else
+                    result.addAll(ofTypeOn(annotated, repeatedType));
+            }
+            return result;
+        });
     }
 
     /** Reverse lookup from the container to the contained class in a {@link Repeatable} annotation */
@@ -52,10 +58,14 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type) {
-        List<AnnotationWrapper> result = new ArrayList<>();
-        for (T annotation : annotated.getAnnotationsByType(type))
-            result.add(wrapped(annotation));
-        return result;
+        Map<Class<?>, List<AnnotationWrapper>> map =
+                annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
+        return map.computeIfAbsent(type, (k) -> {
+            List<AnnotationWrapper> result = new ArrayList<>();
+            for (T annotation : annotated.getAnnotationsByType(type))
+                result.add(wrapped(annotation));
+            return result;
+        });
     }
 
     private static ReflectionAnnotationWrapper wrapped(Annotation annotation) {
