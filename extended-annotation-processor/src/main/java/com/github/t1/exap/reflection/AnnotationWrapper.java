@@ -51,14 +51,14 @@ public class AnnotationWrapper extends Elemental {
         return Type.of(annotation.getAnnotationType(), env());
     }
 
-    public List<String> getValueNames() {
+    public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
         for (ExecutableElement element : annotation.getElementValues().keySet())
             result.add(element.getSimpleName().toString());
         return result;
     }
 
-    public Map<String, Object> getValueMap() {
+    public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotation.getElementValues()
                 .entrySet())
@@ -66,20 +66,12 @@ public class AnnotationWrapper extends Elemental {
         return result;
     }
 
-    public Object getValue() {
-        return getValue("value");
-    }
-
-    public Object getValue(String name) {
+    public Object getProperty(String name) {
         return AnnotationWrapperBuilder.getAnnotationValue(env(), annotation, name);
     }
 
-    public boolean getBooleanValue() {
-        return getBooleanValue("value");
-    }
-
-    public boolean getBooleanValue(String name) {
-        Object value = getValue(name);
+    public boolean getBooleanProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof boolean[])
             if (((boolean[]) value).length == 1)
                 return ((boolean[]) value)[0];
@@ -89,13 +81,9 @@ public class AnnotationWrapper extends Elemental {
         return (boolean) value;
     }
 
-    public List<Boolean> getBooleanValues() {
-        return getBooleanValues("value");
-    }
-
-    public List<Boolean> getBooleanValues(String name) {
+    public List<Boolean> getBooleanProperties(String name) {
         List<Boolean> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Boolean)
             return singletonList((Boolean) value);
         for (boolean b : (boolean[]) value)
@@ -103,12 +91,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public byte getByteValue() {
-        return getByteValue("value");
-    }
-
-    public byte getByteValue(String name) {
-        Object value = getValue(name);
+    public byte getByteProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof byte[])
             if (((byte[]) value).length == 1)
                 return ((byte[]) value)[0];
@@ -117,13 +101,9 @@ public class AnnotationWrapper extends Elemental {
         return (byte) value;
     }
 
-    public List<Byte> getByteValues() {
-        return getByteValues("value");
-    }
-
-    public List<Byte> getByteValues(String name) {
+    public List<Byte> getByteProperties(String name) {
         List<Byte> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Byte)
             return singletonList((Byte) value);
         for (byte b : (byte[]) value)
@@ -131,12 +111,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public char getCharValue() {
-        return getCharValue("value");
-    }
-
-    public char getCharValue(String name) {
-        Object value = getValue(name);
+    public char getCharProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof char[])
             if (((char[]) value).length == 1)
                 return ((char[]) value)[0];
@@ -145,13 +121,9 @@ public class AnnotationWrapper extends Elemental {
         return (char) value;
     }
 
-    public List<Character> getCharValues() {
-        return getCharValues("value");
-    }
-
-    public List<Character> getCharValues(String name) {
+    public List<Character> getCharProperties(String name) {
         List<Character> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Character)
             return singletonList((Character) value);
         for (char c : (char[]) value)
@@ -159,12 +131,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public short getShortValue() {
-        return getShortValue("value");
-    }
-
-    public short getShortValue(String name) {
-        Object value = getValue(name);
+    public short getShortProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof short[])
             if (((short[]) value).length == 1)
                 return ((short[]) value)[0];
@@ -174,13 +142,9 @@ public class AnnotationWrapper extends Elemental {
         return (short) value;
     }
 
-    public List<Short> getShortValues() {
-        return getShortValues("value");
-    }
-
-    public List<Short> getShortValues(String name) {
+    public List<Short> getShortProperties(String name) {
         List<Short> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Short)
             return singletonList((Short) value);
         for (short s : (short[]) value)
@@ -188,12 +152,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public int getIntValue() {
-        return getIntValue("value");
-    }
-
-    public int getIntValue(String name) {
-        Object value = getValue(name);
+    public int getIntProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof int[])
             if (((int[]) value).length == 1)
                 return ((int[]) value)[0];
@@ -202,13 +162,9 @@ public class AnnotationWrapper extends Elemental {
         return (int) value;
     }
 
-    public List<Integer> getIntValues() {
-        return getIntValues("value");
-    }
-
-    public List<Integer> getIntValues(String name) {
+    public List<Integer> getIntProperties(String name) {
         List<Integer> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Integer)
             return singletonList((Integer) value);
         for (int i : (int[]) value)
@@ -216,12 +172,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public long getLongValue() {
-        return getLongValue("value");
-    }
-
-    public long getLongValue(String name) {
-        Object value = getValue(name);
+    public long getLongProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof long[])
             if (((long[]) value).length == 1)
                 return ((long[]) value)[0];
@@ -230,13 +182,9 @@ public class AnnotationWrapper extends Elemental {
         return (long) value;
     }
 
-    public List<Long> getLongValues() {
-        return getLongValues("value");
-    }
-
-    public List<Long> getLongValues(String name) {
+    public List<Long> getLongProperties(String name) {
         List<Long> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Long)
             return singletonList((Long) value);
         for (long l : (long[]) value)
@@ -244,12 +192,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public double getDoubleValue() {
-        return getDoubleValue("value");
-    }
-
-    public double getDoubleValue(String name) {
-        Object value = getValue(name);
+    public double getDoubleProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof double[])
             if (((double[]) value).length == 1)
                 return ((double[]) value)[0];
@@ -259,13 +203,9 @@ public class AnnotationWrapper extends Elemental {
         return (double) value;
     }
 
-    public List<Double> getDoubleValues() {
-        return getDoubleValues("value");
-    }
-
-    public List<Double> getDoubleValues(String name) {
+    public List<Double> getDoubleProperties(String name) {
         List<Double> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Double)
             return singletonList((Double) value);
         for (double d : (double[]) value)
@@ -273,12 +213,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public float getFloatValue() {
-        return getFloatValue("value");
-    }
-
-    public float getFloatValue(String name) {
-        Object value = getValue(name);
+    public float getFloatProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof float[])
             if (((float[]) value).length == 1)
                 return ((float[]) value)[0];
@@ -288,13 +224,9 @@ public class AnnotationWrapper extends Elemental {
         return (float) value;
     }
 
-    public List<Float> getFloatValues() {
-        return getFloatValues("value");
-    }
-
-    public List<Float> getFloatValues(String name) {
+    public List<Float> getFloatProperties(String name) {
         List<Float> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof Float)
             return singletonList((Float) value);
         for (float f : (float[]) value)
@@ -302,12 +234,8 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public String getStringValue() {
-        return getStringValue("value");
-    }
-
-    public String getStringValue(String name) {
-        Object value = getValue(name);
+    public String getStringProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof String[])
             if (((String[]) value).length == 1)
                 return ((String[]) value)[0];
@@ -317,13 +245,9 @@ public class AnnotationWrapper extends Elemental {
         return (String) value;
     }
 
-    public List<String> getStringValues() {
-        return getStringValues("value");
-    }
-
-    public List<String> getStringValues(String name) {
+    public List<String> getStringProperties(String name) {
         List<String> list = new ArrayList<>();
-        Object value = getValue(name);
+        Object value = getProperty(name);
         if (value instanceof String)
             return singletonList((String) value);
         for (String s : (String[]) value)
@@ -331,13 +255,9 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public <T extends Enum<?>> List<T> getEnumValue() {
-        return getEnumValue("value");
-    }
-
     @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> T getEnumValue(String name) {
-        Object value = getValue(name);
+    public <T extends Enum<?>> T getEnumProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof Object[])
             if (((T[]) value).length == 1)
                 return ((T[]) value)[0];
@@ -346,21 +266,13 @@ public class AnnotationWrapper extends Elemental {
         return (T) value;
     }
 
-    public <T extends Enum<?>> List<T> getEnumValues() {
-        return getEnumValues("value");
-    }
-
     @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> List<T> getEnumValues(String name) {
-        return asList((T[]) getValue(name));
+    public <T extends Enum<?>> List<T> getEnumProperties(String name) {
+        return asList((T[]) getProperty(name));
     }
 
-    public Type getTypeValue() {
-        return getTypeValue("value");
-    }
-
-    public Type getTypeValue(String name) {
-        Object value = getValue(name);
+    public Type getTypeProperty(String name) {
+        Object value = getProperty(name);
         // FIXME does this work?
         if (value instanceof TypeMirror[])
             if (((TypeMirror[]) value).length == 1)
@@ -370,12 +282,8 @@ public class AnnotationWrapper extends Elemental {
         return Type.of((TypeMirror) value, env());
     }
 
-    public List<Type> getTypeValues() {
-        return getTypeValues("value");
-    }
-
-    public List<Type> getTypeValues(String name) {
-        Object value = getValue(name);
+    public List<Type> getTypeProperties(String name) {
+        Object value = getProperty(name);
         if (value == null)
             return emptyList();
         List<Type> list = new ArrayList<>();
@@ -383,23 +291,15 @@ public class AnnotationWrapper extends Elemental {
         return list;
     }
 
-    public AnnotationWrapper getAnnotationValue() {
-        return getAnnotationValue("value");
-    }
-
-    public AnnotationWrapper getAnnotationValue(String name) {
-        Object value = getValue(name);
+    public AnnotationWrapper getAnnotationProperty(String name) {
+        Object value = getProperty(name);
         return new AnnotationWrapper((AnnotationMirror) value, env());
     }
 
-    public List<AnnotationWrapper> getAnnotationValues() {
-        return getAnnotationValues("value");
-    }
-
-    public List<AnnotationWrapper> getAnnotationValues(String name) {
+    public List<AnnotationWrapper> getAnnotationProperties(String name) {
         List<AnnotationWrapper> list = new ArrayList<>();
         @SuppressWarnings("unchecked")
-        List<AnnotationMirror> values = (List<AnnotationMirror>) getValue(name);
+        List<AnnotationMirror> values = (List<AnnotationMirror>) getProperty(name);
         for (AnnotationMirror value : values)
             list.add(new AnnotationWrapper(value, env()));
         return list;

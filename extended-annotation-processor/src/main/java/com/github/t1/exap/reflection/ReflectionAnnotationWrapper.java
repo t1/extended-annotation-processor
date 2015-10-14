@@ -108,7 +108,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public List<String> getValueNames() {
+    public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
         for (Method method : annotation.annotationType().getDeclaredMethods()) {
             if (Annotation.class.equals(method.getDeclaringClass()))
@@ -119,7 +119,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Map<String, Object> getValueMap() {
+    public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Method method : annotation.annotationType().getDeclaredMethods()) {
             if (Annotation.class.equals(method.getDeclaringClass()))
@@ -154,7 +154,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Object getValue(String name) {
+    public Object getProperty(String name) {
         try {
             Method method = annotation.annotationType().getMethod(name);
             return invoke(method);
@@ -164,8 +164,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Type getTypeValue(String name) {
-        Object value = getValue(name);
+    public Type getTypeProperty(String name) {
+        Object value = getProperty(name);
         if (value instanceof Class[])
             if (((Class[]) value).length == 1)
                 value = ((Class[]) value)[0];
@@ -176,8 +176,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public List<Type> getTypeValues(String name) {
-        Object value = getValue(name);
+    public List<Type> getTypeProperties(String name) {
+        Object value = getProperty(name);
         if (value instanceof Class)
             return singletonList(Type.of((Class<?>) value));
         List<Type> list = new ArrayList<>();
@@ -188,28 +188,23 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public <T extends Enum<?>> List<T> getEnumValues() {
-        return getEnumValues("value");
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> List<T> getEnumValues(String name) {
-        Object value = getValue(name);
+    public <T extends Enum<?>> List<T> getEnumProperties(String name) {
+        Object value = getProperty(name);
         if (value instanceof Enum)
             return asList((T) value);
         return asList((T[]) value);
     }
 
     @Override
-    public AnnotationWrapper getAnnotationValue(String name) {
-        Object value = getValue(name);
+    public AnnotationWrapper getAnnotationProperty(String name) {
+        Object value = getProperty(name);
         return new ReflectionAnnotationWrapper((Annotation) value);
     }
 
     @Override
-    public List<AnnotationWrapper> getAnnotationValues(String name) {
-        Object value = getValue(name);
+    public List<AnnotationWrapper> getAnnotationProperties(String name) {
+        Object value = getProperty(name);
         if (value instanceof Annotation)
             return singletonList(new ReflectionAnnotationWrapper((Annotation) value));
         List<AnnotationWrapper> list = new ArrayList<>();

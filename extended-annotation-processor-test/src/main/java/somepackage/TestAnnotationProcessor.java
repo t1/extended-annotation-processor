@@ -88,9 +88,9 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             json.writeStartObject();
             json.write("name", annotation.getAnnotationType().getSimpleName());
             json.write("fullName", annotation.getAnnotationType().getFullName());
-            for (String name : annotation.getValueNames()) {
+            for (String name : annotation.getPropertyNames()) {
                 json.writeStartArray(name);
-                Object value = annotation.getValue(name);
+                Object value = annotation.getProperty(name);
                 writeAnnotationPropertyValue(json, value);
                 json.writeEnd();
             }
