@@ -9,6 +9,8 @@ import java.util.*;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.json.Json;
 import javax.json.stream.*;
+import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.tools.FileObject;
 
 import org.slf4j.*;
@@ -86,16 +88,65 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
             json.writeStartObject();
             json.write("name", annotation.getAnnotationType().getSimpleName());
             json.write("fullName", annotation.getAnnotationType().getFullName());
-            for (Map.Entry<String, Object> value : annotation.getElementValues().entrySet()) {
-                if (value.getValue() == null)
-                    json.writeNull(value.getKey());
-                else
-                    json.write(value.getKey(), value.getValue().toString());
+            for (String name : annotation.getValueNames()) {
+                json.writeStartArray(name);
+                Object value = annotation.getValue(name);
+                writeAnnotationPropertyValue(json, value);
+                json.writeEnd();
             }
             json.writeEnd();
         }
 
         json.writeEnd();
+    }
+
+    private void writeAnnotationPropertyValue(JsonGenerator json, Object value) {
+        log.debug("write {}:{}", (value == null) ? null : value.getClass(), value);
+        if (value == null)
+            json.writeNull();
+        else if (value instanceof List)
+            for (Object item : ((List<?>) value))
+                writeAnnotationPropertyValue(json, item);
+        else if (value instanceof Boolean)
+            json.write((boolean) value);
+        else if (value instanceof Character)
+            json.write((char) value);
+        else if (value instanceof Byte)
+            json.write((byte) value);
+        else if (value instanceof Short)
+            json.write((short) value);
+        else if (value instanceof Integer)
+            json.write((int) value);
+        else if (value instanceof Long)
+            json.write((long) value);
+        else if (value instanceof Float)
+            json.write((float) value);
+        else if (value instanceof Double)
+            json.write((double) value);
+        else if (value instanceof String)
+            json.write(value.toString());
+        // FIXME remove dependency on javax.lang.model
+        else if (value instanceof AnnotationValue)
+            json.write(((AnnotationValue) value).getValue().toString());
+        else if (value instanceof DeclaredType)
+            json.write(((DeclaredType) value).toString());
+        else if (value instanceof VariableElement)
+            json.write(((VariableElement) value).getSimpleName().toString());
+        else
+            throw new IllegalArgumentException("unmapped annotations type " + typeInfo(value));
+    }
+
+    private String typeInfo(Object value) {
+        StringBuilder out = new StringBuilder();
+        for (Class<?> t = value.getClass(); t != null; t = t.getSuperclass())
+            typeInfo(out, t);
+        return out.toString();
+    }
+
+    private void typeInfo(StringBuilder out, Class<?> t) {
+        out.append("[").append(t.getName()).append("]");
+        for (Class<?> i : t.getInterfaces())
+            typeInfo(out, i);
     }
 
     private void writeFields(JsonGenerator json, Type type) {

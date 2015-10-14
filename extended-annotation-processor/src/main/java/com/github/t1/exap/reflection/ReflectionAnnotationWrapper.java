@@ -1,11 +1,14 @@
 package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
 
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.ArrayList;
 
 import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.AnnotationMirror;
@@ -105,12 +108,28 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Map<String, Object> getElementValues() {
+    public List<String> getValueNames() {
+        List<String> result = new ArrayList<>();
+        for (Method method : annotation.annotationType().getDeclaredMethods()) {
+            if (Annotation.class.equals(method.getDeclaringClass()))
+                continue;
+            result.add(method.getName());
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getValueMap() {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Method method : annotation.annotationType().getDeclaredMethods()) {
             if (Annotation.class.equals(method.getDeclaringClass()))
                 continue;
-            result.put(method.getName(), invoke(method));
+            Object value = invoke(method);
+            if (value.getClass().isArray())
+                value = arrayToList(value);
+            if (value instanceof Class)
+                value = Type.of((Class<?>) value);
+            result.put(method.getName(), value);
         }
         return result;
     }
@@ -121,6 +140,17 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException("while invoking " + method + " on " + annotation, e);
         }
+    }
+
+    private Object arrayToList(Object array) {
+        List<Object> list = new ArrayList<>();
+        for (int i = 0; i < Array.getLength(array); i++) {
+            Object value = Array.get(array, i);
+            if (value instanceof Class)
+                value = Type.of((Class<?>) value);
+            list.add(value);
+        }
+        return list;
     }
 
     @Override
@@ -136,15 +166,55 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public Type getTypeValue(String name) {
         Object value = getValue(name);
-        return (value == null) ? null : Type.of((Class<?>) value);
+        if (value instanceof Class[])
+            if (((Class[]) value).length == 1)
+                value = ((Class[]) value)[0];
+            else
+                throw new IllegalArgumentException(
+                        "expected Class[] to contain exactly one element but found " + value);
+        return Type.of((Class<?>) value);
     }
 
     @Override
-    public List<AnnotationWrapper> getAnnotationsValue(String name) {
+    public List<Type> getTypeValues(String name) {
+        Object value = getValue(name);
+        if (value instanceof Class)
+            return singletonList(Type.of((Class<?>) value));
+        List<Type> list = new ArrayList<>();
+        if (value != null)
+            for (Class<?> t : (Class<?>[]) value)
+                list.add(Type.of(t));
+        return list;
+    }
+
+    @Override
+    public <T extends Enum<?>> List<T> getEnumValues() {
+        return getEnumValues("value");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Enum<?>> List<T> getEnumValues(String name) {
+        Object value = getValue(name);
+        if (value instanceof Enum)
+            return asList((T) value);
+        return asList((T[]) value);
+    }
+
+    @Override
+    public AnnotationWrapper getAnnotationValue(String name) {
+        Object value = getValue(name);
+        return new ReflectionAnnotationWrapper((Annotation) value);
+    }
+
+    @Override
+    public List<AnnotationWrapper> getAnnotationValues(String name) {
+        Object value = getValue(name);
+        if (value instanceof Annotation)
+            return singletonList(new ReflectionAnnotationWrapper((Annotation) value));
         List<AnnotationWrapper> list = new ArrayList<>();
-        Object[] values = (Object[]) getValue(name);
-        for (Object value : values)
-            list.add(new ReflectionAnnotationWrapper((Annotation) value));
+        for (Annotation annotation : (Annotation[]) value)
+            list.add(new ReflectionAnnotationWrapper(annotation));
         return list;
     }
 

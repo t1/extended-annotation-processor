@@ -1,5 +1,7 @@
 package somepackage;
 
+import static somepackage.FooNum.*;
+
 import java.util.*;
 
 /** javadoc summary. second sentence. */
@@ -7,10 +9,18 @@ import java.util.*;
 @MarkerAnnotation
 @SuppressWarnings("unused") // retention SOURCE
 public class AnnotatedClass<T extends Number> {
+    boolean bool;
+
     @A("fff")
     String string;
-    boolean bool;
+
+    @FooNumA(X)
+    @FooNums({ Y, Z })
     Map<String, Number> map;
+
+    @Multi(booly = false, bytey = 0, chary = 'c', classy = Object.class, doubly = 0.0D, floaty = 0.0F, inty = 0,
+            longy = 0, shorty = 0, string = "s")
+    FooNum fooNum;
 
     @A("mmm")
     @A("nnn")

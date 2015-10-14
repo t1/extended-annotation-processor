@@ -25,7 +25,9 @@
             {
                 "name":"A",
                 "fullName":"somepackage.A",
-                "value":"ppp"
+                "value":[
+                    "ppp"
+                ]
             },
             {
                 "name":"MarkerAnnotation",
@@ -34,10 +36,26 @@
             {
                 "name":"SuppressWarnings",
                 "fullName":"java.lang.SuppressWarnings",
-                "value":"\"unused\""
+                "value":[
+                    "unused"
+                ]
             }
         ],
         "fields":{
+            "bool":{
+                "type":{
+                    "name":"boolean",
+                    "fullName":"boolean",
+                    "typeParameters":[
+                    ],
+                    "isCollection":false
+                },
+                "public":false,
+                "static":false,
+                "transient":false,
+                "annotations":[
+                ]
+            },
             "string":{
                 "type":{
                     "name":"String",
@@ -53,22 +71,10 @@
                     {
                         "name":"A",
                         "fullName":"somepackage.A",
-                        "value":"fff"
+                        "value":[
+                            "fff"
+                        ]
                     }
-                ]
-            },
-            "bool":{
-                "type":{
-                    "name":"boolean",
-                    "fullName":"boolean",
-                    "typeParameters":[
-                    ],
-                    "isCollection":false
-                },
-                "public":false,
-                "static":false,
-                "transient":false,
-                "annotations":[
                 ]
             },
             "map":{
@@ -85,6 +91,69 @@
                 "static":false,
                 "transient":false,
                 "annotations":[
+                    {
+                        "name":"FooNumA",
+                        "fullName":"somepackage.FooNumA",
+                        "value":[
+                            "X"
+                        ]
+                    },
+                    {
+                        "name":"FooNums",
+                        "fullName":"somepackage.FooNums",
+                        "value":[
+                            "Y",
+                            "Z"
+                        ]
+                    }
+                ]
+            },
+            "fooNum":{
+                "type":{
+                    "name":"FooNum",
+                    "fullName":"somepackage.FooNum",
+                    "typeParameters":[
+                    ],
+                    "isCollection":false
+                },
+                "public":false,
+                "static":false,
+                "transient":false,
+                "annotations":[
+                    {
+                        "name":"Multi",
+                        "fullName":"somepackage.Multi",
+                        "booly":[
+                            false
+                        ],
+                        "bytey":[
+                            0
+                        ],
+                        "chary":[
+                            99
+                        ],
+                        "classy":[
+                            "java.lang.Object"
+                        ],
+                        "doubly":[
+                            0.0
+                        ],
+                        "floaty":[
+                            0.0
+                        ],
+                        "inty":[
+                            0
+                        ],
+                        "longy":[
+                            0
+                        ],
+                        "shorty":[
+                            0
+                        ],
+                        "string":[
+                            "s"
+                        ]
+                    }
                 ]
             }
         },
@@ -103,17 +172,23 @@
                     {
                         "name":"A",
                         "fullName":"somepackage.A",
-                        "value":"mmm"
+                        "value":[
+                            "mmm"
+                        ]
                     },
                     {
                         "name":"A",
                         "fullName":"somepackage.A",
-                        "value":"nnn"
+                        "value":[
+                            "nnn"
+                        ]
                     },
                     {
                         "name":"B",
                         "fullName":"somepackage.B",
-                        "value":"bbb"
+                        "value":[
+                            "bbb"
+                        ]
                     }
                 ],
                 "parameters":[
@@ -134,12 +209,17 @@
                     {
                         "name":"A",
                         "fullName":"somepackage.A",
-                        "value":"ooo"
+                        "value":[
+                            "ooo"
+                        ]
                     },
                     {
                         "name":"BB",
                         "fullName":"somepackage.BB",
-                        "value":"@somepackage.B(\"b0\"),@somepackage.B(\"b1\")"
+                        "value":[
+                            "@somepackage.B(\"b0\")",
+                            "@somepackage.B(\"b1\")"
+                        ]
                     }
                 ],
                 "parameters":[
