@@ -198,8 +198,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public String getEnumProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return value.toString();
+        return getSingleProperty(name).toString();
     }
 
     @Override
@@ -216,8 +215,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public Type getTypeProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return Type.of((Class<?>) value);
+        Class<?> value = (Class<?>) getSingleProperty(name);
+        return Type.of(value);
     }
 
     @Override
@@ -234,8 +233,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public AnnotationWrapper getAnnotationProperty(String name) {
-        Object value = getProperty(name);
-        return new ReflectionAnnotationWrapper((Annotation) value);
+        Annotation value = (Annotation) getSingleProperty(name);
+        return new ReflectionAnnotationWrapper(value);
     }
 
     @Override

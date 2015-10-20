@@ -27,7 +27,7 @@ public @interface MultiA {
 
     Class<?>[] classy();
 
-    A[] annoty();
-
     FooNum[] enumy();
+
+    A[] annoty();
 }

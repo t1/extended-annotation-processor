@@ -3,5 +3,10 @@ package somepackage;
 public enum FooNum {
     X,
     Y,
-    Z;
+    Z {
+        @Override
+        public String toString() {
+            return "Z!";
+        }
+    };
 }

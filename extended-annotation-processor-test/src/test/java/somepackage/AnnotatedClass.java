@@ -19,14 +19,14 @@ public class AnnotatedClass<T extends Number> {
     Map<String, Number> map;
 
     @Multi(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.0F, inty = 7,
-            longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+            longy = 8, shorty = 9, stringy = "s", enumy = X, annoty = @A("a") )
     @MultiA(booly = {}, bytey = {}, chary = {}, classy = {}, doubly = {}, floaty = {}, inty = {}, longy = {},
-            shorty = {}, stringy = {}, annoty = {}, enumy = {})
+            shorty = {}, stringy = {}, enumy = {}, annoty = {})
     @MultiA(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.0F, inty = 7,
-            longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+            longy = 8, shorty = 9, stringy = "s", enumy = X, annoty = @A("a") )
     @MultiA(booly = { false, true }, bytey = { 1, 2 }, chary = { 0x21, 0x22 }, classy = { Object.class, String.class },
             doubly = { 3.4D, 4.3D }, floaty = { 5.0F, 6.5F }, inty = { 7, 8 }, longy = { 8, 9 }, shorty = { 9, 8 },
-            stringy = { "s", "t" }, annoty = { @A("a"), @A("b") }, enumy = { X, Y })
+            stringy = { "s", "t" }, enumy = { X, Y }, annoty = { @A("a"), @A("b") })
     FooNum fooNum;
 
     @A("mmm")

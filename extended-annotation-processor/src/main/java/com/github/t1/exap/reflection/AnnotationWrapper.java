@@ -120,6 +120,10 @@ public class AnnotationWrapper extends Elemental {
         return (annotationValue == null) ? null : annotationValue.getValue();
     }
 
+    protected Object getSingleProperty(String name) {
+        return isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
+    }
+
     protected Object getSingleArrayProperty(String name) {
         List<?> list = (List<?>) getProperty(name);
         if (list.size() != 1)
@@ -134,8 +138,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public boolean getBooleanProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (boolean) value;
+        return (boolean) getSingleProperty(name);
     }
 
     public List<Boolean> getBooleanProperties(String name) {
@@ -153,8 +156,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public byte getByteProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (byte) value;
+        return (byte) getSingleProperty(name);
     }
 
     public List<Byte> getByteProperties(String name) {
@@ -172,8 +174,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public char getCharProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (char) value;
+        return (char) getSingleProperty(name);
     }
 
     public List<Character> getCharProperties(String name) {
@@ -191,8 +192,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public short getShortProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (short) value;
+        return (short) getSingleProperty(name);
     }
 
     public List<Short> getShortProperties(String name) {
@@ -210,8 +210,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public int getIntProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (int) value;
+        return (int) getSingleProperty(name);
     }
 
     public List<Integer> getIntProperties(String name) {
@@ -229,8 +228,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public long getLongProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (long) value;
+        return (long) getSingleProperty(name);
     }
 
     public List<Long> getLongProperties(String name) {
@@ -248,8 +246,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public double getDoubleProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (double) value;
+        return (double) getSingleProperty(name);
     }
 
     public List<Double> getDoubleProperties(String name) {
@@ -267,8 +264,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public float getFloatProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return (float) value;
+        return (float) getSingleProperty(name);
     }
 
     public List<Float> getFloatProperties(String name) {
@@ -286,8 +282,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public String getStringProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
-        return value.toString();
+        return getSingleProperty(name).toString();
     }
 
     public List<String> getStringProperties(String name) {
@@ -305,8 +300,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public String getEnumProperty(String name) {
-        VariableElement variable =
-                (VariableElement) (isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name));
+        VariableElement variable = (VariableElement) getSingleProperty(name);
         return variable.getSimpleName().toString();
     }
 
@@ -324,7 +318,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public Type getTypeProperty(String name) {
-        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
+        Object value = getSingleProperty(name);
         return Type.of((TypeMirror) value, env());
     }
 

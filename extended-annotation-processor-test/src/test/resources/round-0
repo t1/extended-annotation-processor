@@ -153,11 +153,11 @@
                         "stringy":[
                             "s"
                         ],
-                        "annoty":[
-                            "@somepackage.A(\"a\")"
-                        ],
                         "enumy":[
                             "X"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")"
                         ]
                     },
                     {
@@ -183,9 +183,9 @@
                         ],
                         "stringy":[
                         ],
-                        "annoty":[
-                        ],
                         "enumy":[
+                        ],
+                        "annoty":[
                         ]
                     },
                     {
@@ -221,11 +221,11 @@
                         "stringy":[
                             "s"
                         ],
-                        "annoty":[
-                            "@somepackage.A(\"a\")"
-                        ],
                         "enumy":[
                             "X"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")"
                         ]
                     },
                     {
@@ -271,13 +271,13 @@
                             "s",
                             "t"
                         ],
-                        "annoty":[
-                            "@somepackage.A(\"a\")",
-                            "@somepackage.A(\"b\")"
-                        ],
                         "enumy":[
                             "X",
                             "Y"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")",
+                            "@somepackage.A(\"b\")"
                         ]
                     }
                 ]

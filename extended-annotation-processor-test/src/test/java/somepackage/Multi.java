@@ -26,7 +26,7 @@ public @interface Multi {
 
     Class<?> classy();
 
-    A annoty();
-
     FooNum enumy();
+
+    A annoty();
 }

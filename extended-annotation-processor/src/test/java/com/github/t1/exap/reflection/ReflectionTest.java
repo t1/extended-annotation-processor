@@ -45,7 +45,12 @@ public class ReflectionTest {
     public enum FooNum {
         X,
         Y,
-        Z;
+        Z {
+            @Override
+            public String toString() {
+                return "Z!";
+            }
+        };
     }
 
     @Retention(RUNTIME)
@@ -70,9 +75,9 @@ public class ReflectionTest {
 
         Class<?> classy();
 
-        A annoty();
-
         FooNum enumy();
+
+        A annoty();
     }
 
     @Retention(RUNTIME)
@@ -103,9 +108,9 @@ public class ReflectionTest {
 
         Class<?>[] classy();
 
-        A[] annoty();
-
         FooNum[] enumy();
+
+        A[] annoty();
     }
 
 
@@ -132,15 +137,15 @@ public class ReflectionTest {
         Map<String, Number> map;
 
         @Multi(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.6F, inty = 7,
-                longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+                longy = 8, shorty = 9, stringy = "s", enumy = X, annoty = @A("a") )
         @MultiA(booly = {}, bytey = {}, chary = {}, classy = {}, doubly = {}, floaty = {}, inty = {}, longy = {},
-                shorty = {}, stringy = {}, annoty = {}, enumy = {})
+                shorty = {}, stringy = {}, enumy = {}, annoty = {})
         @MultiA(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.6F, inty = 7,
-                longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+                longy = 8, shorty = 9, stringy = "s", enumy = X, annoty = @A("a") )
         @MultiA(booly = { false, true }, bytey = { 1, 2 }, chary = { 0x21, 0x22 },
                 classy = { Object.class, String.class }, doubly = { 3.4D, 4.3D }, floaty = { 5.6F, 6.5F },
-                inty = { 7, 8 }, longy = { 8, 9 }, shorty = { 9, 8 }, stringy = { "s", "t" },
-                annoty = { @A("a"), @A("b") }, enumy = { X, Y })
+                inty = { 7, 8 }, longy = { 8, 9 }, shorty = { 9, 8 }, stringy = { "s", "t" }, enumy = { Y, Z },
+                annoty = { @A("a"), @A("b") })
         transient FooNum fooNum;
 
         @A("mmm")
@@ -288,7 +293,7 @@ public class ReflectionTest {
 
         assertTrue(mapField.isAnnotated(FooNums.class));
         assertArrayEquals(new FooNum[] { Y, Z }, mapField.getAnnotation(FooNums.class).value());
-        assertEquals(asList("Y", "Z"), mapField.getAnnotationWrapper(FooNums.class).getEnumProperties("value"));
+        assertEquals(asList("Y", "Z!"), mapField.getAnnotationWrapper(FooNums.class).getEnumProperties("value"));
         assertEquals(1, mapField.getAnnotations(FooNums.class).size());
         assertEquals(1, mapField.getAnnotationWrappers(FooNums.class).size());
     }
@@ -302,7 +307,7 @@ public class ReflectionTest {
         assertTrue(enumField.isTransient());
 
         assertTrue(enumField.getType().isEnum());
-        assertEquals(asList("X", "Y", "Z"), enumField.getType().getEnumValues());
+        assertEquals(asList("X", "Y", "Z!"), enumField.getType().getEnumValues());
 
         assertEquals(4, enumField.getAnnotationWrappers().size());
         assertEnumFieldAnnotationMulti(enumField);
@@ -324,8 +329,8 @@ public class ReflectionTest {
         assertEquals(8, multi.longy());
         assertEquals(9, multi.shorty());
         assertEquals("s", multi.stringy());
-        assertEquals("a", multi.annoty().value());
         assertEquals(X, multi.enumy());
+        assertEquals("a", multi.annoty().value());
 
         AnnotationWrapper wrapper = enumField.getAnnotationWrapper(Multi.class);
 
@@ -353,12 +358,12 @@ public class ReflectionTest {
         assertEquals(asList((short) 9), wrapper.getShortProperties("shorty"));
         assertEquals("s", wrapper.getStringProperty("stringy"));
         assertEquals(asList("s"), wrapper.getStringProperties("stringy"));
+        assertEquals("X", wrapper.getEnumProperty("enumy"));
+        assertEquals(asList("X"), wrapper.getEnumProperties("enumy"));
         assertEquals("a", wrapper.getAnnotationProperty("annoty").getStringProperty("value"));
         List<AnnotationWrapper> annotys = wrapper.getAnnotationProperties("annoty");
         assertEquals(1, annotys.size());
         assertEquals("a", annotys.get(0).getStringProperty("value"));
-        assertEquals("X", wrapper.getEnumProperty("enumy"));
-        assertEquals(asList("X"), wrapper.getEnumProperties("enumy"));
 
         Map<String, Object> valueMap = wrapper.getPropertyMap();
         assertEquals(false, valueMap.get("booly"));
@@ -371,8 +376,8 @@ public class ReflectionTest {
         assertEquals(8L, valueMap.get("longy"));
         assertEquals((short) 9, valueMap.get("shorty"));
         assertEquals("s", valueMap.get("stringy"));
-        // TODO assertEquals("s", valueMap.get("annoty"));
         assertEquals(X, valueMap.get("enumy"));
+        assertEquals(multi.annoty(), valueMap.get("annoty"));
     }
 
     private void assertEnumFieldAnnotationMultiA0(Field enumField) {
@@ -388,8 +393,8 @@ public class ReflectionTest {
         assertArrayEquals(new long[] {}, multia.longy());
         assertArrayEquals(new short[] {}, multia.shorty());
         assertArrayEquals(new String[] {}, multia.stringy());
-        // TODO assertArrayEquals("a", multia.annoty().value());
         assertArrayEquals(new FooNum[] {}, multia.enumy());
+        assertArrayEquals(new Annotation[] {}, multia.annoty());
 
         AnnotationWrapper wrapper = enumField.getAnnotationWrappers(MultiA.class).get(0);
 
@@ -409,8 +414,8 @@ public class ReflectionTest {
         assertEquals(emptyList(), wrapper.getLongProperties("longy"));
         assertEquals(emptyList(), wrapper.getShortProperties("shorty"));
         assertEquals(emptyList(), wrapper.getStringProperties("stringy"));
-        // TODO assertEquals(emptyList(), wrapper.getAnnotationsValues("annoty"));
         assertEquals(emptyList(), wrapper.getEnumProperties("enumy"));
+        assertEquals(emptyList(), wrapper.getAnnotationProperties("annoty"));
 
         Map<String, Object> valueMap = wrapper.getPropertyMap();
         assertEquals(emptyList(), valueMap.get("booly"));
@@ -423,8 +428,8 @@ public class ReflectionTest {
         assertEquals(emptyList(), valueMap.get("longy"));
         assertEquals(emptyList(), valueMap.get("shorty"));
         assertEquals(emptyList(), valueMap.get("stringy"));
-        // TODO assertEquals(emptyList(), valueMap.get("annoty"));
         assertEquals(emptyList(), valueMap.get("enumy"));
+        assertEquals(emptyList(), valueMap.get("annoty"));
     }
 
     private void assertEnumFieldAnnotationMultiA1(Field enumField) {
@@ -440,8 +445,9 @@ public class ReflectionTest {
         assertArrayEquals(new long[] { 8 }, multia.longy());
         assertArrayEquals(new short[] { 9 }, multia.shorty());
         assertArrayEquals(new String[] { "s" }, multia.stringy());
-        // TODO assertArrayEquals("a", multia.annoty().value());
         assertArrayEquals(new FooNum[] { X }, multia.enumy());
+        assertEquals(1, multia.annoty().length);
+        assertEquals("a", multia.annoty()[0].value());
 
         AnnotationWrapper wrapper = enumField.getAnnotationWrappers(MultiA.class).get(1);
 
@@ -459,8 +465,8 @@ public class ReflectionTest {
         assertEquals(8L, wrapper.getLongProperty("longy"));
         assertEquals((short) 9, wrapper.getShortProperty("shorty"));
         assertEquals("s", wrapper.getStringProperty("stringy"));
-        // TODO assertEquals("s", wrapper.getAnnotationsValue("annoty"));
         assertEquals("X", wrapper.getEnumProperty("enumy"));
+        assertEquals("a", wrapper.getAnnotationProperty("annoty").getStringProperty("value"));
 
         assertEquals(asList(false), wrapper.getBooleanProperties("booly"));
         assertEquals(asList((byte) 1), wrapper.getByteProperties("bytey"));
@@ -472,8 +478,9 @@ public class ReflectionTest {
         assertEquals(asList(8L), wrapper.getLongProperties("longy"));
         assertEquals(asList((short) 9), wrapper.getShortProperties("shorty"));
         assertEquals(asList("s"), wrapper.getStringProperties("stringy"));
-        // TODO assertEquals("s", wrapper.getAnnotationsValues("annoty"));
         assertEquals(asList("X"), wrapper.getEnumProperties("enumy"));
+        assertEquals(1, wrapper.getAnnotationProperties("annoty").size());
+        assertEquals("a", wrapper.getAnnotationProperties("annoty").get(0).getStringProperty("value"));
 
         Map<String, Object> valueMap = wrapper.getPropertyMap();
         assertEquals(asList(false), valueMap.get("booly"));
@@ -486,8 +493,9 @@ public class ReflectionTest {
         assertEquals(asList(8L), valueMap.get("longy"));
         assertEquals(asList((short) 9), valueMap.get("shorty"));
         assertEquals(asList("s"), valueMap.get("stringy"));
-        // TODO assertEquals(asList("s"), valueMap.get("annoty"));
         assertEquals(asList(X), valueMap.get("enumy"));
+        assertEquals(1, ((List<?>) valueMap.get("annoty")).size());
+        assertEquals(multia.annoty()[0], ((List<?>) valueMap.get("annoty")).get(0));
     }
 
     private void assertEnumFieldAnnotationMultiA2(Field enumField) {
@@ -503,8 +511,10 @@ public class ReflectionTest {
         assertArrayEquals(new long[] { 8, 9 }, multia.longy());
         assertArrayEquals(new short[] { 9, 8 }, multia.shorty());
         assertArrayEquals(new String[] { "s", "t" }, multia.stringy());
-        // TODO assertArrayEquals("a", multia.annoty().value());
-        assertArrayEquals(new FooNum[] { X, Y }, multia.enumy());
+        assertArrayEquals(new FooNum[] { Y, Z }, multia.enumy());
+        assertEquals(2, multia.annoty().length);
+        assertEquals("a", multia.annoty()[0].value());
+        assertEquals("b", multia.annoty()[1].value());
 
         AnnotationWrapper wrapper = enumField.getAnnotationWrappers(MultiA.class).get(2);
         assertPropertyNamesMulti(wrapper);
@@ -523,8 +533,12 @@ public class ReflectionTest {
         assertEquals(asList(8L, 9L), wrapper.getLongProperties("longy"));
         assertEquals(asList((short) 9, (short) 8), wrapper.getShortProperties("shorty"));
         assertEquals(asList("s", "t"), wrapper.getStringProperties("stringy"));
-        // TODO assertEquals(asList("s"), wrapper.getAnnotationsValues("annoty"));
-        assertEquals(asList("X", "Y"), wrapper.getEnumProperties("enumy"));
+        assertEquals(asList("Y", "Z!"), wrapper.getEnumProperties("enumy"));
+        assertEquals(2, wrapper.getAnnotationProperties("annoty").size());
+        assertEquals(multia.annoty()[0].value(),
+                wrapper.getAnnotationProperties("annoty").get(0).getSingleProperty("value"));
+        assertEquals(multia.annoty()[1].value(),
+                wrapper.getAnnotationProperties("annoty").get(1).getStringProperty("value"));
 
         Map<String, Object> valueMap = wrapper.getPropertyMap();
         assertEquals(asList(false, true), valueMap.get("booly"));
@@ -537,8 +551,10 @@ public class ReflectionTest {
         assertEquals(asList(8L, 9L), valueMap.get("longy"));
         assertEquals(asList((short) 9, (short) 8), valueMap.get("shorty"));
         assertEquals(asList("s", "t"), valueMap.get("stringy"));
-        // TODO assertEquals(asList("s"), valueMap.get("annoty"));
-        assertEquals(asList(X, Y), valueMap.get("enumy"));
+        assertEquals(asList(Y, Z), valueMap.get("enumy"));
+        assertEquals(2, ((List<?>) valueMap.get("annoty")).size());
+        assertEquals(multia.annoty()[0], ((List<?>) valueMap.get("annoty")).get(0));
+        assertEquals(multia.annoty()[1], ((List<?>) valueMap.get("annoty")).get(1));
     }
 
     private void assertThrownUnexpectedArraySizes(AnnotationWrapper wrapper, int expectedSizeMessage) {
@@ -552,8 +568,8 @@ public class ReflectionTest {
         assertThrownUnexpectedArraySize(() -> wrapper.getLongProperty("longy"), expectedSizeMessage);
         assertThrownUnexpectedArraySize(() -> wrapper.getShortProperty("shorty"), expectedSizeMessage);
         assertThrownUnexpectedArraySize(() -> wrapper.getStringProperty("stringy"), expectedSizeMessage);
-        // TODO assertThrownUnexpectedArraySize(() -> wrapper.getAnnotationsValue("annoty"), expectedSizeMessage);
         assertThrownUnexpectedArraySize(() -> wrapper.getEnumProperty("enumy"), expectedSizeMessage);
+        assertThrownUnexpectedArraySize(() -> wrapper.getAnnotationProperty("annoty"), expectedSizeMessage);
     }
 
     private void assertThrownUnexpectedArraySize(ThrowingCallable thrower, int size) {
@@ -563,7 +579,7 @@ public class ReflectionTest {
 
     private void assertPropertyNamesMulti(AnnotationWrapper wrapper) {
         assertThat(wrapper.getPropertyNames()).containsOnly("booly", "bytey", "chary", "classy", "doubly", "floaty",
-                "inty", "longy", "shorty", "stringy", "annoty", "enumy");
+                "inty", "longy", "shorty", "stringy", "enumy", "annoty");
     }
 
     private void assertIsPropertyArrayMulti(boolean expectedIsArray, AnnotationWrapper wrapper) {
@@ -577,8 +593,8 @@ public class ReflectionTest {
         assertEquals(expectedIsArray, wrapper.isArrayProperty("longy"));
         assertEquals(expectedIsArray, wrapper.isArrayProperty("shorty"));
         assertEquals(expectedIsArray, wrapper.isArrayProperty("stringy"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("annoty"));
         assertEquals(expectedIsArray, wrapper.isArrayProperty("enumy"));
+        assertEquals(expectedIsArray, wrapper.isArrayProperty("annoty"));
     }
 
     private void assertPropertyTypesMulti(AnnotationWrapper wrapper) {
@@ -592,8 +608,8 @@ public class ReflectionTest {
         assertEquals(LONG, wrapper.getPropertyType("longy"));
         assertEquals(SHORT, wrapper.getPropertyType("shorty"));
         assertEquals(STRING, wrapper.getPropertyType("stringy"));
-        assertEquals(ANNOTATION, wrapper.getPropertyType("annoty"));
         assertEquals(ENUM, wrapper.getPropertyType("enumy"));
+        assertEquals(ANNOTATION, wrapper.getPropertyType("annoty"));
     }
 
     @Test
