@@ -1,17 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Arrays.*;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
 import static java.util.Collections.*;
 
 import java.lang.annotation.Repeatable;
 import java.util.*;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.*;
 
 /**
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
@@ -25,270 +24,321 @@ import javax.lang.model.type.TypeMirror;
  *      blog </a>
  */
 public class AnnotationWrapper extends Elemental {
-    private final AnnotationMirror annotation;
+    private final AnnotationMirror annotationMirror;
 
     AnnotationWrapper(AnnotationMirror mirror, ProcessingEnvironment env) {
         this(mirror, mirror.getAnnotationType(), env);
     }
 
-    protected AnnotationWrapper(AnnotationMirror annotation, AnnotatedConstruct element, ProcessingEnvironment env) {
+    protected AnnotationWrapper(AnnotationMirror annotationMirror, AnnotatedConstruct element,
+            ProcessingEnvironment env) {
         super(env, element);
-        this.annotation = annotation;
+        this.annotationMirror = annotationMirror;
     }
 
     public boolean isRepeatable() {
         return getRepeatedAnnotation() != null;
     }
 
+    public boolean isArrayProperty(String name) {
+        return getProperty(name) instanceof List;
+    }
+
+    public AnnotationPropertyType getPropertyType(String name) {
+        // see javax.lang.model.element.AnnotationValue
+        Class<?> type = isArrayProperty(name) ? getArrayType(name) : getProperty(name).getClass();
+        AnnotationPropertyType primitivePropertyType = getPrimitivePropertyType(type);
+        if (primitivePropertyType != null)
+            return primitivePropertyType;
+        if (VariableElement.class.isAssignableFrom(type))
+            return ENUM;
+        if (AnnotationMirror.class.isAssignableFrom(type))
+            return ANNOTATION;
+        if (TypeMirror.class.isAssignableFrom(type))
+            return CLASS;
+        throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = "
+                + getProperty(name) + " in " + this + " type:" + new TypeInfo(type));
+    }
+
+    private Class<?> getArrayType(String name) {
+        List<AnnotationValue> list = getAnnotationValueListProperty(name);
+        if (list.isEmpty())
+            return String.class; // TODO try the method return type instead!
+        return list.get(0).getValue().getClass();
+    }
+
+    protected AnnotationPropertyType getPrimitivePropertyType(Class<?> type) {
+        if (type == Boolean.class || type == boolean.class)
+            return BOOLEAN;
+        if (type == Byte.class || type == byte.class)
+            return BYTE;
+        if (type == Character.class || type == char.class)
+            return CHAR;
+        if (type == Short.class || type == short.class)
+            return SHORT;
+        if (type == Integer.class || type == int.class)
+            return INT;
+        if (type == Long.class || type == long.class)
+            return LONG;
+        if (type == Float.class || type == float.class)
+            return FLOAT;
+        if (type == Double.class || type == double.class)
+            return DOUBLE;
+        if (type == String.class)
+            return STRING;
+        return null;
+    }
+
     private AnnotationMirror getRepeatedAnnotation() {
-        for (AnnotationMirror m : annotation.getAnnotationType().getAnnotationMirrors())
+        for (AnnotationMirror m : annotationMirror.getAnnotationType().getAnnotationMirrors())
             if (m.getAnnotationType().toString().equals(Repeatable.class.getName()))
                 return m;
         return null;
     }
 
     public Type getAnnotationType() {
-        return Type.of(annotation.getAnnotationType(), env());
+        return Type.of(annotationMirror.getAnnotationType(), env());
     }
 
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (ExecutableElement element : annotation.getElementValues().keySet())
+        for (ExecutableElement element : annotationMirror.getElementValues().keySet())
             result.add(element.getSimpleName().toString());
         return result;
     }
 
     public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
-        for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotation.getElementValues()
+        for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues()
                 .entrySet())
             result.put(entry.getKey().getSimpleName().toString(), entry.getValue().getValue());
         return result;
     }
 
     public Object getProperty(String name) {
-        return AnnotationWrapperBuilder.getAnnotationValue(env(), annotation, name);
+        AnnotationValue annotationValue = AnnotationWrapperBuilder.getAnnotationValue(env(), annotationMirror, name);
+        return (annotationValue == null) ? null : annotationValue.getValue();
+    }
+
+    protected Object getSingleArrayProperty(String name) {
+        List<?> list = (List<?>) getProperty(name);
+        if (list.size() != 1)
+            throw new IllegalArgumentException(
+                    "expected annotation property array to contain exactly one element but found " + list.size());
+        return list.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AnnotationValue> getAnnotationValueListProperty(String name) {
+        return (List<AnnotationValue>) getProperty(name);
     }
 
     public boolean getBooleanProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof boolean[])
-            if (((boolean[]) value).length == 1)
-                return ((boolean[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected boolean[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (boolean) value;
     }
 
     public List<Boolean> getBooleanProperties(String name) {
-        List<Boolean> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Boolean)
             return singletonList((Boolean) value);
-        for (boolean b : (boolean[]) value)
-            list.add(b);
+        List<Boolean> list = new ArrayList<>();
+        if (value instanceof boolean[])
+            for (boolean b : (boolean[]) value)
+                list.add(b);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Boolean) annotationValue.getValue());
         return list;
     }
 
     public byte getByteProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof byte[])
-            if (((byte[]) value).length == 1)
-                return ((byte[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected byte[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (byte) value;
     }
 
     public List<Byte> getByteProperties(String name) {
-        List<Byte> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Byte)
             return singletonList((Byte) value);
-        for (byte b : (byte[]) value)
-            list.add(b);
+        List<Byte> list = new ArrayList<>();
+        if (value instanceof byte[])
+            for (byte b : (byte[]) value)
+                list.add(b);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Byte) annotationValue.getValue());
         return list;
     }
 
     public char getCharProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof char[])
-            if (((char[]) value).length == 1)
-                return ((char[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected char[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (char) value;
     }
 
     public List<Character> getCharProperties(String name) {
-        List<Character> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Character)
             return singletonList((Character) value);
-        for (char c : (char[]) value)
-            list.add(c);
+        List<Character> list = new ArrayList<>();
+        if (value instanceof char[])
+            for (char c : (char[]) value)
+                list.add(c);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Character) annotationValue.getValue());
         return list;
     }
 
     public short getShortProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof short[])
-            if (((short[]) value).length == 1)
-                return ((short[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected short[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (short) value;
     }
 
     public List<Short> getShortProperties(String name) {
-        List<Short> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Short)
             return singletonList((Short) value);
-        for (short s : (short[]) value)
-            list.add(s);
+        List<Short> list = new ArrayList<>();
+        if (value instanceof short[])
+            for (short s : (short[]) value)
+                list.add(s);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Short) annotationValue.getValue());
         return list;
     }
 
     public int getIntProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof int[])
-            if (((int[]) value).length == 1)
-                return ((int[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected int[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (int) value;
     }
 
     public List<Integer> getIntProperties(String name) {
-        List<Integer> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Integer)
             return singletonList((Integer) value);
-        for (int i : (int[]) value)
-            list.add(i);
+        List<Integer> list = new ArrayList<>();
+        if (value instanceof int[])
+            for (int i : (int[]) value)
+                list.add(i);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Integer) annotationValue.getValue());
         return list;
     }
 
     public long getLongProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof long[])
-            if (((long[]) value).length == 1)
-                return ((long[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected long[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (long) value;
     }
 
     public List<Long> getLongProperties(String name) {
-        List<Long> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Long)
             return singletonList((Long) value);
-        for (long l : (long[]) value)
-            list.add(l);
+        List<Long> list = new ArrayList<>();
+        if (value instanceof long[])
+            for (long l : (long[]) value)
+                list.add(l);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Long) annotationValue.getValue());
         return list;
     }
 
     public double getDoubleProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof double[])
-            if (((double[]) value).length == 1)
-                return ((double[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected double[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (double) value;
     }
 
     public List<Double> getDoubleProperties(String name) {
-        List<Double> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Double)
             return singletonList((Double) value);
-        for (double d : (double[]) value)
-            list.add(d);
+        List<Double> list = new ArrayList<>();
+        if (value instanceof double[])
+            for (double d : (double[]) value)
+                list.add(d);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Double) annotationValue.getValue());
         return list;
     }
 
     public float getFloatProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof float[])
-            if (((float[]) value).length == 1)
-                return ((float[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected float[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return (float) value;
     }
 
     public List<Float> getFloatProperties(String name) {
-        List<Float> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof Float)
             return singletonList((Float) value);
-        for (float f : (float[]) value)
-            list.add(f);
+        List<Float> list = new ArrayList<>();
+        if (value instanceof float[])
+            for (float f : (float[]) value)
+                list.add(f);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((Float) annotationValue.getValue());
         return list;
     }
 
     public String getStringProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof String[])
-            if (((String[]) value).length == 1)
-                return ((String[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected String[] to contain exactly one element but found " + value);
-        return (String) value;
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
+        return value.toString();
     }
 
     public List<String> getStringProperties(String name) {
-        List<String> list = new ArrayList<>();
         Object value = getProperty(name);
         if (value instanceof String)
             return singletonList((String) value);
-        for (String s : (String[]) value)
-            list.add(s);
+        List<String> list = new ArrayList<>();
+        if (value instanceof String[])
+            for (String s : (String[]) value)
+                list.add(s);
+        else
+            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+                list.add((String) annotationValue.getValue());
         return list;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> T getEnumProperty(String name) {
-        Object value = getProperty(name);
-        if (value instanceof Object[])
-            if (((T[]) value).length == 1)
-                return ((T[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected Enum[] to contain exactly one element but found " + value);
-        return (T) value;
+    public String getEnumProperty(String name) {
+        VariableElement variable =
+                (VariableElement) (isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name));
+        return variable.getSimpleName().toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> List<T> getEnumProperties(String name) {
-        return asList((T[]) getProperty(name));
+    public List<String> getEnumProperties(String name) {
+        if (isArrayProperty(name)) {
+            List<AnnotationValue> values = getAnnotationValueListProperty(name);
+            List<String> list = new ArrayList<>();
+            for (AnnotationValue value : values)
+                list.add(((VariableElement) value.getValue()).getSimpleName().toString());
+            return list;
+        } else {
+            VariableElement value = (VariableElement) getProperty(name);
+            return singletonList(value.getSimpleName().toString());
+        }
     }
 
     public Type getTypeProperty(String name) {
-        Object value = getProperty(name);
-        // FIXME does this work?
-        if (value instanceof TypeMirror[])
-            if (((TypeMirror[]) value).length == 1)
-                value = ((TypeMirror[]) value)[0];
-            else
-                throw new IllegalArgumentException("expected type[] to contain exactly one element but found " + value);
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return Type.of((TypeMirror) value, env());
     }
 
     public List<Type> getTypeProperties(String name) {
-        Object value = getProperty(name);
-        if (value == null)
-            return emptyList();
-        List<Type> list = new ArrayList<>();
-        // FIXME for(int e : Type.of((TypeMirror) value, env()))
-        return list;
+        if (isArrayProperty(name)) {
+            List<AnnotationValue> values = getAnnotationValueListProperty(name);
+            List<Type> list = new ArrayList<>();
+            for (AnnotationValue value : values)
+                list.add(Type.of((DeclaredType) value.getValue(), env()));
+            return list;
+        } else {
+            DeclaredType value = (DeclaredType) getProperty(name);
+            return singletonList(Type.of(value, env()));
+        }
     }
 
     public AnnotationWrapper getAnnotationProperty(String name) {
@@ -298,15 +348,20 @@ public class AnnotationWrapper extends Elemental {
 
     public List<AnnotationWrapper> getAnnotationProperties(String name) {
         List<AnnotationWrapper> list = new ArrayList<>();
-        @SuppressWarnings("unchecked")
-        List<AnnotationMirror> values = (List<AnnotationMirror>) getProperty(name);
-        for (AnnotationMirror value : values)
+        if (isArrayProperty(name)) {
+            @SuppressWarnings("unchecked")
+            List<AnnotationMirror> values = (List<AnnotationMirror>) getProperty(name);
+            for (AnnotationMirror value : values)
+                list.add(new AnnotationWrapper(value, env()));
+        } else {
+            AnnotationMirror value = (AnnotationMirror) getProperty(name);
             list.add(new AnnotationWrapper(value, env()));
+        }
         return list;
     }
 
     @Override
     public String toString() {
-        return annotation.toString();
+        return annotationMirror.toString();
     }
 }

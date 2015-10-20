@@ -22,7 +22,11 @@ public @interface Multi {
 
     char chary();
 
-    String string();
+    String stringy();
 
     Class<?> classy();
+
+    A annoty();
+
+    FooNum enumy();
 }

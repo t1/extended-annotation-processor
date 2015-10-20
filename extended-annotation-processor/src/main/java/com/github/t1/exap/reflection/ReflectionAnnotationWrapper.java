@@ -1,14 +1,13 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.ArrayList;
 
 import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.AnnotationMirror;
@@ -164,14 +163,60 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public Type getTypeProperty(String name) {
+    public boolean isArrayProperty(String name) {
+        return getProperty(name).getClass().isArray();
+    }
+
+    @Override
+    public AnnotationPropertyType getPropertyType(String name) {
         Object value = getProperty(name);
-        if (value instanceof Class[])
-            if (((Class[]) value).length == 1)
-                value = ((Class[]) value)[0];
-            else
-                throw new IllegalArgumentException(
-                        "expected Class[] to contain exactly one element but found " + value);
+        Class<?> type = value.getClass();
+        if (type.isArray())
+            type = type.getComponentType();
+        AnnotationPropertyType primitivePropertyType = getPrimitivePropertyType(type);
+        if (primitivePropertyType != null)
+            return primitivePropertyType;
+        if (type.isEnum())
+            return ENUM;
+        if (Annotation.class.isAssignableFrom(type))
+            return ANNOTATION;
+        if (type.isAssignableFrom(Class.class))
+            return CLASS;
+        throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = " + value
+                + " in " + this + " type:" + new TypeInfo(type));
+    }
+
+    @Override
+    protected Object getSingleArrayProperty(String name) {
+        Object value = getProperty(name);
+        if (Array.getLength(value) != 1)
+            throw new IllegalArgumentException(
+                    "expected annotation property array to contain exactly one element but found "
+                            + Array.getLength(value));
+        return Array.get(value, 0);
+    }
+
+    @Override
+    public String getEnumProperty(String name) {
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
+        return value.toString();
+    }
+
+    @Override
+    public List<String> getEnumProperties(String name) {
+        Object value = getProperty(name);
+        List<String> list = new ArrayList<>();
+        if (value instanceof Enum)
+            list.add(value.toString());
+        else
+            for (Enum<?> enumValue : (Enum[]) value)
+                list.add(enumValue.toString());
+        return list;
+    }
+
+    @Override
+    public Type getTypeProperty(String name) {
+        Object value = isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
         return Type.of((Class<?>) value);
     }
 
@@ -185,15 +230,6 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
             for (Class<?> t : (Class<?>[]) value)
                 list.add(Type.of(t));
         return list;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Enum<?>> List<T> getEnumProperties(String name) {
-        Object value = getProperty(name);
-        if (value instanceof Enum)
-            return asList((T) value);
-        return asList((T[]) value);
     }
 
     @Override

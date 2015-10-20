@@ -1,4 +1,4 @@
-package com.github.t1.exap;
+package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static javax.tools.Diagnostic.Kind.*;
@@ -7,8 +7,6 @@ import static org.assertj.core.api.Assertions.*;
 import javax.tools.Diagnostic.Kind;
 
 import org.junit.*;
-
-import com.github.t1.exap.reflection.*;
 
 public class ReflectionMessagesTest {
     @After

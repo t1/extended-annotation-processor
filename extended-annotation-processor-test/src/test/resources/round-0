@@ -6,7 +6,7 @@
         "typeParameters":[
             "java.lang.Number"
         ],
-        "isCollection":false,
+        "collection":false,
         "void":false,
         "boolean":false,
         "number":false,
@@ -48,7 +48,7 @@
                     "fullName":"boolean",
                     "typeParameters":[
                     ],
-                    "isCollection":false
+                    "collection":false
                 },
                 "public":false,
                 "static":false,
@@ -62,7 +62,7 @@
                     "fullName":"java.lang.String",
                     "typeParameters":[
                     ],
-                    "isCollection":false
+                    "collection":false
                 },
                 "public":false,
                 "static":false,
@@ -85,7 +85,7 @@
                         "java.lang.String",
                         "java.lang.Number"
                     ],
-                    "isCollection":false
+                    "collection":false
                 },
                 "public":false,
                 "static":false,
@@ -114,7 +114,7 @@
                     "fullName":"somepackage.FooNum",
                     "typeParameters":[
                     ],
-                    "isCollection":false
+                    "collection":false
                 },
                 "public":false,
                 "static":false,
@@ -127,31 +127,157 @@
                             false
                         ],
                         "bytey":[
-                            0
+                            1
                         ],
                         "chary":[
-                            99
+                            "!"
                         ],
                         "classy":[
                             "java.lang.Object"
                         ],
                         "doubly":[
-                            0.0
+                            3.4
                         ],
                         "floaty":[
-                            0.0
+                            5.0
                         ],
                         "inty":[
-                            0
+                            7
                         ],
                         "longy":[
-                            0
+                            8
                         ],
                         "shorty":[
-                            0
+                            9
                         ],
-                        "string":[
+                        "stringy":[
                             "s"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")"
+                        ],
+                        "enumy":[
+                            "X"
+                        ]
+                    },
+                    {
+                        "name":"MultiA",
+                        "fullName":"somepackage.MultiA",
+                        "booly":[
+                        ],
+                        "bytey":[
+                        ],
+                        "chary":[
+                        ],
+                        "classy":[
+                        ],
+                        "doubly":[
+                        ],
+                        "floaty":[
+                        ],
+                        "inty":[
+                        ],
+                        "longy":[
+                        ],
+                        "shorty":[
+                        ],
+                        "stringy":[
+                        ],
+                        "annoty":[
+                        ],
+                        "enumy":[
+                        ]
+                    },
+                    {
+                        "name":"MultiA",
+                        "fullName":"somepackage.MultiA",
+                        "booly":[
+                            false
+                        ],
+                        "bytey":[
+                            1
+                        ],
+                        "chary":[
+                            "!"
+                        ],
+                        "classy":[
+                            "java.lang.Object"
+                        ],
+                        "doubly":[
+                            3.4
+                        ],
+                        "floaty":[
+                            5.0
+                        ],
+                        "inty":[
+                            7
+                        ],
+                        "longy":[
+                            8
+                        ],
+                        "shorty":[
+                            9
+                        ],
+                        "stringy":[
+                            "s"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")"
+                        ],
+                        "enumy":[
+                            "X"
+                        ]
+                    },
+                    {
+                        "name":"MultiA",
+                        "fullName":"somepackage.MultiA",
+                        "booly":[
+                            false,
+                            true
+                        ],
+                        "bytey":[
+                            1,
+                            2
+                        ],
+                        "chary":[
+                            "!",
+                            "\""
+                        ],
+                        "classy":[
+                            "java.lang.Object",
+                            "java.lang.String"
+                        ],
+                        "doubly":[
+                            3.4,
+                            4.3
+                        ],
+                        "floaty":[
+                            5.0,
+                            6.5
+                        ],
+                        "inty":[
+                            7,
+                            8
+                        ],
+                        "longy":[
+                            8,
+                            9
+                        ],
+                        "shorty":[
+                            9,
+                            8
+                        ],
+                        "stringy":[
+                            "s",
+                            "t"
+                        ],
+                        "annoty":[
+                            "@somepackage.A(\"a\")",
+                            "@somepackage.A(\"b\")"
+                        ],
+                        "enumy":[
+                            "X",
+                            "Y"
                         ]
                     }
                 ]
@@ -166,7 +292,7 @@
                     "fullName":"void",
                     "typeParameters":[
                     ],
-                    "isCollection":false
+                    "collection":false
                 },
                 "annotations":[
                     {
@@ -203,7 +329,7 @@
                     "typeParameters":[
                         "java.lang.String"
                     ],
-                    "isCollection":true
+                    "collection":true
                 },
                 "annotations":[
                     {
@@ -229,7 +355,7 @@
                         "type":"java.lang.String",
                         "typeParameters":[
                         ],
-                        "isCollection":false
+                        "collection":false
                     },
                     {
                         "name":"bool",
@@ -237,7 +363,7 @@
                         "type":"boolean",
                         "typeParameters":[
                         ],
-                        "isCollection":false
+                        "collection":false
                     },
                     {
                         "name":"strings",
@@ -246,7 +372,7 @@
                         "typeParameters":[
                             "java.lang.String"
                         ],
-                        "isCollection":true
+                        "collection":true
                     }
                 ]
             }

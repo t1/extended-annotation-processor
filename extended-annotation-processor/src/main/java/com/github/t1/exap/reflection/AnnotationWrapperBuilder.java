@@ -9,12 +9,12 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
 class AnnotationWrapperBuilder {
-    static Object getAnnotationValue(ProcessingEnvironment env, AnnotationMirror annotation, String name) {
+    static AnnotationValue getAnnotationValue(ProcessingEnvironment env, AnnotationMirror annotation, String name) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
         : env.getElementUtils().getElementValuesWithDefaults(annotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals(name))
-                return entry.getValue().getValue();
-        return null;
+                return entry.getValue();
+        throw new IllegalArgumentException("no property \"" + name + "\" found in annotation " + annotation);
     }
 
     private final ProcessingEnvironment env;
@@ -72,19 +72,23 @@ class AnnotationWrapperBuilder {
             String name) {
         for (AnnotationMirror annotation : env.getElementUtils().getAllAnnotationMirrors(element))
             if (annotationType.getName().contentEquals(annotation.getAnnotationType().toString())) {
-                Object value = getAnnotationValue(env, annotation, name);
-                return (value == null) ? null : value.toString();
+                AnnotationValue value = getAnnotationValue(env, annotation, name);
+                return value.getValue().toString();
             }
         return null;
     }
 
+    /** if the given annotation has an array property "value", return it; otherwise null */
     private List<? extends AnnotationValue> annotationValuesValue(AnnotationMirror containerAnnotation) {
-        Object annotationValue = getAnnotationValue(env, containerAnnotation, "value");
-        if (annotationValue instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<? extends AnnotationValue> result = (List<? extends AnnotationValue>) annotationValue;
-            return result;
-        }
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
+        : env.getElementUtils().getElementValuesWithDefaults(containerAnnotation).entrySet())
+            if (entry.getKey().getSimpleName().contentEquals("value"))
+                if (entry.getValue().getValue() instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<? extends AnnotationValue> result =
+                            (List<? extends AnnotationValue>) entry.getValue().getValue();
+                    return result;
+                }
         return null;
     }
 

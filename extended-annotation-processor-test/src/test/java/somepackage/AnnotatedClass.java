@@ -18,8 +18,15 @@ public class AnnotatedClass<T extends Number> {
     @FooNums({ Y, Z })
     Map<String, Number> map;
 
-    @Multi(booly = false, bytey = 0, chary = 'c', classy = Object.class, doubly = 0.0D, floaty = 0.0F, inty = 0,
-            longy = 0, shorty = 0, string = "s")
+    @Multi(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.0F, inty = 7,
+            longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+    @MultiA(booly = {}, bytey = {}, chary = {}, classy = {}, doubly = {}, floaty = {}, inty = {}, longy = {},
+            shorty = {}, stringy = {}, annoty = {}, enumy = {})
+    @MultiA(booly = false, bytey = 1, chary = 0x21, classy = Object.class, doubly = 3.4D, floaty = 5.0F, inty = 7,
+            longy = 8, shorty = 9, stringy = "s", annoty = @A("a") , enumy = X)
+    @MultiA(booly = { false, true }, bytey = { 1, 2 }, chary = { 0x21, 0x22 }, classy = { Object.class, String.class },
+            doubly = { 3.4D, 4.3D }, floaty = { 5.0F, 6.5F }, inty = { 7, 8 }, longy = { 8, 9 }, shorty = { 9, 8 },
+            stringy = { "s", "t" }, annoty = { @A("a"), @A("b") }, enumy = { X, Y })
     FooNum fooNum;
 
     @A("mmm")
