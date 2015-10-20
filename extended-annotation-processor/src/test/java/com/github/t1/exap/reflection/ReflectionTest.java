@@ -293,7 +293,7 @@ public class ReflectionTest {
 
         assertTrue(mapField.isAnnotated(FooNums.class));
         assertArrayEquals(new FooNum[] { Y, Z }, mapField.getAnnotation(FooNums.class).value());
-        assertEquals(asList("Y", "Z!"), mapField.getAnnotationWrapper(FooNums.class).getEnumProperties("value"));
+        assertEquals(asList("Y", "Z"), mapField.getAnnotationWrapper(FooNums.class).getEnumProperties("value"));
         assertEquals(1, mapField.getAnnotations(FooNums.class).size());
         assertEquals(1, mapField.getAnnotationWrappers(FooNums.class).size());
     }
@@ -307,7 +307,7 @@ public class ReflectionTest {
         assertTrue(enumField.isTransient());
 
         assertTrue(enumField.getType().isEnum());
-        assertEquals(asList("X", "Y", "Z!"), enumField.getType().getEnumValues());
+        assertEquals(asList("X", "Y", "Z"), enumField.getType().getEnumValues());
 
         assertEquals(4, enumField.getAnnotationWrappers().size());
         assertEnumFieldAnnotationMulti(enumField);
@@ -533,7 +533,7 @@ public class ReflectionTest {
         assertEquals(asList(8L, 9L), wrapper.getLongProperties("longy"));
         assertEquals(asList((short) 9, (short) 8), wrapper.getShortProperties("shorty"));
         assertEquals(asList("s", "t"), wrapper.getStringProperties("stringy"));
-        assertEquals(asList("Y", "Z!"), wrapper.getEnumProperties("enumy"));
+        assertEquals(asList("Y", "Z"), wrapper.getEnumProperties("enumy"));
         assertEquals(2, wrapper.getAnnotationProperties("annoty").size());
         assertEquals(multia.annoty()[0].value(),
                 wrapper.getAnnotationProperties("annoty").get(0).getSingleProperty("value"));

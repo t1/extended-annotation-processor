@@ -198,7 +198,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public String getEnumProperty(String name) {
-        return getSingleProperty(name).toString();
+        Enum<?> e = (Enum<?>) getSingleProperty(name);
+        return e.name();
     }
 
     @Override
@@ -206,10 +207,10 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         Object value = getProperty(name);
         List<String> list = new ArrayList<>();
         if (value instanceof Enum)
-            list.add(value.toString());
+            list.add(((Enum<?>) value).name());
         else
             for (Enum<?> enumValue : (Enum[]) value)
-                list.add(enumValue.toString());
+                list.add(enumValue.name());
         return list;
     }
 

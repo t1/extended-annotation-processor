@@ -125,7 +125,7 @@ class ReflectionType extends Type {
             return null;
         List<String> list = new ArrayList<>();
         for (Object constant : asClass().getEnumConstants())
-            list.add(constant.toString());
+            list.add(((Enum<?>) constant).name());
         return list;
     }
 
