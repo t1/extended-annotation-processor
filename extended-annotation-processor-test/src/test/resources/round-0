@@ -31,7 +31,10 @@
             },
             {
                 "name":"MarkerAnnotation",
-                "fullName":"somepackage.MarkerAnnotation"
+                "fullName":"somepackage.MarkerAnnotation",
+                "value":[
+                    "on type"
+                ]
             },
             {
                 "name":"SuppressWarnings",
@@ -73,6 +76,13 @@
                         "fullName":"somepackage.A",
                         "value":[
                             "fff"
+                        ]
+                    },
+                    {
+                        "name":"MarkerAnnotation",
+                        "fullName":"somepackage.MarkerAnnotation",
+                        "value":[
+                            "on field"
                         ]
                     }
                 ]
@@ -315,6 +325,13 @@
                         "value":[
                             "bbb"
                         ]
+                    },
+                    {
+                        "name":"MarkerAnnotation",
+                        "fullName":"somepackage.MarkerAnnotation",
+                        "value":[
+                            "on method"
+                        ]
                     }
                 ],
                 "parameters":[
@@ -355,7 +372,9 @@
                         "type":"java.lang.String",
                         "typeParameters":[
                         ],
-                        "collection":false
+                        "collection":false,
+                        "annotations":[
+                        ]
                     },
                     {
                         "name":"bool",
@@ -363,7 +382,23 @@
                         "type":"boolean",
                         "typeParameters":[
                         ],
-                        "collection":false
+                        "collection":false,
+                        "annotations":[
+                            {
+                                "name":"MarkerAnnotation",
+                                "fullName":"somepackage.MarkerAnnotation",
+                                "value":[
+                                    "on param"
+                                ]
+                            },
+                            {
+                                "name":"A",
+                                "fullName":"somepackage.A",
+                                "value":[
+                                    "ppp"
+                                ]
+                            }
+                        ]
                     },
                     {
                         "name":"strings",
@@ -372,7 +407,9 @@
                         "typeParameters":[
                             "java.lang.String"
                         ],
-                        "collection":true
+                        "collection":true,
+                        "annotations":[
+                        ]
                     }
                 ]
             }

@@ -26,12 +26,11 @@ import javax.lang.model.type.*;
 public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
 
-    AnnotationWrapper(AnnotationMirror mirror, ProcessingEnvironment env) {
-        this(mirror, mirror.getAnnotationType(), env);
+    AnnotationWrapper(AnnotationMirror annotationMirror, ProcessingEnvironment env) {
+        this(annotationMirror, env, env.getTypeUtils().asElement(annotationMirror.getAnnotationType()));
     }
 
-    protected AnnotationWrapper(AnnotationMirror annotationMirror, AnnotatedConstruct element,
-            ProcessingEnvironment env) {
+    AnnotationWrapper(AnnotationMirror annotationMirror, ProcessingEnvironment env, AnnotatedConstruct element) {
         super(env, element);
         this.annotationMirror = annotationMirror;
     }

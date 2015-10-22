@@ -1,4 +1,6 @@
 package somepackage;
 
-/** not a lot to do, here */
-public @interface MarkerAnnotation {}
+/** this annotation marks the element as a warning */
+public @interface MarkerAnnotation {
+    String value();
+}

@@ -77,7 +77,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private final Annotation annotation;
 
     private ReflectionAnnotationWrapper(Annotation annotation) {
-        super(DummyProxy.of(AnnotationMirror.class), DummyProxy.of(AnnotatedConstruct.class), ENV);
+        super(DummyProxy.of(AnnotationMirror.class), ENV, DummyProxy.of(AnnotatedConstruct.class));
         this.annotation = annotation;
     }
 

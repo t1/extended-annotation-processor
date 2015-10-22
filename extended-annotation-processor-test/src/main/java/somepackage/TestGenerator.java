@@ -29,7 +29,6 @@ class TestGenerator implements AutoCloseable {
     public void write(List<Type> types) {
         json.writeStartArray();
         for (Type type : types) {
-            type.warning("marked warning");
             json.writeStartObject();
             writeType(type);
             writeFields(type);
@@ -71,6 +70,8 @@ class TestGenerator implements AutoCloseable {
 
     private void writeAnnotations(Elemental type) {
         log.debug("write annotations on {}", type);
+        if (type.isAnnotated(MarkerAnnotation.class))
+            type.warning("#" + type.getAnnotation(MarkerAnnotation.class).value());
         json.writeStartArray("annotations");
 
         for (AnnotationWrapper annotation : type.getAnnotationWrappers()) {
@@ -212,6 +213,7 @@ class TestGenerator implements AutoCloseable {
             json.write("type", parameter.getType().getFullName());
             writeTypeParameters(parameter.getType());
             json.write("collection", parameter.getType().isA(Collection.class));
+            writeAnnotations(parameter);
             json.writeEnd();
         }
         json.writeEnd();
