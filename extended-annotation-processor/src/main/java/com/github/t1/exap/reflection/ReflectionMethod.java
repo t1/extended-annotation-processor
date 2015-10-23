@@ -56,7 +56,7 @@ class ReflectionMethod extends Method {
 
     @Override
     public Type getReturnType() {
-        return Type.of(method.getReturnType());
+        return Type.of(method.getGenericReturnType());
     }
 
     @Override
