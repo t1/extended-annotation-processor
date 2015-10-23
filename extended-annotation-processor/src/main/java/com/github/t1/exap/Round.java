@@ -43,6 +43,6 @@ public class Round {
 
     @Override
     public String toString() {
-        return "Round#" + roundNumber + "-" + roundEnv.getRootElements();
+        return "Round#" + roundNumber + "-" + roundEnv.getRootElements() + (isLast() ? " [last]" : "");
     }
 }
