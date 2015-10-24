@@ -43,6 +43,10 @@ class ReflectionType extends Type {
         return (Class<?>) type;
     }
 
+    private Class<?> rawType() {
+        return isClass() ? asClass() : (Class<?>) asParameterizedType().getRawType();
+    }
+
     private boolean isParameterizedType() {
         return this.type instanceof ParameterizedType;
     }
@@ -91,8 +95,18 @@ class ReflectionType extends Type {
     }
 
     @Override
+    public boolean isPrimitive() {
+        return isClass() && asClass().isPrimitive();
+    }
+
+    @Override
     public boolean isBoolean() {
         return boolean.class.equals(type) || Boolean.class.equals(type);
+    }
+
+    @Override
+    public boolean isCharacter() {
+        return char.class.equals(type) || Character.class.equals(type);
     }
 
     @Override
@@ -142,10 +156,14 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public boolean isA(Class<?> type) {
-        if (isClass())
-            return type.isAssignableFrom(asClass());
-        return type.isAssignableFrom((Class<?>) asParameterizedType().getRawType());
+    public boolean isA(Class<?> thatClass) {
+        return thatClass.isAssignableFrom(rawType());
+    }
+
+    @Override
+    public boolean isA(Type that) {
+        Class<?> thatClass = ((ReflectionType) that).asClass();
+        return isA(thatClass);
     }
 
     @Override

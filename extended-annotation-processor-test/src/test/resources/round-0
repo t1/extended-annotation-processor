@@ -302,7 +302,8 @@
                     "fullName":"void",
                     "typeParameters":[
                     ],
-                    "collection":false
+                    "is-a-collection":false,
+                    "is-a-container":false
                 },
                 "annotations":[
                     {
@@ -346,7 +347,8 @@
                     "typeParameters":[
                         "java.lang.String"
                     ],
-                    "collection":true
+                    "is-a-collection":true,
+                    "is-a-container":false
                 },
                 "annotations":[
                     {
@@ -411,6 +413,22 @@
                         "annotations":[
                         ]
                     }
+                ]
+            },
+            {
+                "name":"method2",
+                "containerType":"Type:somepackage.AnnotatedClass<T>",
+                "returnType":{
+                    "name":"Nested",
+                    "fullName":"somepackage.Container.Nested",
+                    "typeParameters":[
+                    ],
+                    "is-a-collection":false,
+                    "is-a-container":true
+                },
+                "annotations":[
+                ],
+                "parameters":[
                 ]
             }
         ]

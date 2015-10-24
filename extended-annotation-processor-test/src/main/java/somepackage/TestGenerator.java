@@ -8,6 +8,7 @@ import javax.json.stream.*;
 
 import org.slf4j.*;
 
+import com.github.t1.exap.LoggingJsonGenerator;
 import com.github.t1.exap.reflection.*;
 
 class TestGenerator implements AutoCloseable {
@@ -193,7 +194,8 @@ class TestGenerator implements AutoCloseable {
         json.write("name", returnType.getSimpleName());
         json.write("fullName", returnType.getFullName());
         writeTypeParameters(returnType);
-        json.write("collection", returnType.isA(Collection.class));
+        json.write("is-a-collection", returnType.isA(Collection.class));
+        json.write("is-a-container", returnType.isA(Container.class));
         json.writeEnd();
     }
 

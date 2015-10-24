@@ -4,6 +4,8 @@ import static somepackage.FooNum.*;
 
 import java.util.*;
 
+import somepackage.Container.Nested;
+
 /** javadoc summary. second sentence. */
 @A("ppp")
 @MarkerAnnotation("on type")
@@ -40,6 +42,10 @@ public class AnnotatedClass<T extends Number> {
     @BB({ @B("b0"), @B("b1") })
     public List<String> method1(String string, @MarkerAnnotation("on param") @A("ppp") boolean bool,
             List<String> strings) {
+        return null;
+    }
+
+    public Nested method2() {
         return null;
     }
 }

@@ -27,7 +27,11 @@ public class Type extends Elemental {
 
     @Override
     protected TypeElement getElement() {
-        return (TypeElement) types().asElement(type);
+        return asElement(type);
+    }
+
+    private TypeElement asElement(TypeMirror typeMirror) {
+        return (TypeElement) types().asElement(typeMirror);
     }
 
     private boolean isKind(TypeKind kind) {
@@ -86,8 +90,16 @@ public class Type extends Elemental {
         return isKind(VOID) || isType(Void.class);
     }
 
+    public boolean isPrimitive() {
+        return type.getKind().isPrimitive();
+    }
+
     public boolean isBoolean() {
         return isKind(BOOLEAN) || isType(Boolean.class);
+    }
+
+    public boolean isCharacter() {
+        return isKind(CHAR) || isType(Character.class);
     }
 
     public boolean isNumber() {
@@ -144,29 +156,32 @@ public class Type extends Elemental {
     }
 
     public boolean isA(Class<?> type) {
-        TypeMirror targetType = elements().getTypeElement(type.getName()).asType();
-        return isA(targetType);
+        TypeMirror typeMirror = elements().getTypeElement(type.getName()).asType();
+        return isA(Type.of(typeMirror, env()));
     }
 
-    private boolean isA(TypeMirror type) {
-        // TODO in here, we could also check the type arguments, i.e. if a List<String> is a List<Number>
+    public boolean isA(Type thatType) {
+        // The following methods return false for, e.g., a List<String> and java.util.Collection<E>
+        // as they have different type arguments:
+        // types().isAssignable(left, right);
+        // types().isSameType(left, right)
+        // types().isSubtype(right, left)
+        // TODO we could also check the type parameters, i.e. if a List<String> is a List<Number>
         try {
-            if (isSameRawType(this.type, type))
+            if (isSameRawType(this.type, thatType.type))
                 return true;
-            for (TypeMirror supertype : types().directSupertypes(this.type))
-                if (isSameRawType(type, supertype))
+            if (isVoid() || isPrimitive())
+                return false;
+            for (TypeMirror supertype : allTypes())
+                if (isSameRawType(supertype, thatType.type))
                     return true;
             return false;
         } catch (Error e) {
-            throw new Error(this.type + " isSubclassOf " + type, e);
+            throw new Error(this.type + " isSubclassOf " + thatType.type, e);
         }
     }
 
     private boolean isSameRawType(TypeMirror leftMirror, TypeMirror rightMirror) {
-        // The following methods return false for java.util.Collection<E>, as they have different type arguments
-        // types().isAssignable(left, right);
-        // types().isSameType(left, right)
-        // types().isSubtype(right, left)
         String left = toRawString(leftMirror);
         String right = toRawString(rightMirror);
         return left.equals(right);
@@ -177,6 +192,27 @@ public class Type extends Elemental {
         if (string.contains("<"))
             string = string.substring(0, string.indexOf('<'));
         return string;
+    }
+
+    private List<TypeMirror> allTypes() {
+        Set<TypeMirror> result = new LinkedHashSet<>();
+        for (TypeMirror t = type; t.getKind() != TypeKind.NONE; t = superClass(t)) {
+            addInterfaces(result, t);
+            result.add(t);
+        }
+        return new ArrayList<>(result);
+    }
+
+    private TypeMirror superClass(TypeMirror typeMirror) {
+        TypeElement element = asElement(typeMirror);
+        return element.getSuperclass();
+    }
+
+    private void addInterfaces(Set<TypeMirror> result, TypeMirror t) {
+        for (TypeMirror i : asElement(t).getInterfaces()) {
+            result.add(i);
+            addInterfaces(result, i);
+        }
     }
 
     public List<Method> getAllMethods() {

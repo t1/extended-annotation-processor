@@ -19,6 +19,7 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.Test;
 
 import com.github.t1.exap.JavaDoc;
+import com.github.t1.exap.reflection.ReflectionTest.Container.Nested;
 
 public class ReflectionTest {
     @Repeatable(AA.class)
@@ -124,6 +125,12 @@ public class ReflectionTest {
         FooNum[] value();
     }
 
+    public static class Container {
+        public static class Inner extends Container {}
+
+        public static class Nested extends Inner {}
+    }
+
     @A("ttt")
     @JavaDoc(summary = "s", value = "v")
     public static class Pojo {
@@ -156,7 +163,11 @@ public class ReflectionTest {
         @A("ooo")
         @BB({ @B("b0"), @B("b1") })
         @SuppressWarnings("unused")
-        public String method1(String string, @A("ppp") boolean bool, List<String> strings) {
+        public List<String> method1(String string, @A("ppp") boolean bool, List<String> strings) {
+            return null;
+        }
+
+        public Nested method2() {
             return null;
         }
     }
@@ -173,6 +184,7 @@ public class ReflectionTest {
         assertEquals("Pojo", type.getSimpleName());
         assertEquals(Pojo.class.getName(), type.getFullName());
         assertFalse(type.isVoid());
+        assertFalse(type.isPrimitive());
         assertFalse(type.isBoolean());
         assertFalse(type.isNumber());
         assertFalse(type.isInteger());
@@ -616,9 +628,10 @@ public class ReflectionTest {
     public void shouldGetMethods() {
         List<Method> methods = type.getMethods();
 
-        assertEquals(2, methods.size());
+        assertEquals(3, methods.size());
         assertMethod0(type.getMethod("method0"));
         assertMethod1(type.getMethod("method1"));
+        assertMethod2(type.getMethod("method2"));
     }
 
     private void assertMethod0(Method method) {
@@ -677,12 +690,19 @@ public class ReflectionTest {
     private void assertMethod1(Method method) {
         assertEquals("method1", method.getName());
         assertEquals(type, method.getContainerType());
-        assertEquals(Type.of(String.class), method.getReturnType());
 
+        assertMethod1ReturnType(method.getReturnType());
         assertMethod1Annotations(method);
 
         List<Parameter> parameters = method.getParameters();
         assertMethod1Parameters(method, parameters);
+    }
+
+    private void assertMethod1ReturnType(Type returnType) {
+        assertTrue(returnType.isA(List.class));
+        assertTrue(returnType.isA(Collection.class));
+        assertTrue(returnType.isA(Iterable.class));
+        assertFalse(returnType.isA(Number.class));
     }
 
     private void assertMethod1Annotations(Method method) {
@@ -761,6 +781,17 @@ public class ReflectionTest {
         assertEquals("java.lang.String", parameter.getType().getTypeParameters().get(0).getFullName());
     }
 
+    private void assertMethod2(Method method) {
+        assertEquals("method2", method.getName());
+        assertEquals(type, method.getContainerType());
+        assertEquals(Type.of(Nested.class), method.getReturnType());
+        assertTrue(method.getReturnType().isA(Nested.class));
+        assertTrue(method.getReturnType().isA(Container.class));
+
+        List<Parameter> parameters = method.getParameters();
+        assertEquals(0, parameters.size());
+    }
+
     @Test
     public void shouldVisitType() {
         AtomicInteger count = new AtomicInteger();
@@ -768,7 +799,7 @@ public class ReflectionTest {
         type.accept(new TypeVisitor() {
             @Override
             public void visit(Method method) {
-                assertThat(method.getName()).matches("method[01]");
+                assertThat(method.getName()).matches("method[012]");
                 count.getAndIncrement();
             }
 
@@ -779,6 +810,6 @@ public class ReflectionTest {
             }
         });
 
-        assertEquals(6, count.get());
+        assertEquals(7, count.get());
     }
 }
