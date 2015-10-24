@@ -156,11 +156,7 @@ public class Type extends Elemental {
     }
 
     public boolean isA(Class<?> type) {
-        TypeMirror typeMirror = elements().getTypeElement(type.getName()).asType();
-        return isA(Type.of(typeMirror, env()));
-    }
-
-    public boolean isA(Type thatType) {
+        TypeMirror thatType = elements().getTypeElement(type.getName()).asType();
         // The following methods return false for, e.g., a List<String> and java.util.Collection<E>
         // as they have different type arguments:
         // types().isAssignable(left, right);
@@ -168,16 +164,16 @@ public class Type extends Elemental {
         // types().isSubtype(right, left)
         // TODO we could also check the type parameters, i.e. if a List<String> is a List<Number>
         try {
-            if (isSameRawType(this.type, thatType.type))
+            if (isSameRawType(this.type, thatType))
                 return true;
             if (isVoid() || isPrimitive())
                 return false;
             for (TypeMirror supertype : allTypes())
-                if (isSameRawType(supertype, thatType.type))
+                if (isSameRawType(supertype, thatType))
                     return true;
             return false;
         } catch (Error e) {
-            throw new Error(this.type + " isSubclassOf " + thatType.type, e);
+            throw new Error(this.type + " isSubclassOf " + thatType, e);
         }
     }
 

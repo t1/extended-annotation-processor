@@ -161,12 +161,6 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public boolean isA(Type that) {
-        Class<?> thatClass = ((ReflectionType) that).asClass();
-        return isA(thatClass);
-    }
-
-    @Override
     public List<Type> getTypeParameters() {
         List<Type> list = new ArrayList<>();
         if (isParameterizedType())
