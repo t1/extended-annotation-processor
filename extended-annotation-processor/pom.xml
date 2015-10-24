@@ -13,4 +13,13 @@
 
     <name>ExAP - Extended Annotation Processor</name>
     <description>Makes the Java Annotation Processor easier to use</description>
+
+    <dependencies>
+        <dependency>
+            <!-- only required when using the LoggingJsonGenerator -->
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

@@ -36,7 +36,9 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
-                    <compilerArguments><parameters/></compilerArguments>
+                    <compilerArguments>
+                        <parameters />
+                    </compilerArguments>
                 </configuration>
             </plugin>
             <plugin>
@@ -54,6 +56,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- compile scope -->

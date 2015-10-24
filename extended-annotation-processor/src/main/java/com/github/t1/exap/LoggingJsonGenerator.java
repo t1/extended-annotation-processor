@@ -1,4 +1,4 @@
-package somepackage;
+package com.github.t1.exap;
 
 import java.math.*;
 import java.util.Stack;
