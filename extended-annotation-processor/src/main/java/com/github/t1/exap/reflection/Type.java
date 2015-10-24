@@ -193,8 +193,8 @@ public class Type extends Elemental {
     private List<TypeMirror> allTypes() {
         Set<TypeMirror> result = new LinkedHashSet<>();
         for (TypeMirror t = type; t.getKind() != TypeKind.NONE; t = superClass(t)) {
-            addInterfaces(result, t);
             result.add(t);
+            addInterfaces(result, t);
         }
         return new ArrayList<>(result);
     }
@@ -233,6 +233,14 @@ public class Type extends Elemental {
             if (method.getName().equals(name))
                 return method;
         throw new RuntimeException("method not found: " + name + ".\n  Only knows: " + getMethods());
+    }
+
+    public List<Field> getAllFields() {
+        List<Field> fields = new ArrayList<>();
+        fields.addAll(getFields());
+        if (getSuperType() != null)
+            fields.addAll(getSuperType().getAllFields());
+        return fields;
     }
 
     public List<Field> getFields() {
