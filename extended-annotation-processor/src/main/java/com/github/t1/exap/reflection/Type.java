@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import static javax.lang.model.element.ElementKind.*;
+import static javax.lang.model.element.Modifier.*;
 import static javax.lang.model.type.TypeKind.*;
 
 import java.util.*;
@@ -220,11 +221,20 @@ public class Type extends Elemental {
     }
 
     public List<Method> getMethods() {
+        return getMethods(false);
+    }
+
+    public List<Method> getStaticMethods() {
+        return getMethods(true);
+    }
+
+    private List<Method> getMethods(boolean isStatic) {
         List<Method> list = new ArrayList<>();
         if (getElement() != null)
             for (Element element : getElement().getEnclosedElements())
-                if (element.getKind() == METHOD)
-                    list.add(new Method(env(), this, (ExecutableElement) element));
+                if (element.getModifiers().contains(STATIC) == isStatic)
+                    if (element.getKind() == METHOD)
+                        list.add(new Method(env(), this, (ExecutableElement) element));
         return list;
     }
 
@@ -244,11 +254,20 @@ public class Type extends Elemental {
     }
 
     public List<Field> getFields() {
+        return getFields(false);
+    }
+
+    public List<Field> getStaticFields() {
+        return getFields(true);
+    }
+
+    private List<Field> getFields(boolean isStatic) {
         List<Field> fields = new ArrayList<>();
         if (getElement() != null)
-            for (Element enclosedElement : getElement().getEnclosedElements())
-                if (enclosedElement instanceof VariableElement)
-                    fields.add(new Field(env(), (VariableElement) enclosedElement));
+            for (Element element : getElement().getEnclosedElements())
+                if (element.getModifiers().contains(STATIC) == isStatic)
+                    if (element.getKind() == FIELD)
+                        fields.add(new Field(env(), (VariableElement) element));
         return fields;
     }
 

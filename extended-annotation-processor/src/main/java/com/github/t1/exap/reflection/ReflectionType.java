@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 
 class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
@@ -26,7 +27,9 @@ class ReflectionType extends Type {
 
     private final java.lang.reflect.Type type;
     private List<Method> methods = null;
+    private List<Method> staticMethods = null;
     private List<Field> fields = null;
+    private List<Field> staticFields = null;
 
     private ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
         super(env, DummyProxy.of(TypeMirror.class));
@@ -165,23 +168,45 @@ class ReflectionType extends Type {
 
     @Override
     public List<Method> getMethods() {
-        if (methods == null) {
-            methods = new ArrayList<>();
-            for (java.lang.reflect.Method method : rawType().getDeclaredMethods())
-                if (!isStatic(method))
-                    methods.add(new ReflectionMethod(this, method));
-        }
+        if (methods == null)
+            methods = getMethods(false);
+        return methods;
+    }
+
+    @Override
+    public List<Method> getStaticMethods() {
+        if (staticMethods == null)
+            staticMethods = getMethods(true);
+        return staticMethods;
+    }
+
+    private List<Method> getMethods(boolean isStatic) {
+        List<Method> methods = new ArrayList<>();
+        for (java.lang.reflect.Method method : rawType().getDeclaredMethods())
+            if (isStatic(method) == isStatic)
+                methods.add(new ReflectionMethod(this, method));
         return methods;
     }
 
     @Override
     public List<Field> getFields() {
-        if (fields == null) {
-            fields = new ArrayList<>();
-            for (java.lang.reflect.Field field : rawType().getDeclaredFields())
-                if (!isStatic(field))
-                    fields.add(new ReflectionField(field));
-        }
+        if (fields == null)
+            fields = getFields(false);
+        return fields;
+    }
+
+    @Override
+    public List<Field> getStaticFields() {
+        if (staticFields == null)
+            staticFields = getFields(true);
+        return staticFields;
+    }
+
+    private List<Field> getFields(boolean isStatic) {
+        List<Field> fields = new ArrayList<>();
+        for (java.lang.reflect.Field field : rawType().getDeclaredFields())
+            if (isStatic(field) == isStatic)
+                fields.add(new ReflectionField(field));
         return fields;
     }
 
@@ -191,7 +216,13 @@ class ReflectionType extends Type {
 
     @Override
     public Type getSuperType() {
-        return Type.of(rawType().getSuperclass());
+        Class<?> superClass = rawType().getSuperclass();
+        return (superClass == null) ? null : Type.of(superClass);
+    }
+
+    @Override
+    protected void message(Diagnostic.Kind kind, CharSequence message) {
+        ENV.message(this, kind, message);
     }
 
     @Override

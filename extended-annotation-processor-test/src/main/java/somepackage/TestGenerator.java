@@ -150,6 +150,13 @@ class TestGenerator implements AutoCloseable {
     }
 
     private void writeFields(Type type) {
+        if (!type.getStaticFields().isEmpty()) {
+            json.writeStartArray("staticFields");
+            for (Field field : type.getStaticFields())
+                json.write(field.getName());
+            json.writeEnd();
+        }
+
         json.writeStartObject("fields");
         for (Field field : type.getFields()) {
             log.debug("write field \"{}\"", field.getName());
@@ -172,6 +179,13 @@ class TestGenerator implements AutoCloseable {
     }
 
     private void writeMethods(Type type) {
+        if (!type.getStaticMethods().isEmpty()) {
+            json.writeStartArray("staticMethods");
+            for (Method method : type.getStaticMethods())
+                json.write(method.getName());
+            json.writeEnd();
+        }
+
         json.writeStartArray("methods");
         for (Method method : type.getMethods()) {
             log.debug("write method \"{}\"", method.getName());

@@ -11,6 +11,12 @@ import somepackage.Container.Nested;
 @MarkerAnnotation("on type")
 @SuppressWarnings("unused") // retention SOURCE
 public class AnnotatedClass<T extends Number> {
+    public static final String CONSTANT = "dummy";
+
+    public static String constant() {
+        return CONSTANT;
+    }
+
     boolean bool;
 
     @A("fff")

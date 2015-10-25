@@ -44,6 +44,9 @@
                 ]
             }
         ],
+        "staticFields":[
+            "CONSTANT"
+        ],
         "fields":{
             "bool":{
                 "type":{
@@ -293,6 +296,9 @@
                 ]
             }
         },
+        "staticMethods":[
+            "constant"
+        ],
         "methods":[
             {
                 "name":"method0",

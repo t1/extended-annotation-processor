@@ -135,6 +135,12 @@ public class ReflectionTest {
     @A("ttt")
     @JavaDoc(value = "s. v")
     public static class Pojo {
+        public static final String CONSTANT = "dummy";
+
+        public static String constant() {
+            return CONSTANT;
+        }
+
         boolean bool;
 
         @A("fff")
