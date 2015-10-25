@@ -109,9 +109,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (Method method : annotation.annotationType().getDeclaredMethods()) {
-            if (Annotation.class.equals(method.getDeclaringClass()))
-                continue;
+        for (Method method : declaredMethods()) {
             result.add(method.getName());
         }
         return result;
@@ -120,9 +118,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
-        for (Method method : annotation.annotationType().getDeclaredMethods()) {
-            if (Annotation.class.equals(method.getDeclaringClass()))
-                continue;
+        for (Method method : declaredMethods()) {
             Object value = invoke(method);
             if (value.getClass().isArray())
                 value = arrayToList(value);
@@ -130,6 +126,15 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
                 value = Type.of((Class<?>) value);
             result.put(method.getName(), value);
         }
+        return result;
+    }
+
+    private List<Method> declaredMethods() {
+        List<Method> result = new ArrayList<>();
+        for (Method method : annotation.annotationType().getDeclaredMethods())
+            if (!Annotation.class.equals(method.getDeclaringClass()) //
+                    && !Modifier.isStatic(method.getModifiers()))
+                result.add(method);
         return result;
     }
 

@@ -49,7 +49,7 @@ class TestGenerator implements AutoCloseable {
         json.write("boolean", type.isBoolean());
         json.write("number", type.isNumber());
         json.write("integer", type.isInteger());
-        json.write("decimal", type.isDecimal());
+        json.write("decimal", type.isFloating());
         json.write("string", type.isString());
         json.write("enum", type.isEnum());
         json.writeStartArray("enumValues");

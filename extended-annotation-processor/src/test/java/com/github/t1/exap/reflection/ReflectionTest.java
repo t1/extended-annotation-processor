@@ -5,6 +5,7 @@ import static com.github.t1.exap.reflection.ReflectionTest.FooNum.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.StrictAssertions.*;
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -132,11 +133,12 @@ public class ReflectionTest {
     }
 
     @A("ttt")
-    @JavaDoc(summary = "s", value = "v")
+    @JavaDoc(value = "s. v")
     public static class Pojo {
         boolean bool;
 
         @A("fff")
+        @JavaDoc(value = "s")
         String string;
 
         @FooNumA(X)
@@ -175,12 +177,7 @@ public class ReflectionTest {
     private final Type type = Type.of(Pojo.class);
 
     @Test
-    public void shouldGetType() {
-        assertType();
-        assertTypeAnnotations();
-    }
-
-    private void assertType() {
+    public void assertType() {
         assertEquals("Pojo", type.getSimpleName());
         assertEquals(Pojo.class.getName(), type.getFullName());
         assertFalse(type.isVoid());
@@ -188,7 +185,7 @@ public class ReflectionTest {
         assertFalse(type.isBoolean());
         assertFalse(type.isNumber());
         assertFalse(type.isInteger());
-        assertFalse(type.isDecimal());
+        assertFalse(type.isFloating());
         assertFalse(type.isString());
         assertFalse(type.isEnum());
         assertNull(type.getEnumValues());
@@ -202,7 +199,101 @@ public class ReflectionTest {
         assertFalse(type.isTransient()); // doesn't make sense, but must not lie
     }
 
-    private void assertTypeAnnotations() {
+    @Test
+    @SuppressWarnings("unused")
+    public void assertParameterizedType() {
+        @A("a")
+        class Wrapper<T> {
+            String field;
+
+            void method() {}
+        }
+        class Gen {
+            Wrapper<String> c;
+        }
+
+        Type type = Type.of(Gen.class).getField("c").getType();
+
+        assertEquals("Wrapper", type.getSimpleName());
+        assertEquals(Wrapper.class.getName() + "<java.lang.String>", type.getFullName());
+        assertFalse(type.isVoid());
+        assertFalse(type.isPrimitive());
+        assertFalse(type.isBoolean());
+        assertFalse(type.isNumber());
+        assertFalse(type.isInteger());
+        assertFalse(type.isFloating());
+        assertFalse(type.isString());
+        assertFalse(type.isEnum());
+        assertNull(type.getEnumValues());
+        assertFalse(type.isArray());
+        assertNull(type.elementType());
+        assertFalse(type.isA(String.class));
+
+        assertEquals(1, type.getTypeParameters().size());
+        assertEquals(Type.of(String.class), type.getTypeParameters().get(0));
+
+        assertFalse(type.isPublic());
+        assertFalse(type.isStatic());
+        assertFalse(type.isTransient()); // doesn't make sense, but must not lie
+
+        assertTrue(type.isAnnotated(A.class));
+        assertEquals(1, type.getAnnotations(A.class).size());
+        assertEquals("a", type.getAnnotations(A.class).get(0).value());
+        assertEquals(1, type.getAnnotationWrappers(A.class).size());
+        assertEquals("a", type.getAnnotationWrappers(A.class).get(0).getProperty("value"));
+
+        assertEquals("fields: " + type.getFields(), 2, type.getFields().size());
+        assertThat(type.getFields()).extracting(f -> f.getName()).containsOnly("field", "this$0");
+
+        assertEquals(1, type.getMethods().size());
+        Method method = type.getMethods().get(0);
+        assertEquals("method", method.getName());
+        assertTrue(method.getReturnType().isVoid());
+    }
+
+    @Test
+    public void misc() {
+        assertTrue(Type.of(Void.class).isVoid());
+
+        assertTrue(Type.of(Boolean.class).isBoolean());
+        assertTrue(Type.of(boolean.class).isBoolean());
+
+        assertTrue(Type.of(Character.class).isCharacter());
+        assertTrue(Type.of(char.class).isCharacter());
+        assertFalse(Type.of(boolean.class).isCharacter());
+
+        assertTrue(Type.of(Byte.class).isInteger());
+        assertTrue(Type.of(byte.class).isInteger());
+        assertTrue(Type.of(Short.class).isInteger());
+        assertTrue(Type.of(short.class).isInteger());
+        assertTrue(Type.of(Integer.class).isInteger());
+        assertTrue(Type.of(int.class).isInteger());
+        assertTrue(Type.of(Long.class).isInteger());
+        assertTrue(Type.of(long.class).isInteger());
+
+        assertTrue(Type.of(Float.class).isFloating());
+        assertTrue(Type.of(float.class).isFloating());
+        assertTrue(Type.of(Double.class).isFloating());
+        assertTrue(Type.of(double.class).isFloating());
+
+        assertEquals(Type.of(String.class), Type.of(String[].class).elementType());
+
+        assertEquals(Type.of(Number.class), Type.of(Integer.class).getSuperType());
+
+        assertEquals("ReflectionType:java.lang.Integer", Type.of(Integer.class).toString());
+        assertNotNull(Type.of(Integer.class).hashCode());
+
+        assertTrue(Type.of(String.class).equals(Type.of(String.class)));
+        assertFalse(Type.of(String.class).equals(Type.of(Long.class)));
+        assertFalse(Type.of(String.class).equals(null));
+        assertFalse(Type.of(String.class).equals(String.class));
+    }
+
+    // TODO extract JavaDoc tags
+    // TODO convert JavaDoc-HTML to Markdown
+
+    @Test
+    public void assertTypeAnnotations() {
         assertTrue(type.isAnnotated(A.class));
         assertEquals(1, type.getAnnotations(A.class).size());
         assertEquals("ttt", type.getAnnotations(A.class).get(0).value());
@@ -210,9 +301,8 @@ public class ReflectionTest {
         assertEquals("ttt", type.getAnnotationWrappers(A.class).get(0).getProperty("value"));
 
         assertTrue(type.isAnnotated(JavaDoc.class));
-        assertEquals(1, type.getAnnotationWrappers(JavaDoc.class).size());
-        assertEquals("s", type.getAnnotationWrappers(JavaDoc.class).get(0).getProperty("summary"));
-        assertEquals("v", type.getAnnotationWrappers(JavaDoc.class).get(0).getProperty("value"));
+        assertEquals("s", JavaDoc.SUMMARY.apply(type.getAnnotation(JavaDoc.class)));
+        assertEquals("s. v", type.getAnnotation(JavaDoc.class).value());
 
         List<AnnotationWrapper> wrappers = type.getAnnotationWrappers();
         assertEquals(2, wrappers.size());
@@ -226,16 +316,15 @@ public class ReflectionTest {
         AnnotationWrapper a1 = wrappers.get(1);
         assertEquals("JavaDoc", a1.getAnnotationType().getSimpleName());
         assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getFullName());
-        assertEquals(2, a1.getPropertyMap().size());
-        assertEquals("s", a1.getPropertyMap().get("summary"));
-        assertEquals("v", a1.getPropertyMap().get("value"));
+        assertEquals(1, a1.getPropertyMap().size());
+        assertEquals("s. v", a1.getPropertyMap().get("value"));
     }
 
     @Test
     public void shouldGetFields() {
         List<Field> fields = type.getFields();
 
-        assertEquals("fields size", 4, fields.size());
+        assertEquals("fields: " + fields, 4, fields.size());
         assertBoolField(fields.get(0));
         assertStringField(fields.get(1));
         assertMapField(fields.get(2));
@@ -267,13 +356,20 @@ public class ReflectionTest {
         assertEquals(1, stringField.getAnnotationWrappers(A.class).size());
         assertEquals("fff", stringField.getAnnotationWrappers(A.class).get(0).getProperty("value"));
 
-        assertEquals(1, stringField.getAnnotationWrappers().size());
+        assertEquals(2, stringField.getAnnotationWrappers().size());
 
         AnnotationWrapper a0 = stringField.getAnnotationWrappers().get(0);
         assertEquals("A", a0.getAnnotationType().getSimpleName());
         assertEquals(A.class.getName(), a0.getAnnotationType().getFullName());
         assertEquals(1, a0.getPropertyMap().size());
         assertEquals("fff", a0.getPropertyMap().get("value"));
+
+        AnnotationWrapper a1 = stringField.getAnnotationWrappers().get(1);
+        assertEquals("JavaDoc", a1.getAnnotationType().getSimpleName());
+        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getFullName());
+        assertEquals(1, a1.getPropertyMap().size());
+        assertEquals("s", a1.getPropertyMap().get("value"));
+        assertEquals("s", JavaDoc.SUMMARY.apply(stringField.getAnnotation(JavaDoc.class)));
     }
 
     private void assertMapField(Field mapField) {
@@ -628,7 +724,7 @@ public class ReflectionTest {
     public void shouldGetMethods() {
         List<Method> methods = type.getMethods();
 
-        assertEquals(3, methods.size());
+        assertEquals("methods: " + methods.stream().map(m -> m.getName()).collect(joining("\n")), 3, methods.size());
         assertMethod0(type.getMethod("method0"));
         assertMethod1(type.getMethod("method1"));
         assertMethod2(type.getMethod("method2"));

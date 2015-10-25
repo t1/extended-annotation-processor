@@ -2,7 +2,6 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Arrays.*;
-import static java.util.Collections.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 
 class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
@@ -57,31 +55,27 @@ class ReflectionType extends Type {
 
     @Override
     protected boolean is(Modifier modifier) {
-        return Modifiers.on(asClass().getModifiers()).is(modifier);
+        return Modifiers.on(rawType().getModifiers()).is(modifier);
     }
 
     @Override
     public <T extends Annotation> List<T> getAnnotations(Class<T> annotationType) {
-        if (!isClass())
-            return emptyList();
-        return asList(asClass().getAnnotationsByType(annotationType));
+        return asList(rawType().getAnnotationsByType(annotationType));
     }
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return isClass() ? ReflectionAnnotationWrapper.allOn(asClass()) : emptyList();
+        return ReflectionAnnotationWrapper.allOn(rawType());
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return isClass() ? ReflectionAnnotationWrapper.ofTypeOn(asClass(), type) : emptyList();
+        return ReflectionAnnotationWrapper.ofTypeOn(rawType(), type);
     }
 
     @Override
     public String getSimpleName() {
-        if (type instanceof ParameterizedType)
-            return ((Class<?>) ((ParameterizedType) type).getRawType()).getSimpleName();
-        return isClass() ? asClass().getSimpleName() : type.toString();
+        return rawType().getSimpleName();
     }
 
     @Override
@@ -96,7 +90,7 @@ class ReflectionType extends Type {
 
     @Override
     public boolean isPrimitive() {
-        return isClass() && asClass().isPrimitive();
+        return rawType().isPrimitive();
     }
 
     @Override
@@ -110,7 +104,7 @@ class ReflectionType extends Type {
     }
 
     @Override
-    public boolean isDecimal() {
+    public boolean isFloating() {
         return float.class.equals(type) || Float.class.equals(type) //
                 || double.class.equals(type) || Double.class.equals(type);
     }
@@ -145,7 +139,7 @@ class ReflectionType extends Type {
 
     @Override
     public boolean isArray() {
-        return isClass() && asClass().isArray();
+        return rawType().isArray();
     }
 
     @Override
@@ -173,8 +167,8 @@ class ReflectionType extends Type {
     public List<Method> getMethods() {
         if (methods == null) {
             methods = new ArrayList<>();
-            if (isClass())
-                for (java.lang.reflect.Method method : asClass().getDeclaredMethods())
+            for (java.lang.reflect.Method method : rawType().getDeclaredMethods())
+                if (!isStatic(method))
                     methods.add(new ReflectionMethod(this, method));
         }
         return methods;
@@ -184,21 +178,20 @@ class ReflectionType extends Type {
     public List<Field> getFields() {
         if (fields == null) {
             fields = new ArrayList<>();
-            if (isClass())
-                for (java.lang.reflect.Field field : asClass().getDeclaredFields())
+            for (java.lang.reflect.Field field : rawType().getDeclaredFields())
+                if (!isStatic(field))
                     fields.add(new ReflectionField(field));
         }
         return fields;
     }
 
-    @Override
-    protected void message(Diagnostic.Kind kind, CharSequence message) {
-        ENV.message(this, kind, message);
+    private boolean isStatic(java.lang.reflect.Member member) {
+        return java.lang.reflect.Modifier.isStatic(member.getModifiers());
     }
 
     @Override
     public Type getSuperType() {
-        return isClass() ? Type.of(asClass().getSuperclass()) : null;
+        return Type.of(rawType().getSuperclass());
     }
 
     @Override
@@ -213,8 +206,6 @@ class ReflectionType extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
         ReflectionType that = (ReflectionType) obj;

@@ -103,7 +103,7 @@ public class Type extends Elemental {
     }
 
     public boolean isNumber() {
-        return isInteger() || isDecimal();
+        return isInteger() || isFloating();
     }
 
     public boolean isInteger() {
@@ -113,7 +113,7 @@ public class Type extends Elemental {
                 || isKind(LONG) || isType(Long.class);
     }
 
-    public boolean isDecimal() {
+    public boolean isFloating() {
         return isKind(FLOAT) || isType(Float.class)//
                 || isKind(DOUBLE) || isType(Double.class);
     }

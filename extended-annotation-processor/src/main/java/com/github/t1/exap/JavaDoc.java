@@ -3,6 +3,7 @@ package com.github.t1.exap;
 import static java.lang.annotation.RetentionPolicy.*;
 
 import java.lang.annotation.Retention;
+import java.util.function.Function;
 
 /**
  * An annotation processor can access the javadoc, so we could provide this for all types. But it also should be
@@ -16,11 +17,11 @@ public @interface JavaDoc {
      * The first sentence of the JavaDoc is often treated as the summary of the rest of the text, which works
      * astonishingly well. This is this first sentence, without the period.
      */
-    String summary();
+    public static final Function<JavaDoc, String> SUMMARY = JavaDocHelper.JAVADOC_SUMMARY;
 
     /**
-     * This is the main body of the JavaDoc text, *including* the {@link #summary() first line}. You should not rely on
-     * any markup: even the commonly used more-or-less html may, in a future version, be converted to, e.g., Markdown.
+     * The full JavaDoc text. To get a more useful subset, you should consider one of the extractor methods defined in
+     * {@link JavaDoc}.
      */
     String value();
 }

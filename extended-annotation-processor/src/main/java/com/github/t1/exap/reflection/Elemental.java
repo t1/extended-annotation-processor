@@ -124,16 +124,9 @@ public class Elemental {
         return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
     }
 
-    private String docComment() {
-        return elements().getDocComment(this.getElement());
-    }
-
     private JavaDoc javaDoc() {
         return new JavaDoc() {
-            // TODO provide JavaDoc-tags
-            // TODO convert JavaDoc-HTML to Markdown
             private final String docComment = docComment();
-            private final int firstSentence = docComment.indexOf('.');
 
             @Override
             public Class<? extends Annotation> annotationType() {
@@ -141,14 +134,13 @@ public class Elemental {
             }
 
             @Override
-            public String summary() {
-                return (firstSentence < 0) ? docComment : docComment.substring(0, firstSentence);
-            }
-
-            @Override
             public String value() {
                 return docComment.trim();
             }
         };
+    }
+
+    private String docComment() {
+        return elements().getDocComment(this.getElement());
     }
 }
