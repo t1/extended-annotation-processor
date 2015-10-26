@@ -55,8 +55,13 @@ class ReflectionMethod extends Method {
     }
 
     @Override
+    public Type getDeclaringType() {
+        return ReflectionType.type(method.getDeclaringClass());
+    }
+
+    @Override
     public Type getReturnType() {
-        return Type.of(method.getGenericReturnType());
+        return ReflectionType.type(method.getGenericReturnType());
     }
 
     @Override
@@ -67,10 +72,5 @@ class ReflectionMethod extends Method {
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {
         ENV.message(this, kind, message);
-    }
-
-    @Override
-    public String toString() {
-        return "ReflectionMethod:" + method.getDeclaringClass().getName() + "#" + method.getName();
     }
 }

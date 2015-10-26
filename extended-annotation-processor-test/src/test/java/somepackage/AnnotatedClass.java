@@ -19,6 +19,7 @@ public class AnnotatedClass<T extends Number> {
 
     boolean bool;
 
+    /** field javadoc */
     @A("fff")
     @MarkerAnnotation("on field")
     String string;
@@ -38,6 +39,7 @@ public class AnnotatedClass<T extends Number> {
             stringy = { "s", "t" }, enumy = { X, Y }, annoty = { @A("a"), @A("b") })
     FooNum fooNum;
 
+    /** method javadoc */
     @A("mmm")
     @A("nnn")
     @B("bbb")

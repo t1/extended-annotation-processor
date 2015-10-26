@@ -1,5 +1,7 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Objects.*;
+
 import java.util.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -10,9 +12,9 @@ public class Method extends Elemental {
     private final ExecutableElement method;
 
     public Method(ProcessingEnvironment processingEnv, Type containerType, ExecutableElement method) {
-        super(processingEnv, method);
-        this.containerType = containerType;
-        this.method = method;
+        super(processingEnv);
+        this.containerType = requireNonNull(containerType);
+        this.method = requireNonNull(method);
     }
 
     @Override
@@ -35,7 +37,7 @@ public class Method extends Elemental {
         return new Parameter(this, method.getParameters().get(index));
     }
 
-    public Type getContainerType() {
+    public Type getDeclaringType() {
         return containerType;
     }
 
@@ -45,6 +47,6 @@ public class Method extends Elemental {
 
     @Override
     public String toString() {
-        return "Method:" + containerType.getFullName() + "#" + method.getSimpleName();
+        return getClass().getSimpleName() + ":" + getDeclaringType().getSimpleName() + "#" + getName();
     }
 }

@@ -21,7 +21,7 @@ public class ReflectionMessagesTest {
     @Test
     public void shouldMarkType() {
         class Pojo {}
-        Type type = Type.of(Pojo.class);
+        Type type = ReflectionType.type(Pojo.class);
 
         type.warning("foo");
 
@@ -32,7 +32,7 @@ public class ReflectionMessagesTest {
     public void shouldMarkTypeAnnotation() {
         @Deprecated
         class Pojo {}
-        AnnotationWrapper annotation = Type.of(Pojo.class).getAnnotationWrapper(Deprecated.class);
+        AnnotationWrapper annotation = ReflectionType.type(Pojo.class).getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 
@@ -45,7 +45,7 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             String field;
         }
-        Field field = Type.of(Pojo.class).getField("field");
+        Field field = ReflectionType.type(Pojo.class).getField("field");
 
         field.warning("foo");
 
@@ -59,7 +59,8 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             String field;
         }
-        AnnotationWrapper annotation = Type.of(Pojo.class).getField("field").getAnnotationWrapper(Deprecated.class);
+        AnnotationWrapper annotation =
+                ReflectionType.type(Pojo.class).getField("field").getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 
@@ -72,7 +73,7 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             public void method() {}
         }
-        Method method = Type.of(Pojo.class).getMethod("method");
+        Method method = ReflectionType.type(Pojo.class).getMethod("method");
 
         method.warning("foo");
 
@@ -86,7 +87,8 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             public void method() {}
         }
-        AnnotationWrapper annotation = Type.of(Pojo.class).getMethod("method").getAnnotationWrapper(Deprecated.class);
+        AnnotationWrapper annotation =
+                ReflectionType.type(Pojo.class).getMethod("method").getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 
@@ -99,7 +101,7 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             public void method(String param) {}
         }
-        Parameter parameter = Type.of(Pojo.class).getMethod("method").getParameter(0);
+        Parameter parameter = ReflectionType.type(Pojo.class).getMethod("method").getParameter(0);
 
         parameter.warning("foo");
 
@@ -112,8 +114,8 @@ public class ReflectionMessagesTest {
             @SuppressWarnings("unused")
             public void method(@Deprecated String param) {}
         }
-        AnnotationWrapper annotation =
-                Type.of(Pojo.class).getMethod("method").getParameter(0).getAnnotationWrapper(Deprecated.class);
+        AnnotationWrapper annotation = ReflectionType.type(Pojo.class).getMethod("method").getParameter(0)
+                .getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 

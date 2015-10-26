@@ -10,6 +10,10 @@ import java.util.function.Function;
  * possible to unit test your annotation processors using reflection. So we don't provide an extra api for javadoc, but
  * simulate it with this annotation. Of course, this also allow you to use this annotation instead of the 'real'
  * javadoc... and it works even for parameters, which are not supported by the java compiler.
+ * <p>
+ * <em>Note:</em> The annotation processor provides the javadoc only for the classes currently being compiled. If you
+ * reference classes already compiled, e.g. from a library, they don't have javadoc attached. You can then too resort to
+ * annotating those classes with this.
  */
 @Retention(RUNTIME)
 public @interface JavaDoc {

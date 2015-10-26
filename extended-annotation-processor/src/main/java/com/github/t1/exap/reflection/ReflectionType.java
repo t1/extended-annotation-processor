@@ -148,7 +148,7 @@ class ReflectionType extends Type {
     @Override
     public Type elementType() {
         if (isArray())
-            return Type.of(asClass().getComponentType());
+            return ReflectionType.type(asClass().getComponentType());
         return null;
     }
 
@@ -162,7 +162,7 @@ class ReflectionType extends Type {
         List<Type> list = new ArrayList<>();
         if (isParameterizedType())
             for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
-                list.add(Type.of(type));
+                list.add(ReflectionType.type(type));
         return list;
     }
 
@@ -217,17 +217,12 @@ class ReflectionType extends Type {
     @Override
     public Type getSuperType() {
         Class<?> superClass = rawType().getSuperclass();
-        return (superClass == null) ? null : Type.of(superClass);
+        return (superClass == null) ? null : ReflectionType.type(superClass);
     }
 
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {
         ENV.message(this, kind, message);
-    }
-
-    @Override
-    public String toString() {
-        return "ReflectionType:" + getFullName();
     }
 
     @Override

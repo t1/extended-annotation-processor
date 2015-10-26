@@ -24,7 +24,7 @@ class ReflectionField extends Field {
 
     @Override
     public Type getType() {
-        return Type.of(field.getGenericType());
+        return ReflectionType.type(field.getGenericType());
     }
 
     @Override
@@ -50,10 +50,5 @@ class ReflectionField extends Field {
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {
         ENV.message(this, kind, message);
-    }
-
-    @Override
-    public String toString() {
-        return "Field:" + field.getDeclaringClass().getSimpleName() + "#" + field.getName();
     }
 }

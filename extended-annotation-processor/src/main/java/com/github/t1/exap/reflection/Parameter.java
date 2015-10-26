@@ -1,5 +1,7 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Objects.*;
+
 import javax.lang.model.element.VariableElement;
 
 public class Parameter extends Elemental {
@@ -7,9 +9,14 @@ public class Parameter extends Elemental {
     private final Method method;
 
     public Parameter(Method method, VariableElement param) {
-        super(method.env(), param);
-        this.method = method;
-        this.param = param;
+        super(method.env());
+        this.method = requireNonNull(method);
+        this.param = requireNonNull(param);
+    }
+
+    @Override
+    protected VariableElement getElement() {
+        return param;
     }
 
     public Method getMethod() {
@@ -26,6 +33,6 @@ public class Parameter extends Elemental {
 
     @Override
     public String toString() {
-        return "Parameter:" + getMethod().getName() + "#" + getName();
+        return getClass().getSimpleName() + ":" + getMethod() + "#" + getName();
     }
 }

@@ -1,5 +1,6 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Objects.*;
 import static javax.lang.model.type.TypeKind.*;
 
 import java.util.*;
@@ -12,8 +13,8 @@ public class Field extends Elemental {
     private final VariableElement field;
 
     public Field(ProcessingEnvironment processingEnv, VariableElement field) {
-        super(processingEnv, field);
-        this.field = field;
+        super(processingEnv);
+        this.field = requireNonNull(field);
     }
 
     @Override
@@ -45,6 +46,6 @@ public class Field extends Elemental {
 
     @Override
     public String toString() {
-        return "Field:" + getName();
+        return getClass().getSimpleName() + ":" + getType().getSimpleName() + "#" + getName();
     }
 }

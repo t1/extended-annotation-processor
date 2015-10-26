@@ -2,6 +2,7 @@ package com.github.t1.exap.reflection;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 import static javax.lang.model.element.Modifier.*;
 import static javax.tools.Diagnostic.Kind.*;
 
@@ -9,21 +10,18 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic;
 
 import com.github.t1.exap.JavaDoc;
 
-public class Elemental {
+public abstract class Elemental {
     private final ProcessingEnvironment processingEnv;
-    private final AnnotatedConstruct element;
     private final AnnotationWrapperBuilder annotationWrapperBuilder;
 
-    public Elemental(ProcessingEnvironment processingEnv, AnnotatedConstruct element) {
-        this.processingEnv = processingEnv;
-        this.element = element;
+    public Elemental(ProcessingEnvironment processingEnv) {
+        this.processingEnv = requireNonNull(processingEnv);
         this.annotationWrapperBuilder = new AnnotationWrapperBuilder(processingEnv);
     }
 
@@ -31,9 +29,7 @@ public class Elemental {
         return processingEnv;
     }
 
-    protected Element getElement() {
-        return (Element) element;
-    }
+    protected abstract Element getElement();
 
     protected Elements elements() {
         return processingEnv.getElementUtils();
@@ -117,11 +113,24 @@ public class Elemental {
     }
 
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return annotationWrapperBuilder.allOn(getElement());
+        List<AnnotationWrapper> annotations = annotationWrapperBuilder.allOn(getElement());
+        if (!containsJavaDoc(annotations) && docComment() != null)
+            annotations.add(0, new ReflectionAnnotationWrapper(javaDoc()));
+        return annotations;
+    }
+
+    private boolean containsJavaDoc(List<AnnotationWrapper> annotations) {
+        for (AnnotationWrapper annotation : annotations)
+            if (annotation.getAnnotationType().getFullName().equals(JavaDoc.class.getName()))
+                return true;
+        return false;
     }
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
+        List<AnnotationWrapper> annotations = annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
+        if (annotations.isEmpty() && docComment() != null)
+            annotations.add(new ReflectionAnnotationWrapper(javaDoc()));
+        return annotations;
     }
 
     private JavaDoc javaDoc() {

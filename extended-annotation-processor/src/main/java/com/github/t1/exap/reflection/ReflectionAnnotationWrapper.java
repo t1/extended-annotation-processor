@@ -9,7 +9,6 @@ import java.lang.reflect.*;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.AnnotationMirror;
 import javax.tools.Diagnostic;
 
@@ -24,7 +23,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
             for (Annotation annotation : annotated.getAnnotations()) {
                 Class<? extends Annotation> repeatedType = getRepeatedType(annotation);
                 if (repeatedType == null)
-                    result.add(wrapped(annotation));
+                    result.add(new ReflectionAnnotationWrapper(annotation));
                 else
                     result.addAll(ofTypeOn(annotated, repeatedType));
             }
@@ -65,19 +64,15 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         return map.computeIfAbsent(type, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (T annotation : annotated.getAnnotationsByType(type))
-                result.add(wrapped(annotation));
+                result.add(new ReflectionAnnotationWrapper(annotation));
             return result;
         });
     }
 
-    private static ReflectionAnnotationWrapper wrapped(Annotation annotation) {
-        return new ReflectionAnnotationWrapper(annotation);
-    }
-
     private final Annotation annotation;
 
-    private ReflectionAnnotationWrapper(Annotation annotation) {
-        super(DummyProxy.of(AnnotationMirror.class), ENV, DummyProxy.of(AnnotatedConstruct.class));
+    ReflectionAnnotationWrapper(Annotation annotation) {
+        super(DummyProxy.of(AnnotationMirror.class), ENV);
         this.annotation = annotation;
     }
 
@@ -88,7 +83,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public Type getAnnotationType() {
-        return Type.of(annotation.annotationType());
+        return ReflectionType.type(annotation.annotationType());
     }
 
     @Override
@@ -123,7 +118,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
             if (value.getClass().isArray())
                 value = arrayToList(value);
             if (value instanceof Class)
-                value = Type.of((Class<?>) value);
+                value = ReflectionType.type((Class<?>) value);
             result.put(method.getName(), value);
         }
         return result;
@@ -151,7 +146,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         for (int i = 0; i < Array.getLength(array); i++) {
             Object value = Array.get(array, i);
             if (value instanceof Class)
-                value = Type.of((Class<?>) value);
+                value = ReflectionType.type((Class<?>) value);
             list.add(value);
         }
         return list;
@@ -222,18 +217,18 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public Type getTypeProperty(String name) {
         Class<?> value = (Class<?>) getSingleProperty(name);
-        return Type.of(value);
+        return ReflectionType.type(value);
     }
 
     @Override
     public List<Type> getTypeProperties(String name) {
         Object value = getProperty(name);
         if (value instanceof Class)
-            return singletonList(Type.of((Class<?>) value));
+            return singletonList(ReflectionType.type((Class<?>) value));
         List<Type> list = new ArrayList<>();
         if (value != null)
             for (Class<?> t : (Class<?>[]) value)
-                list.add(Type.of(t));
+                list.add(ReflectionType.type(t));
         return list;
     }
 

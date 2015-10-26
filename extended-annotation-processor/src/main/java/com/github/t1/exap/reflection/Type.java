@@ -1,5 +1,6 @@
 package com.github.t1.exap.reflection;
 
+import static java.util.Objects.*;
 import static javax.lang.model.element.ElementKind.*;
 import static javax.lang.model.element.Modifier.*;
 import static javax.lang.model.type.TypeKind.*;
@@ -15,15 +16,11 @@ public class Type extends Elemental {
         return new Type(env, type);
     }
 
-    public static Type of(java.lang.reflect.Type type) {
-        return ReflectionType.type(type);
-    }
-
     private final TypeMirror type;
 
     protected Type(ProcessingEnvironment processingEnv, TypeMirror type) {
-        super(processingEnv, type);
-        this.type = Objects.requireNonNull(type, "type");
+        super(processingEnv);
+        this.type = requireNonNull(type, "type");
     }
 
     @Override
@@ -63,7 +60,7 @@ public class Type extends Elemental {
 
     @Override
     public String toString() {
-        return "Type:" + type;
+        return getClass().getSimpleName() + ":" + getFullName();
     }
 
     public String getSimpleName() {

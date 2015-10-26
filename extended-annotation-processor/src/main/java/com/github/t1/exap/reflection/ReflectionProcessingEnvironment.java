@@ -61,4 +61,8 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     public void message(Elemental elemental, Diagnostic.Kind kind, CharSequence message) {
         messager.message(elemental, kind, message);
     }
+
+    public Type type(Class<?> type) {
+        return ReflectionType.type(type);
+    }
 }

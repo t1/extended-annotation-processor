@@ -192,7 +192,7 @@ class TestGenerator implements AutoCloseable {
             json.writeStartObject();
 
             json.write("name", method.getName());
-            json.write("containerType", method.getContainerType().toString());
+            json.write("containerType", method.getDeclaringType().toString());
 
             writeReturnType(method.getReturnType());
             writeAnnotations(method);

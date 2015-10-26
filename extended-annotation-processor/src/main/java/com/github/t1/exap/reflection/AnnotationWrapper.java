@@ -2,13 +2,13 @@ package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.lang.annotation.Repeatable;
 import java.util.*;
 import java.util.Map.Entry;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
@@ -27,12 +27,13 @@ public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
 
     AnnotationWrapper(AnnotationMirror annotationMirror, ProcessingEnvironment env) {
-        this(annotationMirror, env, env.getTypeUtils().asElement(annotationMirror.getAnnotationType()));
+        super(env);
+        this.annotationMirror = requireNonNull(annotationMirror);
     }
 
-    AnnotationWrapper(AnnotationMirror annotationMirror, ProcessingEnvironment env, AnnotatedConstruct element) {
-        super(env, element);
-        this.annotationMirror = annotationMirror;
+    @Override
+    protected Element getElement() {
+        return types().asElement(annotationMirror.getAnnotationType());
     }
 
     public boolean isRepeatable() {

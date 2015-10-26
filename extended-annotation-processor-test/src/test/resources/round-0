@@ -23,6 +23,13 @@
         "transient":false,
         "annotations":[
             {
+                "name":"JavaDoc",
+                "fullName":"com.github.t1.exap.JavaDoc",
+                "value":[
+                    "javadoc summary. second sentence."
+                ]
+            },
+            {
                 "name":"A",
                 "fullName":"somepackage.A",
                 "value":[
@@ -74,6 +81,13 @@
                 "static":false,
                 "transient":false,
                 "annotations":[
+                    {
+                        "name":"JavaDoc",
+                        "fullName":"com.github.t1.exap.JavaDoc",
+                        "value":[
+                            "field javadoc"
+                        ]
+                    },
                     {
                         "name":"A",
                         "fullName":"somepackage.A",
@@ -312,6 +326,13 @@
                     "is-a-container":false
                 },
                 "annotations":[
+                    {
+                        "name":"JavaDoc",
+                        "fullName":"com.github.t1.exap.JavaDoc",
+                        "value":[
+                            "method javadoc"
+                        ]
+                    },
                     {
                         "name":"A",
                         "fullName":"somepackage.A",

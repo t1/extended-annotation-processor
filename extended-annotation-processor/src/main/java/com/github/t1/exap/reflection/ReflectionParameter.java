@@ -46,7 +46,7 @@ class ReflectionParameter extends Parameter {
 
     @Override
     public Type getType() {
-        return Type.of(parameter.getParameterizedType());
+        return ReflectionType.type(parameter.getParameterizedType());
     }
 
     @Override
@@ -57,11 +57,5 @@ class ReflectionParameter extends Parameter {
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {
         ENV.message(this, kind, message);
-    }
-
-    @Override
-    public String toString() {
-        return "ReflectionParameter:" + parameter + "@" + parameter.getDeclaringExecutable().getName() + "@"
-                + parameter.getDeclaringExecutable().getDeclaringClass();
     }
 }

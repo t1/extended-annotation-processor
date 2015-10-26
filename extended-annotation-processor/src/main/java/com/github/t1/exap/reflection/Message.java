@@ -1,20 +1,32 @@
 package com.github.t1.exap.reflection;
 
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static java.util.Objects.*;
 
+import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
 public class Message {
-    public static final Elemental NO_ELEMENT = new Elemental(null, null) {
+    public static final Elemental NO_ELEMENT = new Elemental(ENV) {
         @Override
         public String toString() {
             return "#NO_ELEMENT#";
         }
+
+        @Override
+        protected Element getElement() {
+            return null;
+        }
     };
-    public static final Elemental ANY_ELEMENT = new Elemental(null, null) {
+    public static final Elemental ANY_ELEMENT = new Elemental(ENV) {
         @Override
         public String toString() {
             return "#ANY_ELEMENT#";
+        }
+
+        @Override
+        protected Element getElement() {
+            return null;
         }
     };
 
