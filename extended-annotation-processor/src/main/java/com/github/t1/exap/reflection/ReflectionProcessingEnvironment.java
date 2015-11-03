@@ -5,7 +5,7 @@ import java.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.util.*;
-import javax.tools.Diagnostic;
+import javax.tools.*;
 import javax.tools.Diagnostic.Kind;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
@@ -14,14 +14,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private ReflectionProcessingEnvironment() {}
 
     private final ReflectionMessager messager = new ReflectionMessager();
-
-    public List<Message> getMessages() {
-        return messager.getMessages();
-    }
-
-    public List<String> getMessages(Elemental target, Kind messageKind) {
-        return messager.getMessages(target, messageKind);
-    }
+    private final ReflectionFiler filer = new ReflectionFiler();
 
     @Override
     public Map<String, String> getOptions() {
@@ -35,7 +28,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     @Override
     public Filer getFiler() {
-        return null;
+        return filer;
     }
 
     @Override
@@ -58,11 +51,27 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         return Locale.getDefault();
     }
 
-    public void message(Elemental elemental, Diagnostic.Kind kind, CharSequence message) {
+    void message(Elemental elemental, Diagnostic.Kind kind, CharSequence message) {
         messager.message(elemental, kind, message);
     }
 
     public Type type(Class<?> type) {
         return ReflectionType.type(type);
+    }
+
+    public List<Message> getMessages() {
+        return messager.getMessages();
+    }
+
+    public List<String> getMessages(Elemental target, Kind messageKind) {
+        return messager.getMessages(target, messageKind);
+    }
+
+    public List<ReflectionFileObject> getCreatedResources() {
+        return filer.getCreatedResources();
+    }
+
+    public String getCreatedResource(StandardLocation location, String pack, String name) {
+        return filer.getCreatedResource(location, pack, name);
     }
 }

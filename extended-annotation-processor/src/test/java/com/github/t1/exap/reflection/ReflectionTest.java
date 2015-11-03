@@ -183,8 +183,14 @@ public class ReflectionTest {
     private final Type type = ReflectionType.type(Pojo.class);
 
     @Test
+    public void assertPackage() {
+        assertEquals(getClass().getPackage().getName(), type.getPackage().getName());
+    }
+
+    @Test
     public void assertType() {
         assertEquals("Pojo", type.getSimpleName());
+        assertEquals("ReflectionTest$Pojo", type.getClassName());
         assertEquals(Pojo.class.getName(), type.getFullName());
         assertFalse(type.isVoid());
         assertFalse(type.isPrimitive());

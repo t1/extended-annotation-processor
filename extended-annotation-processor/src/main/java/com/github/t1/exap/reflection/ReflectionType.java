@@ -36,6 +36,11 @@ class ReflectionType extends Type {
         this.type = type;
     }
 
+    @Override
+    public Package getPackage() {
+        return new ReflectionPackage(env(), rawType().getPackage());
+    }
+
     private boolean isClass() {
         return type instanceof Class;
     }

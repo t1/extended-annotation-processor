@@ -84,14 +84,6 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         messager().printMessage(OTHER, message);
     }
 
-    public Filer filer() {
-        return processingEnv.getFiler();
-    }
-
-    public String getDocComment(Element e) {
-        return processingEnv.getElementUtils().getDocComment(e);
-    }
-
     public List<? extends Element> getAllMembers(TypeElement type) {
         return processingEnv.getElementUtils().getAllMembers(type);
     }

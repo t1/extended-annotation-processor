@@ -70,6 +70,19 @@ public class Type extends Elemental {
     }
 
     /**
+     * The {@link #getFullName() full name}, but without the package. This is generally the same as the
+     * {@link #getSimpleName() simple name}, but for nested types, it makes a difference
+     */
+    public String getClassName() {
+        String result = getFullName();
+        String pkg = getPackage().getName();
+        if (!pkg.isEmpty())
+            pkg += ".";
+        result = result.substring(pkg.length());
+        return result;
+    }
+
+    /**
      * The fully qualified name plus the fully qualified type parameters, e.g.
      * <code>java.util.List&lt;java.lang.String&gt;</code>.
      */
@@ -279,5 +292,9 @@ public class Type extends Elemental {
         if (getElement() == null || getElement().getSuperclass().getKind() == NONE)
             return null;
         return Type.of(getElement().getSuperclass(), env());
+    }
+
+    public Package getPackage() {
+        return new Package(env(), elements().getPackageOf(((DeclaredType) type).asElement()));
     }
 }

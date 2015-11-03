@@ -2,7 +2,9 @@ package com.github.t1.exap;
 
 import static java.util.Arrays.*;
 import static javax.lang.model.element.ElementKind.*;
+import static javax.tools.StandardLocation.*;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,8 @@ import java.util.List;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.reflection.*;
+import com.github.t1.exap.reflection.Package;
 
 public class Round {
     private static final List<ElementKind> TYPE_KINDS = asList(ENUM, CLASS, ANNOTATION_TYPE, INTERFACE);
@@ -44,5 +47,13 @@ public class Round {
     @Override
     public String toString() {
         return "Round#" + roundNumber + "-" + roundEnv.getRootElements() + (isLast() ? " [last]" : "");
+    }
+
+    public Package getRootPackage() {
+        return new Package(processingEnv, null);
+    }
+
+    public Resource createResource(String pkg, String relativeName) throws IOException {
+        return new Resource(processingEnv.getFiler().createResource(CLASS_OUTPUT, pkg, relativeName));
     }
 }
