@@ -22,6 +22,14 @@ public class Package {
         return (packageElement == null) ? "" : packageElement.getQualifiedName().toString();
     }
 
+    public Resource createSource(String relativeName) {
+        try {
+            return new Resource(processingEnv.getFiler().createSourceFile(getName() + "." + relativeName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Resource createResource(String relativeName) {
         try {
             return new Resource(processingEnv.getFiler().createResource(CLASS_OUTPUT, getName(), relativeName));

@@ -3,10 +3,11 @@ package com.github.t1.exap.reflection;
 import java.io.*;
 import java.net.URI;
 
-import javax.tools.FileObject;
+import javax.lang.model.element.*;
 import javax.tools.JavaFileManager.Location;
+import javax.tools.JavaFileObject;
 
-class ReflectionFileObject implements FileObject {
+class ReflectionFileObject implements JavaFileObject {
     final Location location;
     final CharSequence pkg;
     final CharSequence relativeName;
@@ -26,7 +27,7 @@ class ReflectionFileObject implements FileObject {
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException();
+        return pkg + "." + relativeName;
     }
 
     @Override
@@ -61,6 +62,26 @@ class ReflectionFileObject implements FileObject {
 
     @Override
     public boolean delete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Kind getKind() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isNameCompatible(String simpleName, Kind kind) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NestingKind getNestingKind() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Modifier getAccessLevel() {
         throw new UnsupportedOperationException();
     }
 

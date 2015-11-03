@@ -4,10 +4,14 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Predicate;
 
+import org.slf4j.*;
+
+import com.github.t1.exap.reflection.*;
 import com.github.t1.exap.reflection.Package;
-import com.github.t1.exap.reflection.Type;
 
 public class TypeGenerator implements AutoCloseable {
+    private static final Logger log = LoggerFactory.getLogger(TypeGenerator.class);
+
     private final Package pkg;
     private final String typeName;
     private ImportGenerator imports = new ImportGenerator();
@@ -68,7 +72,9 @@ public class TypeGenerator implements AutoCloseable {
 
     @Override
     public void close() {
-        try (Writer writer = pkg.createResource(typeName).openWriter()) {
+        Resource resource = pkg.createSource(typeName);
+        log.debug("write {} to {}", typeName, resource.getName());
+        try (Writer writer = resource.openWriter()) {
             PrintWriter out = new PrintWriter(writer);
             print(out);
         } catch (IOException e) {

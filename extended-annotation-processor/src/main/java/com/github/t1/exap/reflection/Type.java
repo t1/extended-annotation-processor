@@ -73,7 +73,7 @@ public class Type extends Elemental {
      * The {@link #getFullName() full name}, but without the package. This is generally the same as the
      * {@link #getSimpleName() simple name}, but for nested types, it makes a difference
      */
-    public String getClassName() {
+    public String getRelativeName() {
         String result = getFullName();
         String pkg = getPackage().getName();
         if (!pkg.isEmpty())

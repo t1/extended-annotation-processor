@@ -1,5 +1,7 @@
 package com.github.t1.exap.reflection;
 
+import static javax.tools.StandardLocation.*;
+
 import java.util.*;
 
 import javax.annotation.processing.Filer;
@@ -12,12 +14,18 @@ public class ReflectionFiler implements Filer {
 
     @Override
     public JavaFileObject createSourceFile(CharSequence name, Element... originatingElements) {
-        throw new UnsupportedOperationException("use the methods in " + Package.class);
+        int i = name.toString().lastIndexOf('.');
+        CharSequence pkg = (i < 0) ? "" : name.subSequence(0, i);
+        CharSequence relativeName = (i < 0) ? name : name.subSequence(i + 1, name.length());
+        return (JavaFileObject) createResource(SOURCE_OUTPUT, pkg, relativeName, originatingElements);
     }
 
     @Override
     public JavaFileObject createClassFile(CharSequence name, Element... originatingElements) {
-        throw new UnsupportedOperationException("use the methods in " + Package.class);
+        int i = name.toString().lastIndexOf('.');
+        CharSequence pkg = (i < 0) ? "" : name.subSequence(0, i);
+        CharSequence relativeName = (i < 0) ? name : name.subSequence(i, name.length());
+        return (JavaFileObject) createResource(CLASS_OUTPUT, pkg, relativeName, originatingElements);
     }
 
     @Override
