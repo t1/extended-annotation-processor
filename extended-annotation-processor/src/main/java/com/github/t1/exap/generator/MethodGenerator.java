@@ -2,6 +2,8 @@ package com.github.t1.exap.generator;
 
 import java.io.PrintWriter;
 
+import com.github.t1.exap.reflection.Type;
+
 public class MethodGenerator {
     private final TypeGenerator container;
     private final String name;
@@ -20,6 +22,11 @@ public class MethodGenerator {
     }
 
     public TypeStringGenerator returnType(String returnType) {
+        this.returnType = new TypeStringGenerator(container, returnType);
+        return this.returnType;
+    }
+
+    public TypeStringGenerator returnType(Type returnType) {
         this.returnType = new TypeStringGenerator(container, returnType);
         return this.returnType;
     }

@@ -11,6 +11,7 @@ public class TypeStringGenerator {
 
     public TypeStringGenerator(TypeGenerator container, Type type) {
         this(container, type.getSimpleName());
+        container.addImport(type);
     }
 
     public TypeStringGenerator(TypeGenerator container, String type) {
@@ -19,9 +20,9 @@ public class TypeStringGenerator {
     }
 
     public TypeStringGenerator typeVar(String arg) {
-        if (!container.typeParameters.contains(arg))
+        if (!container.getTypeParameters().contains(arg))
             throw new IllegalArgumentException("unknown type var [" + arg + "]. " + container.getTypeName()
-                    + " only knows " + container.typeParameters);
+                    + " only knows " + container.getTypeParameters());
         if (args == null)
             args = new ArrayList<>();
         args.add(arg);

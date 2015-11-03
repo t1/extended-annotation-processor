@@ -10,8 +10,8 @@ import com.github.t1.exap.reflection.Type;
 public class TypeGenerator implements AutoCloseable {
     private final Package pkg;
     private final String typeName;
-    private Set<Type> imports = new TreeSet<>(Comparator.comparing(c -> c.getFullName()));
-    List<String> typeParameters;
+    private ImportGenerator imports = new ImportGenerator();
+    private List<String> typeParameters;
     private List<FieldGenerator> fields;
     private List<MethodGenerator> methods;
     private List<ConstructorGenerator> constructors;
@@ -22,15 +22,8 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     TypeGenerator addImport(Type type) {
-        if (requiresImport(type))
-            imports.add(type);
+        imports.add(type);
         return this;
-    }
-
-    private boolean requiresImport(Type type) {
-        if ("java.lang".equals(type.getPackage().getName()))
-            return false;
-        return true;
     }
 
     public void addTypeParameter(String typeParameter) {
@@ -68,6 +61,10 @@ public class TypeGenerator implements AutoCloseable {
         return typeName;
     }
 
+    public List<String> getTypeParameters() {
+        return typeParameters;
+    }
+
 
     @Override
     public void close() {
@@ -87,21 +84,7 @@ public class TypeGenerator implements AutoCloseable {
     private void printHeader(PrintWriter out) {
         out.println("package " + pkg.getName() + ";");
         out.println();
-        printImportGroup(out, "java");
-        printImportGroup(out, "javax");
-        printImportGroup(out, "org");
-        printImportGroup(out, "com");
-    }
-
-    private void printImportGroup(PrintWriter out, String groupName) {
-        boolean any = false;
-        for (Type type : imports)
-            if (type.getFullName().startsWith(groupName + ".")) {
-                any = true;
-                out.println("import " + type.getFullName().replace('$', '.') + ";");
-            }
-        if (any)
-            out.println();
+        imports.print(out);
     }
 
     private void printType(PrintWriter out) {

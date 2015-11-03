@@ -13,6 +13,6 @@ public class ReflectionPackage extends Package {
 
     @Override
     public String getName() {
-        return pack.getName();
+        return (pack == null) ? null : pack.getName();
     }
 }
