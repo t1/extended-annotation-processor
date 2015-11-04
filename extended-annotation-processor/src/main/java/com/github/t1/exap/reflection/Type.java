@@ -166,8 +166,15 @@ public class Type extends Elemental {
         return result;
     }
 
+    public boolean isA(Type type) {
+        return isA(type.type);
+    }
+
     public boolean isA(Class<?> type) {
-        TypeMirror thatType = elements().getTypeElement(type.getName()).asType();
+        return isA(elements().getTypeElement(type.getName()).asType());
+    }
+
+    private boolean isA(TypeMirror thatType) {
         // The following methods return false for, e.g., a List<String> and java.util.Collection<E>
         // as they have different type arguments:
         // types().isAssignable(left, right);
@@ -253,6 +260,14 @@ public class Type extends Elemental {
             if (method.getName().equals(name))
                 return method;
         throw new RuntimeException("method not found: " + name + ".\n  Only knows: " + getMethods());
+    }
+
+
+    public boolean hasMethod(String name) {
+        for (Method method : getMethods())
+            if (method.getName().equals(name))
+                return true;
+        return false;
     }
 
     public List<Field> getAllFields() {

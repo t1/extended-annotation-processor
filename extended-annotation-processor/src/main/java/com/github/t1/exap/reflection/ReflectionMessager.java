@@ -19,19 +19,19 @@ class ReflectionMessager implements Messager {
     public void printMessage(Kind kind, CharSequence msg) {
         message(NO_ELEMENT, kind, msg);
         switch (kind) {
-            case ERROR:
-                log.error(msg.toString());
-                break;
-            case MANDATORY_WARNING:
-            case WARNING:
-                log.warn(msg.toString());
-                break;
-            case NOTE:
-                log.info(msg.toString());
-                break;
-            case OTHER:
-                log.debug(msg.toString());
-                break;
+        case ERROR:
+            log.error(msg.toString());
+            break;
+        case MANDATORY_WARNING:
+        case WARNING:
+            log.warn(msg.toString());
+            break;
+        case NOTE:
+            log.info(msg.toString());
+            break;
+        case OTHER:
+            log.debug(msg.toString());
+            break;
         }
     }
 
@@ -67,6 +67,7 @@ class ReflectionMessager implements Messager {
     }
 
     public void message(Elemental elemental, Kind kind, CharSequence message) {
+        log.debug("{}: {}: {}", kind, elemental, message);
         messages.add(new Message(elemental, kind, message));
     }
 }
