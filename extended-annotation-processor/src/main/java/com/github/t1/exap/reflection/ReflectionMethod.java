@@ -14,8 +14,8 @@ class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;
     private List<Parameter> parameters;
 
-    public ReflectionMethod(Type type, java.lang.reflect.Method method) {
-        super(ENV, type, DummyProxy.of(ExecutableElement.class));
+    public ReflectionMethod(Type declaringType, java.lang.reflect.Method method) {
+        super(ENV, declaringType, DummyProxy.of(ExecutableElement.class));
         this.method = method;
     }
 
@@ -52,11 +52,6 @@ class ReflectionMethod extends Method {
     @Override
     public Parameter getParameter(int index) {
         return getParameters().get(index);
-    }
-
-    @Override
-    public Type getDeclaringType() {
-        return ReflectionType.type(method.getDeclaringClass());
     }
 
     @Override

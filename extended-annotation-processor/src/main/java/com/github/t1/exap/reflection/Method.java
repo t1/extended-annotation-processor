@@ -8,12 +8,12 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 
 public class Method extends Elemental {
-    private final Type containerType;
+    private final Type declaringType;
     private final ExecutableElement method;
 
-    public Method(ProcessingEnvironment processingEnv, Type containerType, ExecutableElement method) {
+    public Method(ProcessingEnvironment processingEnv, Type declaringType, ExecutableElement method) {
         super(processingEnv);
-        this.containerType = requireNonNull(containerType);
+        this.declaringType = requireNonNull(declaringType);
         this.method = requireNonNull(method);
     }
 
@@ -38,7 +38,7 @@ public class Method extends Elemental {
     }
 
     public Type getDeclaringType() {
-        return containerType;
+        return declaringType;
     }
 
     public Type getReturnType() {

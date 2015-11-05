@@ -10,10 +10,12 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.*;
 
 public class Field extends Elemental {
+    private final Type declaringType;
     private final VariableElement field;
 
-    public Field(ProcessingEnvironment processingEnv, VariableElement field) {
+    Field(ProcessingEnvironment processingEnv, Type declaringType, VariableElement field) {
         super(processingEnv);
+        this.declaringType = requireNonNull(declaringType);
         this.field = requireNonNull(field);
     }
 
@@ -24,6 +26,10 @@ public class Field extends Elemental {
 
     public String getName() {
         return field.getSimpleName().toString();
+    }
+
+    public Type getDeclaringType() {
+        return declaringType;
     }
 
     public Type getType() {

@@ -211,7 +211,7 @@ class ReflectionType extends Type {
         List<Field> fields = new ArrayList<>();
         for (java.lang.reflect.Field field : rawType().getDeclaredFields())
             if (isStatic(field) == isStatic)
-                fields.add(new ReflectionField(field));
+                fields.add(new ReflectionField(this, field));
         return fields;
     }
 

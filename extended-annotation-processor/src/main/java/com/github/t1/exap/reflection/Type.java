@@ -292,7 +292,7 @@ public class Type extends Elemental {
             for (Element element : getElement().getEnclosedElements())
                 if (element.getModifiers().contains(STATIC) == isStatic)
                     if (element.getKind() == FIELD)
-                        fields.add(new Field(env(), (VariableElement) element));
+                        fields.add(new Field(env(), this, (VariableElement) element));
         return fields;
     }
 

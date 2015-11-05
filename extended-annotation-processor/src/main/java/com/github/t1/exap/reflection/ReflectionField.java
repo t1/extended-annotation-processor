@@ -12,8 +12,8 @@ import javax.tools.Diagnostic;
 class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
-    public ReflectionField(java.lang.reflect.Field field) {
-        super(ENV, DummyProxy.of(VariableElement.class));
+    public ReflectionField(ReflectionType declaringType, java.lang.reflect.Field field) {
+        super(ENV, declaringType, DummyProxy.of(VariableElement.class));
         this.field = field;
     }
 
