@@ -190,7 +190,7 @@ public class ReflectionTest {
     @Test
     public void assertType() {
         assertEquals("Pojo", type.getSimpleName());
-        assertEquals("ReflectionTest$Pojo", type.getRelativeName());
+        assertEquals("ReflectionTest.Pojo", type.getRelativeName());
         assertEquals(Pojo.class.getName(), type.getFullName());
         assertFalse(type.isVoid());
         assertFalse(type.isPrimitive());

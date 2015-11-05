@@ -71,7 +71,8 @@ public class Type extends Elemental {
 
     /**
      * The {@link #getFullName() full name}, but without the package. This is generally the same as the
-     * {@link #getSimpleName() simple name}, but for nested types, it makes a difference
+     * {@link #getSimpleName() simple name}, but for nested types, it makes a difference. And a nested '$' is replaced
+     * with a '.', so it can be used in source.
      */
     public String getRelativeName() {
         String result = getFullName();
@@ -79,7 +80,7 @@ public class Type extends Elemental {
         if (!pkg.isEmpty())
             pkg += ".";
         result = result.substring(pkg.length());
-        return result;
+        return result.replace('$', '.');
     }
 
     /**
