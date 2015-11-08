@@ -8,8 +8,16 @@ import javax.lang.model.util.*;
 import javax.tools.*;
 import javax.tools.Diagnostic.Kind;
 
+import org.slf4j.*;
+
+import com.github.t1.exap.Round;
+
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
+    private static final Logger log = LoggerFactory.getLogger(ReflectionProcessingEnvironment.class);
+
     public static final ReflectionProcessingEnvironment ENV = new ReflectionProcessingEnvironment();
+
+    private static final Round DUMMY_ROUND = new Round(log, ENV, null, 0);
 
     private ReflectionProcessingEnvironment() {}
 
@@ -56,7 +64,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     }
 
     public Type type(Class<?> type) {
-        return ReflectionType.type(type);
+        return ReflectionType.type(type, DUMMY_ROUND);
     }
 
     public List<Message> getMessages() {

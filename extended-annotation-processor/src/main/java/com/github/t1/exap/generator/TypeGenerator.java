@@ -4,23 +4,24 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Predicate;
 
-import org.slf4j.*;
+import org.slf4j.Logger;
 
 import com.github.t1.exap.reflection.*;
 import com.github.t1.exap.reflection.Package;
 
 public class TypeGenerator implements AutoCloseable {
-    private static final Logger log = LoggerFactory.getLogger(TypeGenerator.class);
-
+    private final Logger log;
     private final Package pkg;
     private final String typeName;
+
     private ImportGenerator imports = new ImportGenerator();
     private List<String> typeParameters;
     private List<FieldGenerator> fields;
     private List<MethodGenerator> methods;
     private List<ConstructorGenerator> constructors;
 
-    public TypeGenerator(Package pkg, String typeName) {
+    public TypeGenerator(Logger log, Package pkg, String typeName) {
+        this.log = log;
         this.pkg = pkg;
         this.typeName = typeName;
     }

@@ -12,17 +12,21 @@ import java.util.List;
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 
+import org.slf4j.Logger;
+
 import com.github.t1.exap.reflection.*;
 import com.github.t1.exap.reflection.Package;
 
 public class Round {
     private static final List<ElementKind> TYPE_KINDS = asList(ENUM, CLASS, ANNOTATION_TYPE, INTERFACE);
 
+    private final Logger log;
     private final ProcessingEnvironment processingEnv;
     private final RoundEnvironment roundEnv;
     private final int roundNumber;
 
-    public Round(ProcessingEnvironment processingEnv, RoundEnvironment roundEnv, int roundNumber) {
+    public Round(Logger log, ProcessingEnvironment processingEnv, RoundEnvironment roundEnv, int roundNumber) {
+        this.log = log;
         this.processingEnv = processingEnv;
         this.roundEnv = roundEnv;
         this.roundNumber = roundNumber;
@@ -32,8 +36,18 @@ public class Round {
         List<Type> result = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(type))
             if (TYPE_KINDS.contains(element.getKind()))
-                result.add(Type.of(element.asType(), processingEnv));
+                result.add(Type.of(element.asType(), this));
         return result;
+    }
+
+    public Logger log() {
+        return log;
+    }
+
+    /** only for internal use. */
+    @Deprecated
+    public ProcessingEnvironment env() {
+        return processingEnv;
     }
 
     public int number() {
@@ -50,7 +64,7 @@ public class Round {
     }
 
     public Package getRootPackage() {
-        return new Package(processingEnv, null);
+        return new Package(null, this);
     }
 
     public Resource createResource(String pkg, String relativeName) throws IOException {

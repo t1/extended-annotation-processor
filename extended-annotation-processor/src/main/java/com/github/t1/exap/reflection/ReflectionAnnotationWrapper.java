@@ -12,20 +12,22 @@ import java.util.*;
 import javax.lang.model.element.AnnotationMirror;
 import javax.tools.Diagnostic;
 
+import com.github.t1.exap.Round;
+
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private static Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
     private static final Map<AnnotatedElement, Map<Class<?>, List<AnnotationWrapper>>> annotationsByType =
             new HashMap<>();
 
-    public static List<AnnotationWrapper> allOn(AnnotatedElement annotated) {
+    public static List<AnnotationWrapper> allOn(AnnotatedElement annotated, Round round) {
         return annotationsOnType.computeIfAbsent(annotated, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (Annotation annotation : annotated.getAnnotations()) {
                 Class<? extends Annotation> repeatedType = getRepeatedType(annotation);
                 if (repeatedType == null)
-                    result.add(new ReflectionAnnotationWrapper(annotation));
+                    result.add(new ReflectionAnnotationWrapper(annotation, round));
                 else
-                    result.addAll(ofTypeOn(annotated, repeatedType));
+                    result.addAll(ofTypeOn(annotated, repeatedType, round));
             }
             return result;
         });
@@ -58,21 +60,22 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         return null;
     }
 
-    public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type) {
+    public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type,
+            Round round) {
         Map<Class<?>, List<AnnotationWrapper>> map =
                 annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
         return map.computeIfAbsent(type, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (T annotation : annotated.getAnnotationsByType(type))
-                result.add(new ReflectionAnnotationWrapper(annotation));
+                result.add(new ReflectionAnnotationWrapper(annotation, round));
             return result;
         });
     }
 
     private final Annotation annotation;
 
-    ReflectionAnnotationWrapper(Annotation annotation) {
-        super(DummyProxy.of(AnnotationMirror.class), ENV);
+    ReflectionAnnotationWrapper(Annotation annotation, Round round) {
+        super(DummyProxy.of(AnnotationMirror.class), round);
         this.annotation = annotation;
     }
 
@@ -83,7 +86,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public Type getAnnotationType() {
-        return ReflectionType.type(annotation.annotationType());
+        return type(annotation.annotationType());
     }
 
     @Override
@@ -118,7 +121,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
             if (value.getClass().isArray())
                 value = arrayToList(value);
             if (value instanceof Class)
-                value = ReflectionType.type((Class<?>) value);
+                value = type((Class<?>) value);
             result.put(method.getName(), value);
         }
         return result;
@@ -146,7 +149,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         for (int i = 0; i < Array.getLength(array); i++) {
             Object value = Array.get(array, i);
             if (value instanceof Class)
-                value = ReflectionType.type((Class<?>) value);
+                value = type((Class<?>) value);
             list.add(value);
         }
         return list;
@@ -216,36 +219,39 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public Type getTypeProperty(String name) {
-        Class<?> value = (Class<?>) getSingleProperty(name);
-        return ReflectionType.type(value);
+        return type((Class<?>) getSingleProperty(name));
+    }
+
+    private ReflectionType type(Class<?> value) {
+        return ReflectionType.type(value, round());
     }
 
     @Override
     public List<Type> getTypeProperties(String name) {
         Object value = getProperty(name);
         if (value instanceof Class)
-            return singletonList(ReflectionType.type((Class<?>) value));
+            return singletonList(type((Class<?>) value));
         List<Type> list = new ArrayList<>();
         if (value != null)
             for (Class<?> t : (Class<?>[]) value)
-                list.add(ReflectionType.type(t));
+                list.add(type(t));
         return list;
     }
 
     @Override
     public AnnotationWrapper getAnnotationProperty(String name) {
         Annotation value = (Annotation) getSingleProperty(name);
-        return new ReflectionAnnotationWrapper(value);
+        return new ReflectionAnnotationWrapper(value, round());
     }
 
     @Override
     public List<AnnotationWrapper> getAnnotationProperties(String name) {
         Object value = getProperty(name);
         if (value instanceof Annotation)
-            return singletonList(new ReflectionAnnotationWrapper((Annotation) value));
+            return singletonList(new ReflectionAnnotationWrapper((Annotation) value, round()));
         List<AnnotationWrapper> list = new ArrayList<>();
         for (Annotation annotation : (Annotation[]) value)
-            list.add(new ReflectionAnnotationWrapper(annotation));
+            list.add(new ReflectionAnnotationWrapper(annotation, round()));
         return list;
     }
 

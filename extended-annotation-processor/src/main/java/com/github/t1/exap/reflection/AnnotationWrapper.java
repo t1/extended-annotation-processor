@@ -8,9 +8,10 @@ import java.lang.annotation.Repeatable;
 import java.util.*;
 import java.util.Map.Entry;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+
+import com.github.t1.exap.Round;
 
 /**
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
@@ -19,15 +20,15 @@ import javax.lang.model.type.*;
  * {@link TypeMirror}s is. You'd get a {@link javax.lang.model.type.MirroredTypeException} with the message: Attempt to
  * access Class object for TypeMirror. You'll have to use {@link Elemental#getAnnotationWrapper(Class)} for those
  * annotation properties, which returns an instance of this class.
- * 
+ *
  * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">this
  *      blog </a>
  */
 public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
 
-    AnnotationWrapper(AnnotationMirror annotationMirror, ProcessingEnvironment env) {
-        super(env);
+    AnnotationWrapper(AnnotationMirror annotationMirror, Round round) {
+        super(round);
         this.annotationMirror = requireNonNull(annotationMirror);
     }
 
@@ -97,7 +98,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public Type getAnnotationType() {
-        return Type.of(annotationMirror.getAnnotationType(), env());
+        return Type.of(annotationMirror.getAnnotationType(), round());
     }
 
     public List<String> getPropertyNames() {
@@ -116,7 +117,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public Object getProperty(String name) {
-        AnnotationValue annotationValue = AnnotationWrapperBuilder.getAnnotationValue(env(), annotationMirror, name);
+        AnnotationValue annotationValue = AnnotationWrapperBuilder.getAnnotationValue(annotationMirror, name, round());
         return (annotationValue == null) ? null : annotationValue.getValue();
     }
 
@@ -319,7 +320,7 @@ public class AnnotationWrapper extends Elemental {
 
     public Type getTypeProperty(String name) {
         Object value = getSingleProperty(name);
-        return Type.of((TypeMirror) value, env());
+        return Type.of((TypeMirror) value, round());
     }
 
     public List<Type> getTypeProperties(String name) {
@@ -327,17 +328,17 @@ public class AnnotationWrapper extends Elemental {
             List<AnnotationValue> values = getAnnotationValueListProperty(name);
             List<Type> list = new ArrayList<>();
             for (AnnotationValue value : values)
-                list.add(Type.of((DeclaredType) value.getValue(), env()));
+                list.add(Type.of((DeclaredType) value.getValue(), round()));
             return list;
         } else {
             DeclaredType value = (DeclaredType) getProperty(name);
-            return singletonList(Type.of(value, env()));
+            return singletonList(Type.of(value, round()));
         }
     }
 
     public AnnotationWrapper getAnnotationProperty(String name) {
         Object value = getProperty(name);
-        return new AnnotationWrapper((AnnotationMirror) value, env());
+        return new AnnotationWrapper((AnnotationMirror) value, round());
     }
 
     public List<AnnotationWrapper> getAnnotationProperties(String name) {
@@ -346,10 +347,10 @@ public class AnnotationWrapper extends Elemental {
             @SuppressWarnings("unchecked")
             List<AnnotationMirror> values = (List<AnnotationMirror>) getProperty(name);
             for (AnnotationMirror value : values)
-                list.add(new AnnotationWrapper(value, env()));
+                list.add(new AnnotationWrapper(value, round()));
         } else {
             AnnotationMirror value = (AnnotationMirror) getProperty(name);
-            list.add(new AnnotationWrapper(value, env()));
+            list.add(new AnnotationWrapper(value, round()));
         }
         return list;
     }

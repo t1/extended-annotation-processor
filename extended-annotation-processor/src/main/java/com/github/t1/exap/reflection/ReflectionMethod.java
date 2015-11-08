@@ -10,12 +10,14 @@ import java.util.List;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
+import com.github.t1.exap.Round;
+
 class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;
     private List<Parameter> parameters;
 
-    public ReflectionMethod(Type declaringType, java.lang.reflect.Method method) {
-        super(ENV, declaringType, DummyProxy.of(ExecutableElement.class));
+    public ReflectionMethod(Type declaringType, java.lang.reflect.Method method, Round round) {
+        super(declaringType, DummyProxy.of(ExecutableElement.class), round);
         this.method = method;
     }
 
@@ -26,7 +28,7 @@ class ReflectionMethod extends Method {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(method);
+        return ReflectionAnnotationWrapper.allOn(method, round());
     }
 
     @Override
@@ -36,7 +38,7 @@ class ReflectionMethod extends Method {
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(method, type);
+        return ReflectionAnnotationWrapper.ofTypeOn(method, type, round());
     }
 
     @Override
@@ -56,7 +58,7 @@ class ReflectionMethod extends Method {
 
     @Override
     public Type getReturnType() {
-        return ReflectionType.type(method.getGenericReturnType());
+        return ReflectionType.type(method.getGenericReturnType(), round());
     }
 
     @Override

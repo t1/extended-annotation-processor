@@ -36,17 +36,17 @@ class ReflectionParameter extends Parameter {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(parameter);
+        return ReflectionAnnotationWrapper.allOn(parameter, round());
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(parameter, type);
+        return ReflectionAnnotationWrapper.ofTypeOn(parameter, type, round());
     }
 
     @Override
     public Type getType() {
-        return ReflectionType.type(parameter.getParameterizedType());
+        return ReflectionType.type(parameter.getParameterizedType(), round());
     }
 
     @Override

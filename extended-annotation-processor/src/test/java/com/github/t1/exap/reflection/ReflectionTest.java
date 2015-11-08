@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
 import static com.github.t1.exap.reflection.ReflectionTest.FooNum.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.util.Arrays.*;
@@ -180,7 +181,7 @@ public class ReflectionTest {
         }
     }
 
-    private final Type type = ReflectionType.type(Pojo.class);
+    private final Type type = ENV.type(Pojo.class);
 
     @Test
     public void assertPackage() {
@@ -224,7 +225,7 @@ public class ReflectionTest {
             Wrapper<String> c;
         }
 
-        Type type = ReflectionType.type(Gen.class).getField("c").getType();
+        Type type = ENV.type(Gen.class).getField("c").getType();
 
         assertEquals("Wrapper", type.getSimpleName());
         assertEquals(Wrapper.class.getName() + "<java.lang.String>", type.getFullName());
@@ -242,7 +243,7 @@ public class ReflectionTest {
         assertFalse(type.isA(String.class));
 
         assertEquals(1, type.getTypeParameters().size());
-        assertEquals(ReflectionType.type(String.class), type.getTypeParameters().get(0));
+        assertEquals(ENV.type(String.class), type.getTypeParameters().get(0));
 
         assertFalse(type.isPublic());
         assertFalse(type.isStatic());
@@ -265,40 +266,40 @@ public class ReflectionTest {
 
     @Test
     public void misc() {
-        assertTrue(ReflectionType.type(Void.class).isVoid());
+        assertTrue(ENV.type(Void.class).isVoid());
 
-        assertTrue(ReflectionType.type(Boolean.class).isBoolean());
-        assertTrue(ReflectionType.type(boolean.class).isBoolean());
+        assertTrue(ENV.type(Boolean.class).isBoolean());
+        assertTrue(ENV.type(boolean.class).isBoolean());
 
-        assertTrue(ReflectionType.type(Character.class).isCharacter());
-        assertTrue(ReflectionType.type(char.class).isCharacter());
-        assertFalse(ReflectionType.type(boolean.class).isCharacter());
+        assertTrue(ENV.type(Character.class).isCharacter());
+        assertTrue(ENV.type(char.class).isCharacter());
+        assertFalse(ENV.type(boolean.class).isCharacter());
 
-        assertTrue(ReflectionType.type(Byte.class).isInteger());
-        assertTrue(ReflectionType.type(byte.class).isInteger());
-        assertTrue(ReflectionType.type(Short.class).isInteger());
-        assertTrue(ReflectionType.type(short.class).isInteger());
-        assertTrue(ReflectionType.type(Integer.class).isInteger());
-        assertTrue(ReflectionType.type(int.class).isInteger());
-        assertTrue(ReflectionType.type(Long.class).isInteger());
-        assertTrue(ReflectionType.type(long.class).isInteger());
+        assertTrue(ENV.type(Byte.class).isInteger());
+        assertTrue(ENV.type(byte.class).isInteger());
+        assertTrue(ENV.type(Short.class).isInteger());
+        assertTrue(ENV.type(short.class).isInteger());
+        assertTrue(ENV.type(Integer.class).isInteger());
+        assertTrue(ENV.type(int.class).isInteger());
+        assertTrue(ENV.type(Long.class).isInteger());
+        assertTrue(ENV.type(long.class).isInteger());
 
-        assertTrue(ReflectionType.type(Float.class).isFloating());
-        assertTrue(ReflectionType.type(float.class).isFloating());
-        assertTrue(ReflectionType.type(Double.class).isFloating());
-        assertTrue(ReflectionType.type(double.class).isFloating());
+        assertTrue(ENV.type(Float.class).isFloating());
+        assertTrue(ENV.type(float.class).isFloating());
+        assertTrue(ENV.type(Double.class).isFloating());
+        assertTrue(ENV.type(double.class).isFloating());
 
-        assertEquals(ReflectionType.type(String.class), ReflectionType.type(String[].class).elementType());
+        assertEquals(ENV.type(String.class), ENV.type(String[].class).elementType());
 
-        assertEquals(ReflectionType.type(Number.class), ReflectionType.type(Integer.class).getSuperType());
+        assertEquals(ENV.type(Number.class), ENV.type(Integer.class).getSuperType());
 
-        assertEquals("ReflectionType:java.lang.Integer", ReflectionType.type(Integer.class).toString());
-        assertNotNull(ReflectionType.type(Integer.class).hashCode());
+        assertEquals("ReflectionType:java.lang.Integer", ENV.type(Integer.class).toString());
+        assertNotNull(ENV.type(Integer.class).hashCode());
 
-        assertTrue(ReflectionType.type(String.class).equals(ReflectionType.type(String.class)));
-        assertFalse(ReflectionType.type(String.class).equals(ReflectionType.type(Long.class)));
-        assertFalse(ReflectionType.type(String.class).equals(null));
-        assertFalse(ReflectionType.type(String.class).equals(String.class));
+        assertTrue(ENV.type(String.class).equals(ENV.type(String.class)));
+        assertFalse(ENV.type(String.class).equals(ENV.type(Long.class)));
+        assertFalse(ENV.type(String.class).equals(null));
+        assertFalse(ENV.type(String.class).equals(String.class));
     }
 
     // TODO extract JavaDoc tags
@@ -464,8 +465,8 @@ public class ReflectionTest {
         assertEquals(asList((byte) 1), wrapper.getByteProperties("bytey"));
         assertEquals(0x21, wrapper.getCharProperty("chary"));
         assertEquals(asList((char) 0x21), wrapper.getCharProperties("chary"));
-        assertEquals(ReflectionType.type(Object.class), wrapper.getTypeProperty("classy"));
-        assertEquals(asList(ReflectionType.type(Object.class)), wrapper.getTypeProperties("classy"));
+        assertEquals(ENV.type(Object.class), wrapper.getTypeProperty("classy"));
+        assertEquals(asList(ENV.type(Object.class)), wrapper.getTypeProperties("classy"));
         assertEquals(3.4d, wrapper.getDoubleProperty("doubly"), 0.01d);
         assertEquals(asList(3.4d), wrapper.getDoubleProperties("doubly"));
         assertEquals(5.6f, wrapper.getFloatProperty("floaty"), 0.01f);
@@ -489,7 +490,7 @@ public class ReflectionTest {
         assertEquals(false, valueMap.get("booly"));
         assertEquals((byte) 1, valueMap.get("bytey"));
         assertEquals((char) 0x21, valueMap.get("chary"));
-        assertEquals(ReflectionType.type(Object.class), valueMap.get("classy"));
+        assertEquals(ENV.type(Object.class), valueMap.get("classy"));
         assertEquals(3.4d, valueMap.get("doubly"));
         assertEquals(5.6f, valueMap.get("floaty"));
         assertEquals(7, valueMap.get("inty"));
@@ -578,7 +579,7 @@ public class ReflectionTest {
         assertEquals(false, wrapper.getBooleanProperty("booly"));
         assertEquals((byte) 1, wrapper.getByteProperty("bytey"));
         assertEquals((char) 0x21, wrapper.getCharProperty("chary"));
-        assertEquals(ReflectionType.type(Object.class), wrapper.getTypeProperty("classy"));
+        assertEquals(ENV.type(Object.class), wrapper.getTypeProperty("classy"));
         assertEquals(3.4d, wrapper.getDoubleProperty("doubly"), 0.01d);
         assertEquals(5.6f, wrapper.getFloatProperty("floaty"), 0.01f);
         assertEquals(7, wrapper.getIntProperty("inty"));
@@ -591,7 +592,7 @@ public class ReflectionTest {
         assertEquals(asList(false), wrapper.getBooleanProperties("booly"));
         assertEquals(asList((byte) 1), wrapper.getByteProperties("bytey"));
         assertEquals(asList((char) 0x21), wrapper.getCharProperties("chary"));
-        assertEquals(asList(ReflectionType.type(Object.class)), wrapper.getTypeProperties("classy"));
+        assertEquals(asList(ENV.type(Object.class)), wrapper.getTypeProperties("classy"));
         assertEquals(asList(3.4d), wrapper.getDoubleProperties("doubly"));
         assertEquals(asList(5.6f), wrapper.getFloatProperties("floaty"));
         assertEquals(asList(7), wrapper.getIntProperties("inty"));
@@ -606,7 +607,7 @@ public class ReflectionTest {
         assertEquals(asList(false), valueMap.get("booly"));
         assertEquals(asList((byte) 1), valueMap.get("bytey"));
         assertEquals(asList((char) 0x21), valueMap.get("chary"));
-        assertEquals(asList(ReflectionType.type(Object.class)), valueMap.get("classy"));
+        assertEquals(asList(ENV.type(Object.class)), valueMap.get("classy"));
         assertEquals(asList(3.4d), valueMap.get("doubly"));
         assertEquals(asList(5.6f), valueMap.get("floaty"));
         assertEquals(asList(7), valueMap.get("inty"));
@@ -646,8 +647,7 @@ public class ReflectionTest {
         assertEquals(asList(false, true), wrapper.getBooleanProperties("booly"));
         assertEquals(asList((byte) 1, (byte) 2), wrapper.getByteProperties("bytey"));
         assertEquals(asList((char) 0x21, (char) 0x22), wrapper.getCharProperties("chary"));
-        assertEquals(asList(ReflectionType.type(Object.class), ReflectionType.type(String.class)),
-                wrapper.getTypeProperties("classy"));
+        assertEquals(asList(ENV.type(Object.class), ENV.type(String.class)), wrapper.getTypeProperties("classy"));
         assertEquals(asList(3.4d, 4.3d), wrapper.getDoubleProperties("doubly"));
         assertEquals(asList(5.6f, 6.5f), wrapper.getFloatProperties("floaty"));
         assertEquals(asList(7, 8), wrapper.getIntProperties("inty"));
@@ -665,8 +665,7 @@ public class ReflectionTest {
         assertEquals(asList(false, true), valueMap.get("booly"));
         assertEquals(asList((byte) 1, (byte) 2), valueMap.get("bytey"));
         assertEquals(asList((char) 0x21, (char) 0x22), valueMap.get("chary"));
-        assertEquals(asList(ReflectionType.type(Object.class), ReflectionType.type(String.class)),
-                valueMap.get("classy"));
+        assertEquals(asList(ENV.type(Object.class), ENV.type(String.class)), valueMap.get("classy"));
         assertEquals(asList(3.4d, 4.3d), valueMap.get("doubly"));
         assertEquals(asList(5.6f, 6.5f), valueMap.get("floaty"));
         assertEquals(asList(7, 8), valueMap.get("inty"));
@@ -747,7 +746,7 @@ public class ReflectionTest {
     private void assertMethod0(Method method) {
         assertEquals("method0", method.getName());
         assertEquals(type, method.getDeclaringType());
-        assertEquals(ReflectionType.type(void.class), method.getReturnType());
+        assertEquals(ENV.type(void.class), method.getReturnType());
         assertTrue(method.isPublic());
         assertFalse(method.isStatic());
         assertFalse(method.isTransient());
@@ -854,7 +853,7 @@ public class ReflectionTest {
     private void assertMethod1Parameter0(Method method, Parameter parameter) {
         assertEquals(method, parameter.getMethod());
         assertEquals("string", parameter.getName());
-        assertEquals(ReflectionType.type(String.class), parameter.getType());
+        assertEquals(ENV.type(String.class), parameter.getType());
 
         assertFalse(parameter.isAnnotated(A.class));
         assertEquals(0, parameter.getAnnotations(A.class).size());
@@ -864,7 +863,7 @@ public class ReflectionTest {
     private void assertMethod1Parameter1(Method method, Parameter parameter1) {
         assertEquals(method, parameter1.getMethod());
         assertEquals("bool", parameter1.getName());
-        assertEquals(ReflectionType.type(boolean.class), parameter1.getType());
+        assertEquals(ENV.type(boolean.class), parameter1.getType());
 
         assertTrue(parameter1.isAnnotated(A.class));
         assertEquals(1, parameter1.getAnnotations(A.class).size());
@@ -894,7 +893,7 @@ public class ReflectionTest {
     private void assertMethod2(Method method) {
         assertEquals("method2", method.getName());
         assertEquals(type, method.getDeclaringType());
-        assertEquals(ReflectionType.type(Nested.class), method.getReturnType());
+        assertEquals(ENV.type(Nested.class), method.getReturnType());
         assertTrue(method.getReturnType().isA(Nested.class));
         assertTrue(method.getReturnType().isA(Container.class));
 

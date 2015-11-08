@@ -3,24 +3,31 @@ package com.github.t1.exap.reflection;
 import java.lang.annotation.*;
 import java.util.*;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+import javax.lang.model.util.Elements;
+
+import com.github.t1.exap.Round;
 
 class AnnotationWrapperBuilder {
-    static AnnotationValue getAnnotationValue(ProcessingEnvironment env, AnnotationMirror annotation, String name) {
+    static AnnotationValue getAnnotationValue(AnnotationMirror annotation, String name, Round round) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
-        : env.getElementUtils().getElementValuesWithDefaults(annotation).entrySet())
+        : elements(round).getElementValuesWithDefaults(annotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals(name))
                 return entry.getValue();
         throw new IllegalArgumentException("no property \"" + name + "\" found in annotation " + annotation);
     }
 
-    private final ProcessingEnvironment env;
+    @SuppressWarnings("deprecation")
+    private static Elements elements(Round round) {
+        return round.env().getElementUtils();
+    }
 
-    public AnnotationWrapperBuilder(ProcessingEnvironment env) {
-        this.env = env;
+    private final Round round;
+
+    public AnnotationWrapperBuilder(Round round) {
+        this.round = round;
     }
 
     public List<AnnotationWrapper> allOn(Element annotated) {
@@ -42,12 +49,12 @@ class AnnotationWrapperBuilder {
     }
 
     private List<? extends AnnotationMirror> mirrors(Element annotated) {
-        return env.getElementUtils().getAllAnnotationMirrors(annotated);
+        return elements(round).getAllAnnotationMirrors(annotated);
     }
 
     /**
      * Reverse lookup from the container to the contained class in a {@link Repeatable} annotation
-     * 
+     *
      * @param env
      */
     private TypeMirror getRepeatedType(AnnotationMirror containerAnnotation) {
@@ -70,9 +77,9 @@ class AnnotationWrapperBuilder {
 
     private <T extends Annotation> String getAnnotationClassAttribute(Element element, Class<T> annotationType,
             String name) {
-        for (AnnotationMirror annotation : env.getElementUtils().getAllAnnotationMirrors(element))
+        for (AnnotationMirror annotation : elements(round).getAllAnnotationMirrors(element))
             if (annotationType.getName().contentEquals(annotation.getAnnotationType().toString())) {
-                AnnotationValue value = getAnnotationValue(env, annotation, name);
+                AnnotationValue value = getAnnotationValue(annotation, name, round);
                 return value.getValue().toString();
             }
         return null;
@@ -81,7 +88,7 @@ class AnnotationWrapperBuilder {
     /** if the given annotation has an array property "value", return it; otherwise null */
     private List<? extends AnnotationValue> annotationValuesValue(AnnotationMirror containerAnnotation) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
-        : env.getElementUtils().getElementValuesWithDefaults(containerAnnotation).entrySet())
+        : elements(round).getElementValuesWithDefaults(containerAnnotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals("value"))
                 if (entry.getValue().getValue() instanceof List) {
                     @SuppressWarnings("unchecked")
@@ -106,11 +113,10 @@ class AnnotationWrapperBuilder {
     }
 
     private AnnotationWrapper wrapped(AnnotationMirror annotation) {
-        return new AnnotationWrapper(annotation, env);
+        return new AnnotationWrapper(annotation, round);
     }
 
     private boolean isInstance(AnnotationMirror annotation, String typeName) {
         return annotation.getAnnotationType().toString().equals(typeName);
     }
-
 }

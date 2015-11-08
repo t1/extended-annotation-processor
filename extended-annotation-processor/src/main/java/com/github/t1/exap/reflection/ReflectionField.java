@@ -9,11 +9,13 @@ import java.util.List;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 
+import com.github.t1.exap.Round;
+
 class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
-    public ReflectionField(ReflectionType declaringType, java.lang.reflect.Field field) {
-        super(ENV, declaringType, DummyProxy.of(VariableElement.class));
+    public ReflectionField(ReflectionType declaringType, java.lang.reflect.Field field, Round round) {
+        super(declaringType, DummyProxy.of(VariableElement.class), round);
         this.field = field;
     }
 
@@ -24,7 +26,7 @@ class ReflectionField extends Field {
 
     @Override
     public Type getType() {
-        return ReflectionType.type(field.getGenericType());
+        return ReflectionType.type(field.getGenericType(), round());
     }
 
     @Override
@@ -39,12 +41,12 @@ class ReflectionField extends Field {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(field);
+        return ReflectionAnnotationWrapper.allOn(field, round());
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(field, type);
+        return ReflectionAnnotationWrapper.ofTypeOn(field, type, round());
     }
 
     @Override

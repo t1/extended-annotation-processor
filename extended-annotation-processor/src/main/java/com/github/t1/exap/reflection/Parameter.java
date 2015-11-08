@@ -9,7 +9,7 @@ public class Parameter extends Elemental {
     private final Method method;
 
     public Parameter(Method method, VariableElement param) {
-        super(method.env());
+        super(method.round());
         this.method = requireNonNull(method);
         this.param = requireNonNull(param);
     }
@@ -28,7 +28,7 @@ public class Parameter extends Elemental {
     }
 
     public Type getType() {
-        return Type.of(param.asType(), env());
+        return Type.of(param.asType(), round());
     }
 
     @Override

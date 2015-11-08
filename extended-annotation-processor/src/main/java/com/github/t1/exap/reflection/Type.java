@@ -7,19 +7,20 @@ import static javax.lang.model.type.TypeKind.*;
 
 import java.util.*;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
+import com.github.t1.exap.Round;
+
 public class Type extends Elemental {
-    public static Type of(TypeMirror type, ProcessingEnvironment env) {
-        return new Type(env, type);
+    public static Type of(TypeMirror type, Round round) {
+        return new Type(type, round);
     }
 
     private final TypeMirror type;
 
-    protected Type(ProcessingEnvironment processingEnv, TypeMirror type) {
-        super(processingEnv);
+    protected Type(TypeMirror type, Round round) {
+        super(round);
         this.type = requireNonNull(type, "type");
     }
 
@@ -155,7 +156,7 @@ public class Type extends Elemental {
 
     public Type elementType() {
         if (isArray())
-            return Type.of(((ArrayType) type).getComponentType(), env());
+            return Type.of(((ArrayType) type).getComponentType(), round());
         return null;
     }
 
@@ -163,7 +164,7 @@ public class Type extends Elemental {
         List<Type> result = new ArrayList<>();
         if (isKind(DECLARED))
             for (TypeMirror arg : ((DeclaredType) type).getTypeArguments())
-                result.add(Type.of(arg, env()));
+                result.add(Type.of(arg, round()));
         return result;
     }
 
@@ -252,7 +253,7 @@ public class Type extends Elemental {
             for (Element element : getElement().getEnclosedElements())
                 if (element.getModifiers().contains(STATIC) == isStatic)
                     if (element.getKind() == METHOD)
-                        list.add(new Method(env(), this, (ExecutableElement) element));
+                        list.add(new Method(this, (ExecutableElement) element, round()));
         return list;
     }
 
@@ -293,7 +294,7 @@ public class Type extends Elemental {
             for (Element element : getElement().getEnclosedElements())
                 if (element.getModifiers().contains(STATIC) == isStatic)
                     if (element.getKind() == FIELD)
-                        fields.add(new Field(env(), this, (VariableElement) element));
+                        fields.add(new Field(this, (VariableElement) element, round()));
         return fields;
     }
 
@@ -307,10 +308,10 @@ public class Type extends Elemental {
     public Type getSuperType() {
         if (getElement() == null || getElement().getSuperclass().getKind() == NONE)
             return null;
-        return Type.of(getElement().getSuperclass(), env());
+        return Type.of(getElement().getSuperclass(), round());
     }
 
     public Package getPackage() {
-        return new Package(env(), elements().getPackageOf(((DeclaredType) type).asElement()));
+        return new Package(elements().getPackageOf(((DeclaredType) type).asElement()), round());
     }
 }

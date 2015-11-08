@@ -8,18 +8,19 @@ import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.ArrayList;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
+import com.github.t1.exap.Round;
+
 class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
 
-    static ReflectionType type(java.lang.reflect.Type type) {
+    static ReflectionType type(java.lang.reflect.Type type, Round round) {
         ReflectionType reflectionType = types.get(type);
         if (reflectionType == null) {
-            reflectionType = new ReflectionType(ENV, type);
+            reflectionType = new ReflectionType(type, round);
             types.put(type, reflectionType);
         }
         return reflectionType;
@@ -31,14 +32,14 @@ class ReflectionType extends Type {
     private List<Field> fields = null;
     private List<Field> staticFields = null;
 
-    private ReflectionType(ProcessingEnvironment env, java.lang.reflect.Type type) {
-        super(env, DummyProxy.of(TypeMirror.class));
+    private ReflectionType(java.lang.reflect.Type type, Round round) {
+        super(DummyProxy.of(TypeMirror.class), round);
         this.type = type;
     }
 
     @Override
     public Package getPackage() {
-        return new ReflectionPackage(env(), rawType().getPackage());
+        return new ReflectionPackage(rawType().getPackage(), round());
     }
 
     private boolean isClass() {
@@ -73,12 +74,12 @@ class ReflectionType extends Type {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(rawType());
+        return ReflectionAnnotationWrapper.allOn(rawType(), round());
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(rawType(), type);
+        return ReflectionAnnotationWrapper.ofTypeOn(rawType(), type, round());
     }
 
     @Override
@@ -153,7 +154,7 @@ class ReflectionType extends Type {
     @Override
     public Type elementType() {
         if (isArray())
-            return ReflectionType.type(asClass().getComponentType());
+            return ReflectionType.type(asClass().getComponentType(), round());
         return null;
     }
 
@@ -167,7 +168,7 @@ class ReflectionType extends Type {
         List<Type> list = new ArrayList<>();
         if (isParameterizedType())
             for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
-                list.add(ReflectionType.type(type));
+                list.add(ReflectionType.type(type, round()));
         return list;
     }
 
@@ -189,7 +190,7 @@ class ReflectionType extends Type {
         List<Method> methods = new ArrayList<>();
         for (java.lang.reflect.Method method : rawType().getDeclaredMethods())
             if (isStatic(method) == isStatic)
-                methods.add(new ReflectionMethod(this, method));
+                methods.add(new ReflectionMethod(this, method, round()));
         return methods;
     }
 
@@ -211,7 +212,7 @@ class ReflectionType extends Type {
         List<Field> fields = new ArrayList<>();
         for (java.lang.reflect.Field field : rawType().getDeclaredFields())
             if (isStatic(field) == isStatic)
-                fields.add(new ReflectionField(this, field));
+                fields.add(new ReflectionField(this, field, round()));
         return fields;
     }
 
@@ -222,7 +223,7 @@ class ReflectionType extends Type {
     @Override
     public Type getSuperType() {
         Class<?> superClass = rawType().getSuperclass();
-        return (superClass == null) ? null : ReflectionType.type(superClass);
+        return (superClass == null) ? null : ReflectionType.type(superClass, round());
     }
 
     @Override

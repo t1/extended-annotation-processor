@@ -4,15 +4,16 @@ import static java.util.Objects.*;
 
 import java.util.*;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
+
+import com.github.t1.exap.Round;
 
 public class Method extends Elemental {
     private final Type declaringType;
     private final ExecutableElement method;
 
-    public Method(ProcessingEnvironment processingEnv, Type declaringType, ExecutableElement method) {
-        super(processingEnv);
+    public Method(Type declaringType, ExecutableElement method, Round round) {
+        super(round);
         this.declaringType = requireNonNull(declaringType);
         this.method = requireNonNull(method);
     }
@@ -42,7 +43,7 @@ public class Method extends Elemental {
     }
 
     public Type getReturnType() {
-        return Type.of(method.getReturnType(), env());
+        return Type.of(method.getReturnType(), round());
     }
 
     @Override

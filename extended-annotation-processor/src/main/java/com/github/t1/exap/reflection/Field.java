@@ -5,16 +5,17 @@ import static javax.lang.model.type.TypeKind.*;
 
 import java.util.*;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.*;
+
+import com.github.t1.exap.Round;
 
 public class Field extends Elemental {
     private final Type declaringType;
     private final VariableElement field;
 
-    Field(ProcessingEnvironment processingEnv, Type declaringType, VariableElement field) {
-        super(processingEnv);
+    Field(Type declaringType, VariableElement field, Round round) {
+        super(round);
         this.declaringType = requireNonNull(declaringType);
         this.field = requireNonNull(field);
     }
@@ -34,7 +35,7 @@ public class Field extends Elemental {
 
     public Type getType() {
         try {
-            return Type.of(field.asType(), env());
+            return Type.of(field.asType(), round());
         } catch (RuntimeException e) {
             throw new RuntimeException("while getting type of field " + field.getSimpleName(), e);
         } catch (Error e) {
@@ -46,7 +47,7 @@ public class Field extends Elemental {
         List<Type> list = new ArrayList<>();
         if (field.asType().getKind() == DECLARED)
             for (TypeMirror typeMirror : ((DeclaredType) field.asType()).getTypeArguments())
-                list.add(Type.of(typeMirror, env()));
+                list.add(Type.of(typeMirror, round()));
         return list;
     }
 

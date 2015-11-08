@@ -14,29 +14,40 @@ import javax.lang.model.element.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic;
 
-import com.github.t1.exap.JavaDoc;
+import org.slf4j.Logger;
+
+import com.github.t1.exap.*;
 
 public abstract class Elemental {
-    private final ProcessingEnvironment processingEnv;
+    private final Round round;
     private final AnnotationWrapperBuilder annotationWrapperBuilder;
 
-    public Elemental(ProcessingEnvironment processingEnv) {
-        this.processingEnv = requireNonNull(processingEnv);
-        this.annotationWrapperBuilder = new AnnotationWrapperBuilder(processingEnv);
+    public Elemental(Round round) {
+        this.round = requireNonNull(round);
+        this.annotationWrapperBuilder = new AnnotationWrapperBuilder(round);
     }
 
+    public Round round() {
+        return round;
+    }
+
+    @Deprecated
     protected ProcessingEnvironment env() {
-        return processingEnv;
+        return round.env();
+    }
+
+    public Logger log() {
+        return round.log();
     }
 
     protected abstract Element getElement();
 
     protected Elements elements() {
-        return processingEnv.getElementUtils();
+        return env().getElementUtils();
     }
 
     protected Types types() {
-        return processingEnv.getTypeUtils();
+        return env().getTypeUtils();
     }
 
     public void error(CharSequence message) {
@@ -60,7 +71,7 @@ public abstract class Elemental {
     }
 
     protected void message(Diagnostic.Kind kind, CharSequence message) {
-        processingEnv.getMessager().printMessage(kind, message, getElement());
+        env().getMessager().printMessage(kind, message, getElement());
     }
 
     public boolean isPublic() {
@@ -115,7 +126,7 @@ public abstract class Elemental {
     public List<AnnotationWrapper> getAnnotationWrappers() {
         List<AnnotationWrapper> annotations = annotationWrapperBuilder.allOn(getElement());
         if (!containsJavaDoc(annotations) && docComment() != null)
-            annotations.add(0, new ReflectionAnnotationWrapper(javaDoc()));
+            annotations.add(0, new ReflectionAnnotationWrapper(javaDoc(), round));
         return annotations;
     }
 
@@ -129,7 +140,7 @@ public abstract class Elemental {
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
         List<AnnotationWrapper> annotations = annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
         if (annotations.isEmpty() && docComment() != null)
-            annotations.add(new ReflectionAnnotationWrapper(javaDoc()));
+            annotations.add(new ReflectionAnnotationWrapper(javaDoc(), round));
         return annotations;
     }
 

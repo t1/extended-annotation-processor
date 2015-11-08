@@ -16,7 +16,7 @@ import org.slf4j.*;
  * other convenience methods.
  */
 public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
-    private static final Logger log = LoggerFactory.getLogger(ExtendedAbstractProcessor.class);
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     private int roundNumber = -1;
 
@@ -28,7 +28,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         log.debug("begin round {} (final = {}) of {}", +roundNumber, roundEnv.processingOver(), name());
 
         try {
-            boolean claimed = process(new Round(processingEnv, roundEnv, roundNumber));
+            boolean claimed = process(new Round(log, processingEnv, roundEnv, roundNumber));
 
             log.debug("end round {} of {}", roundNumber, name());
 

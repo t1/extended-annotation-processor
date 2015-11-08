@@ -23,12 +23,11 @@ public class ReflectionFilerTest {
     @Test
     public void shouldCreateClassFile() throws IOException {
         class Pojo {}
-        Type type = ReflectionType.type(Pojo.class);
+        Type type = ENV.type(Pojo.class);
 
         try (Writer writer = type.getPackage().createResource("foo").openWriter()) {
             writer.write("bar");
-        } finally {
-            assertCreatedFile("bar", CLASS_OUTPUT, getClass().getPackage().getName(), "foo");
         }
+        assertCreatedFile("bar", CLASS_OUTPUT, getClass().getPackage().getName(), "foo");
     }
 }
