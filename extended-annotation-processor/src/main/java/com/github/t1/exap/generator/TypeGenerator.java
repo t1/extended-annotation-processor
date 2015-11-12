@@ -26,7 +26,8 @@ public class TypeGenerator implements AutoCloseable {
         this.typeName = typeName;
     }
 
-    TypeGenerator addImport(Type type) {
+    /** You should only need to call this for types needed <em>in</em> your body */
+    public TypeGenerator addImport(Type type) {
         imports.add(type);
         return this;
     }
