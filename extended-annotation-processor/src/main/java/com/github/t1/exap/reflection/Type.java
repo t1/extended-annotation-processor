@@ -169,38 +169,32 @@ public class Type extends Elemental {
     }
 
     public boolean isA(Type type) {
-        return isA(type.type);
-    }
-
-    public boolean isA(Class<?> type) {
-        return isA(elements().getTypeElement(type.getName()).asType());
-    }
-
-    private boolean isA(TypeMirror thatType) {
         // The following methods return false for, e.g., a List<String> and java.util.Collection<E>
         // as they have different type arguments:
         // types().isAssignable(left, right);
         // types().isSameType(left, right)
         // types().isSubtype(right, left)
         // TODO we could also check the type parameters, i.e. if a List<String> is a List<Number>
+        return isA(toRawString(type.type));
+    }
+
+    public boolean isA(Class<?> type) {
+        return isA(type.getName());
+    }
+
+    private boolean isA(String thatTypeName) {
         try {
-            if (isSameRawType(this.type, thatType))
+            if (toRawString(this.type).equals(thatTypeName))
                 return true;
             if (isVoid() || isPrimitive())
                 return false;
             for (TypeMirror supertype : allTypes())
-                if (isSameRawType(supertype, thatType))
+                if (toRawString(supertype).equals(thatTypeName))
                     return true;
             return false;
         } catch (Error e) {
-            throw new Error(this.type + " isSubclassOf " + thatType, e);
+            throw new Error(this.type + " isSubclassOf " + thatTypeName, e);
         }
-    }
-
-    private boolean isSameRawType(TypeMirror leftMirror, TypeMirror rightMirror) {
-        String left = toRawString(leftMirror);
-        String right = toRawString(rightMirror);
-        return left.equals(right);
     }
 
     private String toRawString(TypeMirror mirror) {
