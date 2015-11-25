@@ -2,13 +2,13 @@ package com.github.t1.exap.generator;
 
 public class ParameterGenerator {
     private final String name;
-    private TypeStringGenerator type;
+    private TypeExpressionGenerator type;
 
     public ParameterGenerator(String name) {
         this.name = name;
     }
 
-    public ParameterGenerator type(TypeStringGenerator type) {
+    public ParameterGenerator type(TypeExpressionGenerator type) {
         this.type = type;
         return this;
     }
@@ -17,7 +17,7 @@ public class ParameterGenerator {
         return name;
     }
 
-    public TypeStringGenerator getType() {
+    public TypeExpressionGenerator getType() {
         return type;
     }
 }

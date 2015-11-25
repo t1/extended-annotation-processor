@@ -5,18 +5,24 @@ import static javax.tools.StandardLocation.*;
 import java.io.IOException;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.*;
 
 import com.github.t1.exap.Round;
 import com.github.t1.exap.generator.TypeGenerator;
 
-public class Package {
+public class Package extends Elemental {
     private final PackageElement packageElement;
     private Round round;
 
     public Package(PackageElement packageElement, Round round) {
+        super(round);
         this.packageElement = packageElement;
         this.round = round;
+    }
+
+    @Override
+    protected Element getElement() {
+        return packageElement;
     }
 
     public String getName() {
@@ -46,5 +52,10 @@ public class Package {
 
     public TypeGenerator openTypeGenerator(String name) {
         return new TypeGenerator(round.log(), this, name);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ":" + getName();
     }
 }

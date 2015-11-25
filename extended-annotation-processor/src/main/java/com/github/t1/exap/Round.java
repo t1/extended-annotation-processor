@@ -40,6 +40,14 @@ public class Round {
         return result;
     }
 
+    public List<Package> packagesAnnotatedWith(Class<? extends Annotation> type) {
+        List<Package> result = new ArrayList<>();
+        for (Element element : roundEnv.getElementsAnnotatedWith(type))
+            if (PACKAGE == element.getKind())
+                result.add(new Package((PackageElement) element, this));
+        return result;
+    }
+
     public Logger log() {
         return log;
     }

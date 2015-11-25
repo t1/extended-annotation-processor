@@ -4,22 +4,22 @@ import java.util.*;
 
 import com.github.t1.exap.reflection.Type;
 
-public class TypeStringGenerator {
+public class TypeExpressionGenerator {
     private final TypeGenerator container;
     private String type;
     private List<Object> args;
 
-    public TypeStringGenerator(TypeGenerator container, Type type) {
+    public TypeExpressionGenerator(TypeGenerator container, Type type) {
         this(container, type.getSimpleName());
         container.addImport(type);
     }
 
-    public TypeStringGenerator(TypeGenerator container, String type) {
+    public TypeExpressionGenerator(TypeGenerator container, String type) {
         this.container = container;
         this.type = type;
     }
 
-    public TypeStringGenerator typeVar(String arg) {
+    public TypeExpressionGenerator typeVar(String arg) {
         if (!container.getTypeParameters().contains(arg))
             throw new IllegalArgumentException("unknown type var [" + arg + "]. " + container.getTypeName()
                     + " only knows " + container.getTypeParameters());
@@ -29,9 +29,9 @@ public class TypeStringGenerator {
         return this;
     }
 
-    public TypeStringGenerator typeArg(Type typeArg) {
+    public TypeExpressionGenerator typeArg(Type typeArg) {
         container.addImport(typeArg);
-        TypeStringGenerator sub = new TypeStringGenerator(container, typeArg);
+        TypeExpressionGenerator sub = new TypeExpressionGenerator(container, typeArg);
         if (args == null)
             args = new ArrayList<>();
         args.add(sub);

@@ -8,7 +8,7 @@ public class FieldGenerator {
     final TypeGenerator container;
     private final String name;
     private boolean isFinal;
-    private TypeStringGenerator type;
+    private TypeExpressionGenerator type;
 
     public FieldGenerator(TypeGenerator container, String name) {
         this.container = container;
@@ -20,9 +20,9 @@ public class FieldGenerator {
         return this;
     }
 
-    public TypeStringGenerator type(Type type) {
+    public TypeExpressionGenerator type(Type type) {
         container.addImport(type);
-        this.type = new TypeStringGenerator(container, type);
+        this.type = new TypeExpressionGenerator(container, type);
         return this.type;
     }
 
@@ -31,7 +31,7 @@ public class FieldGenerator {
     }
 
 
-    public TypeStringGenerator getType() {
+    public TypeExpressionGenerator getType() {
         return type;
     }
 
