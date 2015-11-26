@@ -1,5 +1,7 @@
 package com.github.t1.exap.generator;
 
+import static com.github.t1.exap.generator.TypeKind.*;
+
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -40,7 +42,10 @@ public class MethodGenerator {
     }
 
     public MethodGenerator body(String body) {
-        this.body = body;
+        if (container.kind() == CLASS)
+            this.body = body;
+        else
+            throw new IllegalStateException("can't add method body to an " + container.kind() + " method");
         return this;
     }
 
@@ -57,9 +62,11 @@ public class MethodGenerator {
         out.print("    public ");
         if (isStatic)
             out.print("static ");
-        out.println(returnType + " " + name + "() {");
-        out.println("        " + body);
-        out.println("    }");
+        out.print(returnType + " " + name + "()");
+        if (body == null)
+            out.append(";\n");
+        else
+            out.append(" {\n").append("        ").append(body).append("\n    }\n");
         out.println();
     }
 }

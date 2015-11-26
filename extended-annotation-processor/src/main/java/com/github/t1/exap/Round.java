@@ -75,6 +75,14 @@ public class Round {
         return new Package(null, this);
     }
 
+    public Package getPackage(String pkg) {
+        return new Package(processingEnv.getElementUtils().getPackageElement(pkg), this);
+    }
+
+    public Package getPackageOf(Class<?> type) {
+        return getPackage(type.getPackage().getName());
+    }
+
     public Resource createResource(String pkg, String relativeName) throws IOException {
         return new Resource(processingEnv.getFiler().createResource(CLASS_OUTPUT, pkg, relativeName));
     }

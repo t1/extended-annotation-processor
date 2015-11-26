@@ -7,20 +7,54 @@ import java.nio.file.*;
 import org.junit.Test;
 
 public class AnnotationProcessorTest {
-    private static final Path EXPECTED_FOLDER = Paths.get("src/test/resources");
-    private static final Path ACTUAL_FOLDER = Paths.get("target/test-classes");
+    private static final Path RESOURCES = Paths.get("src/test/resources");
+    private static final Path TEST_CLASSES = Paths.get("target/test-classes");
+    private static final Path GENERATED_TEST_SOURCES = Paths.get("target/generated-test-sources/test-annotations");
 
     @Test
     public void shouldHaveRunRound0() {
-        assertRound(0);
+        verifyRoundHasRun(0);
     }
 
     @Test
     public void shouldHaveRunRound1() {
-        assertRound(1);
+        verifyRoundHasRun(1);
     }
 
-    private void assertRound(int round) {
-        assertThat(ACTUAL_FOLDER.resolve("round-" + round)).hasSameContentAs(EXPECTED_FOLDER.resolve("round-" + round));
+    private void verifyRoundHasRun(int round) {
+        assertThat(TEST_CLASSES.resolve("round-" + round)).hasSameContentAs(RESOURCES.resolve("round-" + round));
+    }
+
+    @Test
+    public void shouldHaveGeneratedInterface() {
+        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(""
+                + "package somepackage;\n"
+                + "\n"
+                + "public interface GeneratedInterface {\n"
+                + "    public AnnotatedClass method0();\n"
+                + "\n"
+                + "}\n");
+    }
+
+    @Test
+    public void shouldHaveGeneratedRootClass() {
+        assertThat(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java")).hasContent(""
+                + "public interface GeneratedRootClass {\n"
+                + "}\n");
+    }
+
+    @Test
+    public void shouldHaveGeneratedClass() {
+        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(""
+                + "package somepackage;\n"
+                + "\n"
+                + "public class GeneratedClass {\n"
+                + "    private AnnotatedClass value;\n"
+                + "\n"
+                + "    public AnnotatedClass method0() {\n"
+                + "        return value;\n"
+                + "    }\n"
+                + "\n"
+                + "}\n");
     }
 }

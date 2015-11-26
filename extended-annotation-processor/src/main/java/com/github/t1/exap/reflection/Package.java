@@ -29,12 +29,25 @@ public class Package extends Elemental {
         return (packageElement == null) ? "" : packageElement.getQualifiedName().toString();
     }
 
+    public boolean isRoot() {
+        return packageElement == null;
+    }
+
     public Resource createSource(String relativeName) {
         try {
-            return new Resource(filer().createSourceFile(getName() + "." + relativeName));
+            String sourceName = sourceName(relativeName);
+            return new Resource(filer().createSourceFile(sourceName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String sourceName(String relativeName) {
+        String sourceName = getName();
+        if (!sourceName.isEmpty())
+            sourceName += ".";
+        sourceName += relativeName;
+        return sourceName;
     }
 
     @SuppressWarnings("deprecation")

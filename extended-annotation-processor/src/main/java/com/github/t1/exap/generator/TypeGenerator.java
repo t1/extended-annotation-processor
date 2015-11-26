@@ -1,5 +1,7 @@
 package com.github.t1.exap.generator;
 
+import static com.github.t1.exap.generator.TypeKind.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.function.Predicate;
@@ -15,6 +17,7 @@ public class TypeGenerator implements AutoCloseable {
     private final String typeName;
 
     private ImportGenerator imports = new ImportGenerator();
+    private TypeKind kind = CLASS;
     private List<String> typeParameters;
     private List<AnnotationGenerator> annotations;
     private List<FieldGenerator> fields;
@@ -25,6 +28,14 @@ public class TypeGenerator implements AutoCloseable {
         this.log = log;
         this.pkg = pkg;
         this.typeName = typeName;
+    }
+
+    public void kind(TypeKind kind) {
+        this.kind = kind;
+    }
+
+    public TypeKind kind() {
+        return kind;
     }
 
     /** You should only need to call this for types needed <em>in</em> your body */
@@ -99,14 +110,16 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     private void printHeader(PrintWriter out) {
-        out.println("package " + pkg.getName() + ";");
-        out.println();
+        if (!pkg.isRoot()) {
+            out.println("package " + pkg.getName() + ";");
+            out.println();
+        }
         imports.print(out);
     }
 
     private void printType(PrintWriter out) {
         printAnnotations(out);
-        out.print("public class " + typeName);
+        out.append("public ").append(kind.toString()).append(" ").append(typeName);
         printTypeParams(out);
         out.println(" {");
         printMethods(out, m -> m.isStatic());
