@@ -16,9 +16,10 @@ public class TypeGenerator implements AutoCloseable {
 
     private ImportGenerator imports = new ImportGenerator();
     private List<String> typeParameters;
+    private List<AnnotationGenerator> annotations;
     private List<FieldGenerator> fields;
-    private List<MethodGenerator> methods;
     private List<ConstructorGenerator> constructors;
+    private List<MethodGenerator> methods;
 
     public TypeGenerator(Logger log, Package pkg, String typeName) {
         this.log = log;
@@ -36,6 +37,14 @@ public class TypeGenerator implements AutoCloseable {
         if (typeParameters == null)
             typeParameters = new ArrayList<>();
         typeParameters.add(typeParameter);
+    }
+
+    public AnnotationGenerator annotation(Type type) {
+        if (annotations == null)
+            annotations = new ArrayList<>();
+        AnnotationGenerator annotationGenerator = new AnnotationGenerator(this, type);
+        annotations.add(annotationGenerator);
+        return annotationGenerator;
     }
 
     public FieldGenerator addField(String name) {
@@ -96,6 +105,7 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     private void printType(PrintWriter out) {
+        printAnnotations(out);
         out.print("public class " + typeName);
         printTypeParams(out);
         out.println(" {");
@@ -106,14 +116,20 @@ public class TypeGenerator implements AutoCloseable {
         out.println("}");
     }
 
+    private void printAnnotations(PrintWriter out) {
+        if (annotations == null)
+            return;
+        for (AnnotationGenerator annotation : annotations)
+            out.println(annotation.toString());
+    }
+
     private void printTypeParams(PrintWriter out) {
         if (typeParameters == null)
             return;
-        out.print("<");
-        Delimiter delimiter = new Delimiter(", ");
+        StringJoiner joiner = new StringJoiner(", ", "<", ">");
         for (String typeParameter : typeParameters)
-            out.append(delimiter.next()).print(typeParameter);
-        out.print(">");
+            joiner.add(typeParameter);
+        out.print(joiner);
     }
 
     private void printMethods(PrintWriter out, Predicate<MethodGenerator> filter) {

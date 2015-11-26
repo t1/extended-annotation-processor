@@ -28,10 +28,10 @@ public class ConstructorGenerator {
     public void print(PrintWriter out) {
         out.print("    public " + container.getTypeName() + "(");
         if (parameters != null) {
-            Delimiter delimiter = new Delimiter(", ");
+            StringJoiner joiner = new StringJoiner(", ");
             for (ParameterGenerator param : parameters)
-                out.append(delimiter.next()).append(param.getType().toString()) //
-                        .append(" ").append(param.getName());
+                joiner.add(param.getType() + " " + param.getName());
+            out.print(joiner);
         }
         out.println(") {");
         out.println("        " + body);

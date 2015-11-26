@@ -43,12 +43,10 @@ public class TypeExpressionGenerator {
         StringBuilder out = new StringBuilder();
         out.append(type);
         if (args != null) {
-            out.append("<");
-            Delimiter delimiter = new Delimiter(", ");
-            for (Object arg : args) {
-                out.append(delimiter.next()).append(arg);
-            }
-            out.append(">");
+            StringJoiner joiner = new StringJoiner(", ", "<", ">");
+            for (Object arg : args)
+                joiner.add(arg.toString());
+            out.append(joiner);
         }
         return out.toString();
     }
