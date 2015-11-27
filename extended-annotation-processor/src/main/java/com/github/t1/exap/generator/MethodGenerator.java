@@ -14,6 +14,7 @@ public class MethodGenerator {
     private boolean isStatic;
     private TypeExpressionGenerator returnType;
     private final String name;
+    private List<ParameterGenerator> parameters;
     private String body;
 
     public MethodGenerator(TypeGenerator container, String name) {
@@ -49,6 +50,14 @@ public class MethodGenerator {
         return this.returnType;
     }
 
+    public ParameterGenerator addParameter(String name) {
+        if (parameters == null)
+            parameters = new ArrayList<>();
+        ParameterGenerator parameter = new ParameterGenerator(container, name);
+        parameters.add(parameter);
+        return parameter;
+    }
+
     public MethodGenerator body(String body) {
         if (container.kind() == CLASS)
             this.body = body;
@@ -69,7 +78,9 @@ public class MethodGenerator {
         out.print("    public ");
         if (isStatic)
             out.print("static ");
-        out.print(returnType + " " + name + "()");
+        out.print(returnType + " " + name + "(");
+        ParameterGenerator.print(parameters, out);
+        out.print(")");
         if (body == null)
             out.append(";\n");
         else

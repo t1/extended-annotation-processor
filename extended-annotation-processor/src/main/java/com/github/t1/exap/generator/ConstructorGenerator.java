@@ -13,9 +13,9 @@ public class ConstructorGenerator {
     }
 
     public ParameterGenerator addParameter(String name) {
-        ParameterGenerator parameterGenerator = new ParameterGenerator(name);
         if (this.parameters == null)
             this.parameters = new ArrayList<>();
+        ParameterGenerator parameterGenerator = new ParameterGenerator(container, name);
         this.parameters.add(parameterGenerator);
         return parameterGenerator;
     }
@@ -27,12 +27,7 @@ public class ConstructorGenerator {
 
     public void print(PrintWriter out) {
         out.print("    public " + container.getTypeName() + "(");
-        if (parameters != null) {
-            StringJoiner joiner = new StringJoiner(", ");
-            for (ParameterGenerator param : parameters)
-                joiner.add(param.getType() + " " + param.getName());
-            out.print(joiner);
-        }
+        ParameterGenerator.print(parameters, out);
         out.println(") {");
         out.println("        " + body);
         out.println("    }");
