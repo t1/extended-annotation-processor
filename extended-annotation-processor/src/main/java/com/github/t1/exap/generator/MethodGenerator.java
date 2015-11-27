@@ -10,6 +10,7 @@ import com.github.t1.exap.reflection.Type;
 public class MethodGenerator {
     private final TypeGenerator container;
     private final String name;
+    private JavaDocGenerator javaDoc;
     private TypeExpressionGenerator returnType;
     private String body;
     private boolean isStatic;
@@ -18,6 +19,11 @@ public class MethodGenerator {
     public MethodGenerator(TypeGenerator container, String name) {
         this.container = container;
         this.name = name;
+    }
+
+    public void javaDoc(String javaDoc) {
+        if (javaDoc != null && !javaDoc.isEmpty())
+            this.javaDoc = new JavaDocGenerator("    ", javaDoc);
     }
 
     public MethodGenerator setStatic() {
@@ -55,6 +61,8 @@ public class MethodGenerator {
     }
 
     public void print(PrintWriter out) {
+        if (javaDoc != null)
+            javaDoc.print(out);
         for (String annotation : annotations) {
             out.print("    @");
             out.println(annotation);

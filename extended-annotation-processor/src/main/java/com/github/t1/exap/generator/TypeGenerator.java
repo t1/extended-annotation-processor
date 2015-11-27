@@ -17,6 +17,7 @@ public class TypeGenerator implements AutoCloseable {
     private final String typeName;
 
     private ImportGenerator imports = new ImportGenerator();
+    private JavaDocGenerator javaDoc;
     private TypeKind kind = CLASS;
     private List<String> typeParameters;
     private List<AnnotationGenerator> annotations;
@@ -28,6 +29,11 @@ public class TypeGenerator implements AutoCloseable {
         this.log = log;
         this.pkg = pkg;
         this.typeName = typeName;
+    }
+
+    public void javaDoc(String javaDoc) {
+        if (javaDoc != null && !javaDoc.isEmpty())
+            this.javaDoc = new JavaDocGenerator("", javaDoc);
     }
 
     public void kind(TypeKind kind) {
@@ -118,6 +124,8 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     private void printType(PrintWriter out) {
+        if (javaDoc != null)
+            javaDoc.print(out);
         printAnnotations(out);
         out.append("public ").append(kind.toString()).append(" ").append(typeName);
         printTypeParams(out);
