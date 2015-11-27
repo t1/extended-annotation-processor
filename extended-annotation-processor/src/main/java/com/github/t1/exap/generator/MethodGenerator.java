@@ -9,12 +9,12 @@ import com.github.t1.exap.reflection.Type;
 
 public class MethodGenerator {
     private final TypeGenerator container;
-    private final String name;
     private JavaDocGenerator javaDoc;
-    private TypeExpressionGenerator returnType;
-    private String body;
+    private List<AnnotationGenerator> annotations;
     private boolean isStatic;
-    private List<String> annotations = new ArrayList<>();
+    private TypeExpressionGenerator returnType;
+    private final String name;
+    private String body;
 
     public MethodGenerator(TypeGenerator container, String name) {
         this.container = container;
@@ -31,10 +31,12 @@ public class MethodGenerator {
         return this;
     }
 
-    // TODO return a new class AnnotationExpressionGenerator
-    public void annotation(Type type) {
-        this.annotations.add(type.getSimpleName());
-        container.addImport(type);
+    public AnnotationGenerator annotation(Type type) {
+        if (annotations == null)
+            annotations = new ArrayList<>();
+        AnnotationGenerator annotationGenerator = new AnnotationGenerator(container, type);
+        annotations.add(annotationGenerator);
+        return annotationGenerator;
     }
 
     public TypeExpressionGenerator returnType(String returnType) {
@@ -63,10 +65,7 @@ public class MethodGenerator {
     public void print(PrintWriter out) {
         if (javaDoc != null)
             javaDoc.print(out);
-        for (String annotation : annotations) {
-            out.print("    @");
-            out.println(annotation);
-        }
+        printAnnotations(out);
         out.print("    public ");
         if (isStatic)
             out.print("static ");
@@ -76,5 +75,13 @@ public class MethodGenerator {
         else
             out.append(" {\n").append("        ").append(body).append("\n    }\n");
         out.println();
+    }
+
+
+    private void printAnnotations(PrintWriter out) {
+        if (annotations == null)
+            return;
+        for (AnnotationGenerator annotation : annotations)
+            out.println("    " + annotation);
     }
 }
