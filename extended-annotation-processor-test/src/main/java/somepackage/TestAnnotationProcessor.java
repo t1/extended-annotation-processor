@@ -22,6 +22,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     public boolean process(Round round) throws IOException {
         log.info("start annotation processor");
         createRoundOutput(round);
+        createFieldList(round);
         generateSourceFile(round);
         return false;
     }
@@ -31,6 +32,15 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         try (Writer writer = resource.openWriter()) {
             try (TestGenerator generator = new TestGenerator(writer)) {
                 generator.write(round.typesAnnotatedWith(MarkerAnnotation.class));
+            }
+        }
+    }
+
+    private void createFieldList(Round round) throws IOException {
+        Resource resource = round.getRootPackage().createResource("fields-" + round.number());
+        try (Writer writer = resource.openWriter()) {
+            for (Field field : round.fieldsAnnotatedWith(MarkerAnnotation.class)) {
+                writer.append(field.getName() + ":" + field.getAnnotation(MarkerAnnotation.class).value() + "\n");
             }
         }
     }

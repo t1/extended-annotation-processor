@@ -5,12 +5,16 @@ import static javax.lang.model.type.TypeKind.*;
 
 import java.util.*;
 
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
 import com.github.t1.exap.Round;
 
 public class Field extends Elemental {
+    public static Field of(Element element, Round round) {
+        return Type.of(element.getEnclosingElement().asType(), round).getField(element.getSimpleName().toString());
+    }
+
     private final Type declaringType;
     private final VariableElement field;
 
