@@ -2,13 +2,13 @@ package com.github.t1.exap.reflection;
 
 import static javax.tools.StandardLocation.*;
 
-import java.io.IOException;
+import com.github.t1.exap.Round;
+import com.github.t1.exap.generator.TypeGenerator;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.*;
-
-import com.github.t1.exap.Round;
-import com.github.t1.exap.generator.TypeGenerator;
+import java.io.IOException;
+import java.nio.file.*;
 
 public class Package extends Elemental {
     private final PackageElement packageElement;
@@ -31,6 +31,14 @@ public class Package extends Elemental {
 
     public boolean isRoot() {
         return packageElement == null;
+    }
+
+    public boolean isSuperPackageOf(Package that) {
+        return toPath().startsWith(that.toPath());
+    }
+
+    public Path toPath() {
+        return Paths.get(toString());
     }
 
     public Resource createSource(String relativeName) {
@@ -70,5 +78,18 @@ public class Package extends Elemental {
     @Override
     public String toString() {
         return getClass().getSimpleName() + ":" + getName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Package))
+            return false;
+        Package that = (Package) obj;
+        return this.toString().equals(that.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

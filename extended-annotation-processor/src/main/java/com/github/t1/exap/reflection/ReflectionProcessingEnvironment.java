@@ -1,16 +1,14 @@
 package com.github.t1.exap.reflection;
 
-import java.util.*;
+import com.github.t1.exap.Round;
+import org.slf4j.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.util.*;
 import javax.tools.*;
 import javax.tools.Diagnostic.Kind;
-
-import org.slf4j.*;
-
-import com.github.t1.exap.Round;
+import java.util.*;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private static final Logger log = LoggerFactory.getLogger(ReflectionProcessingEnvironment.class);
@@ -19,7 +17,8 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     private static final Round DUMMY_ROUND = new Round(log, ENV, null, 0);
 
-    private ReflectionProcessingEnvironment() {}
+    private ReflectionProcessingEnvironment() {
+    }
 
     private final ReflectionMessager messager = new ReflectionMessager();
     private final ReflectionFiler filer = new ReflectionFiler();
@@ -81,5 +80,9 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     public String getCreatedResource(StandardLocation location, String pack, String name) {
         return filer.getCreatedResource(location, pack, name);
+    }
+
+    public void clearCreatedResource() {
+        filer.getCreatedResources().clear();
     }
 }
