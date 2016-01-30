@@ -5,8 +5,8 @@ import static java.util.Arrays.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.*;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
@@ -39,7 +39,7 @@ class ReflectionType extends Type {
 
     @Override
     public Package getPackage() {
-        return new ReflectionPackage(rawType().getPackage(), round());
+        return ReflectionPackage.of(rawType(), round());
     }
 
     private boolean isClass() {

@@ -10,9 +10,14 @@ import javax.lang.model.element.PackageElement;
 import com.github.t1.exap.Round;
 
 public class ReflectionPackage extends Package {
+    public static Package of(Class<?> type, Round round) {
+        java.lang.Package pkg = type.getPackage();
+        return (pkg == null) ? null : new ReflectionPackage(pkg, round);
+    }
+
     private final java.lang.Package pkg;
 
-    public ReflectionPackage(java.lang.Package pack, Round round) {
+    private ReflectionPackage(java.lang.Package pack, Round round) {
         super(DummyProxy.of(PackageElement.class), round);
         this.pkg = pack;
     }

@@ -73,7 +73,8 @@ public class Round {
 
     @Override
     public String toString() {
-        return "Round#" + roundNumber + "-" + roundEnv.getRootElements() + (isLast() ? " [last]" : "");
+        return "Round#" + roundNumber + "-" //
+                + ((roundEnv == null) ? "mock" : (roundEnv.getRootElements() + (isLast() ? " [last]" : "")));
     }
 
     public Package getRootPackage() {

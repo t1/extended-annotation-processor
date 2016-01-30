@@ -2,11 +2,11 @@ package com.github.t1.exap.generator;
 
 import static java.util.Arrays.*;
 
-import com.github.t1.exap.reflection.Type;
-
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.github.t1.exap.reflection.Type;
 
 public class ImportGenerator {
     private static final List<String> ROOT_PACKAGES = asList("java", "javax", "org", "com");
