@@ -6,13 +6,19 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.github.t1.exap.reflection.Package;
 import com.github.t1.exap.reflection.Type;
 
 public class ImportGenerator {
     private static final List<String> ROOT_PACKAGES = asList("java", "javax", "org", "com");
     private static final String OTHER = "*";
 
+    private final Package selfPackage;
     private final Set<Type> imports = new TreeSet<>(Comparator.comparing(Type::getFullName));
+
+    public ImportGenerator(Package selfPackage) {
+        this.selfPackage = selfPackage;
+    }
 
     public void add(Type type) {
         if (requiresImport(type))
@@ -20,7 +26,8 @@ public class ImportGenerator {
     }
 
     private boolean requiresImport(Type type) {
-        return !(type.getPackage() == null || "java.lang".equals(type.getPackage().getName()));
+        return !(type.getPackage() == null || "java.lang".equals(type.getPackage().getName())
+                || type.getPackage().equals(selfPackage));
     }
 
     public void print(PrintWriter out) {
@@ -59,7 +66,7 @@ public class ImportGenerator {
 
     private boolean removeOther(List<String> typeNames, String stripped) {
         boolean removed = false;
-        for (Iterator<String> iter = typeNames.iterator(); iter.hasNext(); ) {
+        for (Iterator<String> iter = typeNames.iterator(); iter.hasNext();) {
             String typeName = iter.next();
             if (stripLastItem(typeName).equals(stripped)) {
                 iter.remove();

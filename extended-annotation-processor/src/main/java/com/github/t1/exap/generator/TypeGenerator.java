@@ -1,6 +1,7 @@
 package com.github.t1.exap.generator;
 
 import static com.github.t1.exap.generator.TypeKind.*;
+import static java.util.Collections.*;
 
 import java.io.*;
 import java.util.*;
@@ -16,7 +17,7 @@ public class TypeGenerator implements AutoCloseable {
     private final Package pkg;
     private final String typeName;
 
-    private ImportGenerator imports = new ImportGenerator();
+    private final ImportGenerator imports;
     private JavaDocGenerator javaDoc;
     private TypeKind kind = CLASS;
     private List<String> typeParameters;
@@ -29,6 +30,7 @@ public class TypeGenerator implements AutoCloseable {
         this.log = log;
         this.pkg = pkg;
         this.typeName = typeName;
+        this.imports = new ImportGenerator(pkg);
     }
 
     public void javaDoc(String javaDoc) {
@@ -94,7 +96,7 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     public List<String> getTypeParameters() {
-        return typeParameters;
+        return (typeParameters == null) ? emptyList() : typeParameters;
     }
 
 
