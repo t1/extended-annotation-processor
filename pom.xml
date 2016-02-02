@@ -19,6 +19,20 @@
         <developerConnection>scm:git:https://github.com/t1/extended-annotation-processor</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <distributionManagement>
+        <repository>
+            <id>bintray-t1-javaee-helpers</id>
+            <name>t1-javaee-helpers-extended-annotation-processor</name>
+            <url>https://api.bintray.com/maven/t1/javaee-helpers/extended-annotation-processor/;publish=1</url>
+        </repository>
+    </distributionManagement>
 
     <modules>
         <module>extended-annotation-processor</module>
