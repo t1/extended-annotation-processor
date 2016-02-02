@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.t1</groupId>
     <artifactId>extended-annotation-processor-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>ExAP - Extended Annotation Processor Parent</name>
     <description>Makes the Java Annotation Processor easier to use</description>
@@ -17,7 +16,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/t1/extended-annotation-processor</developerConnection>
-        <tag>HEAD</tag>
+        <tag>extended-annotation-processor-parent-1.0.0</tag>
     </scm>
     <licenses>
         <license>
