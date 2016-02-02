@@ -5,18 +5,18 @@ public enum TypeKind {
         @Override
         public String toString() {
             return "class";
-        };
+        }
     },
     INTERFACE {
         @Override
         public String toString() {
             return "interface";
-        };
+        }
     },
     ANNOTATION {
         @Override
         public String toString() {
             return "@interface";
-        };
+        }
     };
 }
