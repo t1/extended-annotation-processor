@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.t1</groupId>
     <artifactId>extended-annotation-processor-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>ExAP - Extended Annotation Processor Parent</name>
     <description>Makes the Java Annotation Processor easier to use</description>
@@ -16,7 +16,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/t1/extended-annotation-processor</developerConnection>
-        <tag>extended-annotation-processor-parent-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <licenses>
         <license>
