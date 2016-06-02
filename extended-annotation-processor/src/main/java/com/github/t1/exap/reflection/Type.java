@@ -1,16 +1,15 @@
 package com.github.t1.exap.reflection;
 
+import com.github.t1.exap.Round;
+
+import javax.lang.model.element.*;
+import javax.lang.model.type.*;
+import java.util.*;
+
 import static java.util.Objects.*;
 import static javax.lang.model.element.ElementKind.*;
 import static javax.lang.model.element.Modifier.*;
 import static javax.lang.model.type.TypeKind.*;
-
-import java.util.*;
-
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
-
-import com.github.t1.exap.Round;
 
 public class Type extends Elemental {
     public static Type of(TypeMirror type, Round round) {
@@ -136,7 +135,7 @@ public class Type extends Elemental {
     }
 
     public boolean isEnum() {
-        return (getElement() == null) ? false : getElement().getKind() == ENUM;
+        return getElement() != null && getElement().getKind() == ENUM;
     }
 
     public List<String> getEnumValues() {

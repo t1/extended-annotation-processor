@@ -1,10 +1,12 @@
 package com.github.t1.exap.generator;
 
-import static java.util.Arrays.*;
+import com.github.t1.exap.reflection.Type;
 
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Arrays.*;
 
 import com.github.t1.exap.reflection.Package;
 import com.github.t1.exap.reflection.Type;
@@ -21,7 +23,7 @@ public class ImportGenerator {
     }
 
     public void add(Type type) {
-        if (requiresImport(type))
+        if (!imports.contains(type) && requiresImport(type))
             imports.add(type);
     }
 
@@ -36,9 +38,10 @@ public class ImportGenerator {
     }
 
     private void printImportGroup(PrintWriter out, String groupName) {
-        List<String> actualImports = this.imports.stream() //
-                .filter(type -> matches(type, groupName)) //
-                .map(type -> type.getFullName().replace('$', '.')) //
+        List<String> actualImports = this.imports
+                .stream()
+                .filter(type -> matches(type, groupName))
+                .map(type -> type.getFullName().replace('$', '.').replaceAll("<.*>", ""))
                 .collect(Collectors.toList());
         if (!actualImports.isEmpty()) {
             while (!actualImports.isEmpty()) {
