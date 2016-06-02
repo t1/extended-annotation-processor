@@ -31,8 +31,6 @@ public class AnnotationProcessorTest {
         assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(""
                 + "package somepackage;\n"
                 + "\n"
-                + "import somepackage.AnnotatedClass;\n"
-                + "\n"
                 + "public interface GeneratedInterface {\n"
                 + "    public AnnotatedClass method0();\n"
                 + "\n"
@@ -50,8 +48,6 @@ public class AnnotationProcessorTest {
     public void shouldHaveGeneratedClass() {
         assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(""
                 + "package somepackage;\n"
-                + "\n"
-                + "import somepackage.AnnotatedClass;\n"
                 + "\n"
                 + "public class GeneratedClass {\n"
                 + "    private AnnotatedClass value;\n"
