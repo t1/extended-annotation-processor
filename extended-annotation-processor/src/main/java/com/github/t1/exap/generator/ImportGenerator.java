@@ -4,8 +4,8 @@ import com.github.t1.exap.reflection.Package;
 import com.github.t1.exap.reflection.*;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.*;
 
@@ -21,13 +21,14 @@ public class ImportGenerator {
     }
 
     public void add(Type type) {
-        if (requiresImport(type))
+        if (!isAutoImport(type))
             imports.add(type);
     }
 
-    private boolean requiresImport(Type type) {
-        return !(type.getPackage() == null || "java.lang".equals(type.getPackage().getName())
-                         || type.getPackage().equals(selfPackage));
+    private boolean isAutoImport(Type type) {
+        return type.getPackage() == null
+                || "java.lang".equals(type.getPackage().getName())
+                || type.getPackage().equals(selfPackage);
     }
 
     public void print(PrintWriter out) {
@@ -36,21 +37,25 @@ public class ImportGenerator {
     }
 
     private void printImportGroup(PrintWriter out, String groupName) {
-        List<String> actualImports = this.imports
-                .stream()
-                .filter(type -> matches(type, groupName))
-                .map(type -> type.getFullName().replace('$', '.').replaceAll("<.*>", ""))
-                .collect(Collectors.toList());
-        if (!actualImports.isEmpty()) {
-            while (!actualImports.isEmpty()) {
-                String actualImport = actualImports.remove(0);
-                if (removeOther(actualImports, stripLastItem(actualImport)))
-                    actualImport = stripLastItem(actualImport) + "*";
-                out.println("import " + actualImport + ";");
+        boolean anyImports = false;
+        for (int i = 0; i < imports.size(); i++) {
+            Type type = new ArrayList<>(imports).get(i);
+            if (matches(type, groupName)) {
+                imports.remove(type);
+                --i;
+                anyImports = true;
+                String typeName = typeName(type);
+                String stripped = stripLastItem(typeName);
+                if (removeOther(imports, stripped))
+                    typeName = stripped + "*";
+                out.println("import " + typeName + ";");
             }
-            out.println();
         }
+        if (anyImports)
+            out.println();
     }
+
+    private String typeName(Type type) {return type.getFullName().replace('$', '.').replaceAll("<.*>", "");}
 
     private boolean matches(Type type, String groupName) {
         if (OTHER.equals(groupName))
@@ -65,10 +70,10 @@ public class ImportGenerator {
         return typeName;
     }
 
-    private boolean removeOther(List<String> typeNames, String stripped) {
+    private boolean removeOther(Iterable<Type> typeNames, String stripped) {
         boolean removed = false;
-        for (Iterator<String> iter = typeNames.iterator(); iter.hasNext(); ) {
-            String typeName = iter.next();
+        for (Iterator<Type> iter = typeNames.iterator(); iter.hasNext(); ) {
+            String typeName = typeName(iter.next());
             if (stripLastItem(typeName).equals(stripped)) {
                 iter.remove();
                 removed = true;

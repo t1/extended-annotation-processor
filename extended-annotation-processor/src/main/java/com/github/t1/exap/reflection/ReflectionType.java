@@ -1,18 +1,17 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Arrays.*;
+import com.github.t1.exap.Round;
 
+import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.*;
 
-import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
-
-import com.github.t1.exap.Round;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+import static java.util.Arrays.*;
 
 class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
@@ -241,6 +240,6 @@ class ReflectionType extends Type {
         if (obj == null || getClass() != obj.getClass())
             return false;
         ReflectionType that = (ReflectionType) obj;
-        return this.type == that.type;
+        return this.type.equals(that.type);
     }
 }
