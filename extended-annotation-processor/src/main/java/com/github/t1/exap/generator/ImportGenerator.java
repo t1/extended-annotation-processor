@@ -1,15 +1,13 @@
 package com.github.t1.exap.generator;
 
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.reflection.Package;
+import com.github.t1.exap.reflection.*;
 
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.*;
-
-import com.github.t1.exap.reflection.Package;
-import com.github.t1.exap.reflection.Type;
 
 public class ImportGenerator {
     private static final List<String> ROOT_PACKAGES = asList("java", "javax", "org", "com");
@@ -23,13 +21,13 @@ public class ImportGenerator {
     }
 
     public void add(Type type) {
-        if (!imports.contains(type) && requiresImport(type))
+        if (requiresImport(type))
             imports.add(type);
     }
 
     private boolean requiresImport(Type type) {
         return !(type.getPackage() == null || "java.lang".equals(type.getPackage().getName())
-                || type.getPackage().equals(selfPackage));
+                         || type.getPackage().equals(selfPackage));
     }
 
     public void print(PrintWriter out) {
@@ -69,7 +67,7 @@ public class ImportGenerator {
 
     private boolean removeOther(List<String> typeNames, String stripped) {
         boolean removed = false;
-        for (Iterator<String> iter = typeNames.iterator(); iter.hasNext();) {
+        for (Iterator<String> iter = typeNames.iterator(); iter.hasNext(); ) {
             String typeName = iter.next();
             if (stripLastItem(typeName).equals(stripped)) {
                 iter.remove();
