@@ -1,21 +1,19 @@
 package com.github.t1.exap;
 
-import static java.util.Arrays.*;
-import static java.util.stream.Collectors.*;
-import static javax.lang.model.element.ElementKind.*;
-import static javax.tools.StandardLocation.*;
+import com.github.t1.exap.reflection.*;
+import com.github.t1.exap.reflection.Package;
+import org.slf4j.Logger;
 
+import javax.annotation.processing.*;
+import javax.lang.model.element.*;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import javax.annotation.processing.*;
-import javax.lang.model.element.*;
-
-import org.slf4j.Logger;
-
-import com.github.t1.exap.reflection.*;
-import com.github.t1.exap.reflection.Package;
+import static java.util.Arrays.*;
+import static java.util.stream.Collectors.*;
+import static javax.lang.model.element.ElementKind.*;
+import static javax.tools.StandardLocation.*;
 
 public class Round {
     private static final List<ElementKind> TYPE_KINDS = asList(ENUM, CLASS, ANNOTATION_TYPE, INTERFACE);
