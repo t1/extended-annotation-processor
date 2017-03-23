@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
+import javax.tools.JavaFileManager;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.nio.file.*;
 import java.util.List;
 
 import static java.util.Arrays.*;
@@ -32,23 +35,23 @@ public class Round {
 
     public List<Field> fieldsAnnotatedWith(Class<? extends Annotation> type) {
         return roundEnv.getElementsAnnotatedWith(type).stream()
-                .filter(element -> FIELD == element.getKind())
-                .map(element -> Field.of(element, this))
-                .collect(toList());
+                       .filter(element -> FIELD == element.getKind())
+                       .map(element -> Field.of(element, this))
+                       .collect(toList());
     }
 
     public List<Type> typesAnnotatedWith(Class<? extends Annotation> type) {
         return roundEnv.getElementsAnnotatedWith(type).stream()
-                .filter(element -> TYPE_KINDS.contains(element.getKind()))
-                .map(element -> Type.of(element.asType(), this))
-                .collect(toList());
+                       .filter(element -> TYPE_KINDS.contains(element.getKind()))
+                       .map(element -> Type.of(element.asType(), this))
+                       .collect(toList());
     }
 
     public List<Package> packagesAnnotatedWith(Class<? extends Annotation> type) {
         return roundEnv.getElementsAnnotatedWith(type).stream()
-                .filter(element -> PACKAGE == element.getKind())
-                .map(element -> new Package((PackageElement) element, this))
-                .collect(toList());
+                       .filter(element -> PACKAGE == element.getKind())
+                       .map(element -> new Package((PackageElement) element, this))
+                       .collect(toList());
     }
 
     public Logger log() {
@@ -83,11 +86,23 @@ public class Round {
         return new Package(processingEnv.getElementUtils().getPackageElement(pkg), this);
     }
 
-    public Package getPackageOf(Class<?> type) {
-        return getPackage(type.getPackage().getName());
+    public Package getPackageOf(Class<?> type) { return getPackage(type.getPackage().getName()); }
+
+    /** Generate a resource in `target/generated-resources` */
+    public Resource createResource(String relativeName) {
+        Path path = Paths.get(getUri(CLASS_OUTPUT)) // target/generated-sources/annotations
+                         .getParent() // target/generated-sources
+                         .getParent() // target
+                         .resolve("generated-resources")
+                         .resolve(relativeName);
+        return new Resource(new ReflectiveFileObject(path));
     }
 
-    public Resource createResource(String pkg, String relativeName) throws IOException {
-        return new Resource(processingEnv.getFiler().createResource(CLASS_OUTPUT, pkg, relativeName));
+    private URI getUri(JavaFileManager.Location location) {
+        try {
+            return processingEnv.getFiler().createResource(location, "", "dummy").toUri();
+        } catch (IOException e) {
+            throw new RuntimeException("could not locate " + location, e);
+        }
     }
 }
