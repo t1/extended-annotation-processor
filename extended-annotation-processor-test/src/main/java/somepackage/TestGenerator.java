@@ -1,15 +1,13 @@
 package somepackage;
 
-import java.io.Writer;
-import java.util.*;
+import com.github.t1.exap.LoggingJsonGenerator;
+import com.github.t1.exap.reflection.*;
+import org.slf4j.*;
 
 import javax.json.Json;
 import javax.json.stream.*;
-
-import org.slf4j.*;
-
-import com.github.t1.exap.LoggingJsonGenerator;
-import com.github.t1.exap.reflection.*;
+import java.io.Writer;
+import java.util.*;
 
 class TestGenerator implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(TestGenerator.class);
@@ -94,7 +92,7 @@ class TestGenerator implements AutoCloseable {
 
     private void writeAnnotationPropertyValue(AnnotationWrapper annotation, String name) {
         AnnotationPropertyType propertyType = annotation.getPropertyType(name);
-        log.debug("write annotation property \"{}\" type {}{}", name, propertyType, //
+        log.debug("write annotation property \"{}\" type {}{}", name, propertyType,
                 annotation.isArrayProperty(name) ? "[]" : "");
         switch (propertyType) {
             case ANNOTATION:

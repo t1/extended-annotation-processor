@@ -1,22 +1,20 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Arrays.*;
-import static java.util.Collections.*;
-import static java.util.Objects.*;
-import static javax.lang.model.element.Modifier.*;
-import static javax.tools.Diagnostic.Kind.*;
-
-import java.lang.annotation.Annotation;
-import java.util.List;
+import com.github.t1.exap.*;
+import org.slf4j.Logger;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.util.*;
 import javax.tools.Diagnostic;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-import org.slf4j.Logger;
-
-import com.github.t1.exap.*;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
+import static java.util.Objects.*;
+import static javax.lang.model.element.Modifier.*;
+import static javax.tools.Diagnostic.Kind.*;
 
 public abstract class Elemental {
     private final Round round;
@@ -160,7 +158,7 @@ public abstract class Elemental {
         };
     }
 
-    private String docComment() {
+    public String docComment() {
         return elements().getDocComment(this.getElement());
     }
 }

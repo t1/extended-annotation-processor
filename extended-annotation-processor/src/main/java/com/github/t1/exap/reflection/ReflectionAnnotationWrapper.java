@@ -1,18 +1,17 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Collections.*;
+import com.github.t1.exap.Round;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.tools.Diagnostic;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import javax.lang.model.element.AnnotationMirror;
-import javax.tools.Diagnostic;
-
-import com.github.t1.exap.Round;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
+import static java.util.Collections.*;
 
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private static Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
@@ -130,7 +129,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private List<Method> declaredMethods() {
         List<Method> result = new ArrayList<>();
         for (Method method : annotation.annotationType().getDeclaredMethods())
-            if (!Annotation.class.equals(method.getDeclaringClass()) //
+            if (!Annotation.class.equals(method.getDeclaringClass())
                     && !Modifier.isStatic(method.getModifiers()))
                 result.add(method);
         return result;

@@ -1,14 +1,13 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.Message.*;
-
-import java.util.*;
+import org.slf4j.*;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic.Kind;
+import java.util.*;
 
-import org.slf4j.*;
+import static com.github.t1.exap.reflection.Message.*;
 
 class ReflectionMessager implements Messager {
     private static final Logger log = LoggerFactory.getLogger(ReflectionMessager.class);
@@ -56,7 +55,7 @@ class ReflectionMessager implements Messager {
     List<String> getMessages(Elemental element, Kind kind) {
         List<String> list = new ArrayList<>();
         for (Message message : messages)
-            if ((ANY_ELEMENT.equals(element) || message.getElemental().equals(element)) //
+            if ((ANY_ELEMENT.equals(element) || message.getElemental().equals(element))
                     && message.getKind().equals(kind))
                 list.add(message.getText().toString());
         return list;

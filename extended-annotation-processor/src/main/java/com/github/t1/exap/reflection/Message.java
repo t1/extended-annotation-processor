@@ -1,11 +1,11 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Objects.*;
+import com.github.t1.exap.Round;
 
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
-import com.github.t1.exap.Round;
+import static java.util.Objects.*;
 
 public class Message {
     private static final Round DUMMY_ROUND = new Round(null, null, null, 0);
@@ -73,8 +73,8 @@ public class Message {
         if (getClass() != obj.getClass())
             return false;
         Message that = (Message) obj;
-        return this.elemental.equals(that.elemental) //
-                && this.kind == that.kind //
+        return this.elemental.equals(that.elemental)
+                && this.kind == that.kind
                 && this.text.equals(that.text);
     }
 

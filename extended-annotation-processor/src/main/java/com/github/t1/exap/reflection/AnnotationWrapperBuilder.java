@@ -12,7 +12,7 @@ import com.github.t1.exap.Round;
 
 class AnnotationWrapperBuilder {
     static AnnotationValue getAnnotationValue(AnnotationMirror annotation, String name, Round round) {
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
         : elements(round).getElementValuesWithDefaults(annotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals(name))
                 return entry.getValue();
@@ -87,7 +87,7 @@ class AnnotationWrapperBuilder {
 
     /** if the given annotation has an array property "value", return it; otherwise null */
     private List<? extends AnnotationValue> annotationValuesValue(AnnotationMirror containerAnnotation) {
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry //
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
         : elements(round).getElementValuesWithDefaults(containerAnnotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals("value"))
                 if (entry.getValue().getValue() instanceof List) {

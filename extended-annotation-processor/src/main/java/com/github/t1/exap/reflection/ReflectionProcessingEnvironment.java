@@ -5,6 +5,7 @@ import org.slf4j.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.*;
 import javax.tools.*;
 import javax.tools.Diagnostic.Kind;
@@ -17,11 +18,11 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     private static final Round DUMMY_ROUND = new Round(log, ENV, null, 0);
 
-    private ReflectionProcessingEnvironment() {
-    }
+    private ReflectionProcessingEnvironment() {}
 
     private final ReflectionMessager messager = new ReflectionMessager();
     private final ReflectionFiler filer = new ReflectionFiler();
+    private final ReflectionTypes types = new ReflectionTypes();
 
     @Override
     public Map<String, String> getOptions() {
@@ -45,7 +46,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     @Override
     public Types getTypeUtils() {
-        return null;
+        return types;
     }
 
     @Override
@@ -62,9 +63,9 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         messager.message(elemental, kind, message);
     }
 
-    public Type type(Class<?> type) {
-        return ReflectionType.type(type, DUMMY_ROUND);
-    }
+    public Type type(Class<?> type) { return ReflectionType.type(type, DUMMY_ROUND); }
+
+    public Type type(TypeMirror type) { return Type.of(type, DUMMY_ROUND); }
 
     public List<Message> getMessages() {
         return messager.getMessages();
