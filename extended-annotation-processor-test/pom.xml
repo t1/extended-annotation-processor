@@ -5,7 +5,7 @@
         <groupId>com.github.t1</groupId>
         <artifactId>extended-annotation-processor-parent</artifactId>
         <version>1.0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>extended-annotation-processor-test</artifactId>
@@ -17,6 +17,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
                 <configuration>
                     <!-- don't fork, or the log output won't work -->
                     <testCompilerArguments>
@@ -28,15 +29,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <!-- any slf4j impl would do; even the fallback to NOP -->
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.5</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
         <dependency>
             <groupId>com.github.t1</groupId>
             <artifactId>extended-annotation-processor</artifactId>
