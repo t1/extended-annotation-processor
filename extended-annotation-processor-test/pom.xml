@@ -32,7 +32,7 @@
             <!-- any slf4j impl would do; even the fallback to NOP -->
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.0</version>
+            <version>1.4.5</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
