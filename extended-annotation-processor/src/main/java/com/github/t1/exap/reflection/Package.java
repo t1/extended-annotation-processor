@@ -1,18 +1,20 @@
 package com.github.t1.exap.reflection;
 
-import static javax.tools.StandardLocation.*;
-
 import com.github.t1.exap.Round;
 import com.github.t1.exap.generator.TypeGenerator;
 
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 public class Package extends Elemental {
     private final PackageElement packageElement;
-    private Round round;
+    private final Round round;
 
     public Package(PackageElement packageElement, Round round) {
         super(round);
@@ -82,7 +84,7 @@ public class Package extends Elemental {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Package))
+        if (!(obj instanceof Package))
             return false;
         Package that = (Package) obj;
         return this.toString().equals(that.toString());

@@ -1,16 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Arrays.*;
+import com.github.t1.exap.Round;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.lang.model.element.*;
-import javax.tools.Diagnostic;
-
-import com.github.t1.exap.Round;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static java.util.Arrays.asList;
 
 class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;

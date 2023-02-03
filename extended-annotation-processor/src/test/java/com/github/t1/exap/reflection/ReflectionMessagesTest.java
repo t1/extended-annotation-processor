@@ -1,15 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static javax.tools.Diagnostic.Kind.*;
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import javax.tools.Diagnostic.Kind;
 
-import org.junit.*;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static javax.tools.Diagnostic.Kind.WARNING;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionMessagesTest {
-    @After
+    @AfterEach
     public void clearMessages() {
         ENV.getMessages().clear();
     }
@@ -30,7 +31,7 @@ public class ReflectionMessagesTest {
 
     @Test
     public void shouldMarkTypeAnnotation() {
-        @Deprecated
+        @SuppressWarnings("DeprecatedIsStillUsed") @Deprecated
         class Pojo {}
         AnnotationWrapper annotation = ENV.type(Pojo.class).getAnnotationWrapper(Deprecated.class);
 
@@ -113,7 +114,7 @@ public class ReflectionMessagesTest {
             public void method(@Deprecated String param) {}
         }
         AnnotationWrapper annotation =
-                ENV.type(Pojo.class).getMethod("method").getParameter(0).getAnnotationWrapper(Deprecated.class);
+            ENV.type(Pojo.class).getMethod("method").getParameter(0).getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 

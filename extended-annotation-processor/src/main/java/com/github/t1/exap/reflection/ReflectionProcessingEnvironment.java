@@ -1,15 +1,21 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.*;
-import javax.tools.*;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
-import java.util.*;
+import javax.tools.StandardLocation;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private static final Logger log = LoggerFactory.getLogger(ReflectionProcessingEnvironment.class);
@@ -63,9 +69,9 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         messager.message(elemental, kind, message);
     }
 
-    public Type type(Class<?> type) { return ReflectionType.type(type, DUMMY_ROUND); }
+    public Type type(Class<?> type) {return ReflectionType.type(type, DUMMY_ROUND);}
 
-    public Type type(TypeMirror type) { return Type.of(type, DUMMY_ROUND); }
+    public Type type(TypeMirror type) {return Type.of(type, DUMMY_ROUND);}
 
     public List<Message> getMessages() {
         return messager.getMessages();

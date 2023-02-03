@@ -1,11 +1,15 @@
 package com.github.t1.exap.reflection;
 
-import java.io.*;
-import java.net.URI;
-
-import javax.lang.model.element.*;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URI;
 
 class ReflectionFileObject implements JavaFileObject {
     final Location location;

@@ -1,28 +1,39 @@
 package com.github.t1.exap.reflection;
 
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.FileObject;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.nio.file.Files.*;
-import static java.util.Objects.*;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.deleteIfExists;
+import static java.nio.file.Files.getLastModifiedTime;
+import static java.nio.file.Files.newBufferedReader;
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.util.Objects.requireNonNull;
 
 public class ReflectiveFileObject implements FileObject {
     private static final Logger log = LoggerFactory.getLogger(ReflectiveFileObject.class);
 
     private final Path path;
 
-    public ReflectiveFileObject(Path path) { this.path = requireNonNull(path); }
+    public ReflectiveFileObject(Path path) {this.path = requireNonNull(path);}
 
-    @Override public URI toUri() { return path.toUri(); }
+    @Override public URI toUri() {return path.toUri();}
 
-    @Override public String getName() { return path.getFileName().toString(); }
+    @Override public String getName() {return path.getFileName().toString();}
 
-    @Override public InputStream openInputStream() throws IOException { return newInputStream(path); }
+    @Override public InputStream openInputStream() throws IOException {return newInputStream(path);}
 
     @Override public OutputStream openOutputStream() throws IOException {
         createParentDir();
@@ -34,7 +45,7 @@ public class ReflectiveFileObject implements FileObject {
     }
 
     @Override public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-        return new String(readAllBytes(path), UTF_8);
+        return Files.readString(path);
     }
 
     @Override public Writer openWriter() throws IOException {
@@ -60,5 +71,5 @@ public class ReflectiveFileObject implements FileObject {
         }
     }
 
-    private void createParentDir() throws IOException { createDirectories(path.getParent()); }
+    private void createParentDir() throws IOException {createDirectories(path.getParent());}
 }

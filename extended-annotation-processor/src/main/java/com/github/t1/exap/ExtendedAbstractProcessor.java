@@ -1,15 +1,24 @@
 package com.github.t1.exap;
 
-import static javax.tools.Diagnostic.Kind.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.annotation.processing.*;
-import javax.lang.model.element.*;
-
-import org.slf4j.*;
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
+import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.Diagnostic.Kind.OTHER;
+import static javax.tools.Diagnostic.Kind.WARNING;
 
 /**
  * Extends the {@link AbstractProcessor} with the handling for the {@link SupportedAnnotationClasses} annotation and
@@ -21,8 +30,7 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     private int roundNumber = -1;
 
     /** use {@link #process(Round)} */
-    @Override
-    final public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    @Override final public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         ++roundNumber;
 
         log.debug("begin round {} (final = {}) of {}", +roundNumber, roundEnv.processingOver(), name());

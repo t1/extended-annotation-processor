@@ -1,13 +1,13 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Arrays.*;
-
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import javax.lang.model.element.*;
-import javax.tools.Diagnostic;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static java.util.Arrays.asList;
 
 class ReflectionParameter extends Parameter {
     private final Method method;

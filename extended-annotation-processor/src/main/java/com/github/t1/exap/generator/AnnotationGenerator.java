@@ -1,20 +1,18 @@
 package com.github.t1.exap.generator;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 import com.github.t1.exap.reflection.Type;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class AnnotationGenerator {
-    private final TypeGenerator annotated;
     private final Type annotation;
     private Map<String, Object> properties;
 
     public AnnotationGenerator(TypeGenerator annotated, Type annotation) {
-        this.annotated = annotated;
         this.annotation = annotation;
-
-        this.annotated.addImport(annotation);
+        annotated.addImport(annotation);
     }
 
     public void set(String property, String value) {

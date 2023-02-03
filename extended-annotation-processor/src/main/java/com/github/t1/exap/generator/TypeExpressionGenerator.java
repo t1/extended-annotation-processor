@@ -1,12 +1,14 @@
 package com.github.t1.exap.generator;
 
-import java.util.*;
-
 import com.github.t1.exap.reflection.Type;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 
 public class TypeExpressionGenerator {
     private final TypeGenerator container;
-    private String type;
+    private final String type;
     private List<Object> args;
 
     public TypeExpressionGenerator(TypeGenerator container, Type type) {
@@ -22,7 +24,7 @@ public class TypeExpressionGenerator {
     public TypeExpressionGenerator typeVar(String arg) {
         if (!container.getTypeParameters().contains(arg))
             throw new IllegalArgumentException("unknown type var [" + arg + "]. " + container.getTypeName()
-                    + " only knows " + container.getTypeParameters());
+                                               + " only knows " + container.getTypeParameters());
         if (args == null)
             args = new ArrayList<>();
         args.add(arg);

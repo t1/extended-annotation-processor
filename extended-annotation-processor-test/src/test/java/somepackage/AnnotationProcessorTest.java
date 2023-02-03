@@ -1,10 +1,11 @@
 package somepackage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnnotationProcessorTest {
     private static final Path RESOURCES = Paths.get("src/test/resources");
@@ -29,33 +30,33 @@ public class AnnotationProcessorTest {
     @Test
     public void shouldHaveGeneratedInterface() {
         assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(""
-                + "package somepackage;\n"
-                + "\n"
-                + "public interface GeneratedInterface {\n"
-                + "    public AnnotatedClass method0();\n"
-                + "\n"
-                + "}\n");
+                                                                                                     + "package somepackage;\n"
+                                                                                                     + "\n"
+                                                                                                     + "public interface GeneratedInterface {\n"
+                                                                                                     + "    public AnnotatedClass method0();\n"
+                                                                                                     + "\n"
+                                                                                                     + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedRootClass() {
         assertThat(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java")).hasContent(""
-                + "public interface GeneratedRootClass {\n"
-                + "}\n");
+                                                                                         + "public interface GeneratedRootClass {\n"
+                                                                                         + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedClass() {
         assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(""
-                + "package somepackage;\n"
-                + "\n"
-                + "public class GeneratedClass {\n"
-                + "    private AnnotatedClass value;\n"
-                + "\n"
-                + "    public AnnotatedClass method0() {\n"
-                + "        return value;\n"
-                + "    }\n"
-                + "\n"
-                + "}\n");
+                                                                                                 + "package somepackage;\n"
+                                                                                                 + "\n"
+                                                                                                 + "public class GeneratedClass {\n"
+                                                                                                 + "    private AnnotatedClass value;\n"
+                                                                                                 + "\n"
+                                                                                                 + "    public AnnotatedClass method0() {\n"
+                                                                                                 + "        return value;\n"
+                                                                                                 + "    }\n"
+                                                                                                 + "\n"
+                                                                                                 + "}\n");
     }
 }

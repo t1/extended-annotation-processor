@@ -1,13 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import static javax.tools.StandardLocation.*;
-
-import java.util.*;
-
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
-import javax.tools.*;
+import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.tools.StandardLocation.CLASS_OUTPUT;
+import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
 public class ReflectionFiler implements Filer {
     private final List<ReflectionFileObject> list = new ArrayList<>();
@@ -30,7 +33,7 @@ public class ReflectionFiler implements Filer {
 
     @Override
     public FileObject createResource(Location location, CharSequence pkg, CharSequence relativeName,
-            Element... originatingElements) {
+                                     Element... originatingElements) {
         ReflectionFileObject file = new ReflectionFileObject(location, pkg, relativeName);
         list.add(file);
         return file;

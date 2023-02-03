@@ -8,10 +8,12 @@ import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Arrays.*;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static java.util.Arrays.asList;
 
 class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
@@ -114,15 +116,15 @@ class ReflectionType extends Type {
     @Override
     public boolean isFloating() {
         return float.class.equals(type) || Float.class.equals(type)
-                || double.class.equals(type) || Double.class.equals(type);
+               || double.class.equals(type) || Double.class.equals(type);
     }
 
     @Override
     public boolean isInteger() {
         return byte.class.equals(type) || Byte.class.equals(type)
-                || short.class.equals(type) || Short.class.equals(type)
-                || int.class.equals(type) || Integer.class.equals(type)
-                || long.class.equals(type) || Long.class.equals(type);
+               || short.class.equals(type) || Short.class.equals(type)
+               || int.class.equals(type) || Integer.class.equals(type)
+               || long.class.equals(type) || Long.class.equals(type);
     }
 
     @Override

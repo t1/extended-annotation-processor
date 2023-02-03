@@ -1,16 +1,20 @@
 package com.github.t1.exap.generator;
 
-import static com.github.t1.exap.generator.TypeKind.*;
-import static java.util.Collections.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.function.Predicate;
-
+import com.github.t1.exap.reflection.Package;
+import com.github.t1.exap.reflection.Resource;
+import com.github.t1.exap.reflection.Type;
 import org.slf4j.Logger;
 
-import com.github.t1.exap.reflection.*;
-import com.github.t1.exap.reflection.Package;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Predicate;
+
+import static com.github.t1.exap.generator.TypeKind.CLASS;
+import static java.util.Collections.emptyList;
 
 public class TypeGenerator implements AutoCloseable {
     private final Logger log;
@@ -132,7 +136,7 @@ public class TypeGenerator implements AutoCloseable {
         out.append("public ").append(kind.toString()).append(" ").append(typeName);
         printTypeParams(out);
         out.println(" {");
-        printMethods(out, m -> m.isStatic());
+        printMethods(out, MethodGenerator::isStatic);
         printFields(out);
         printConstructors(out);
         printMethods(out, m -> !m.isStatic());

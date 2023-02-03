@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
-import java.lang.reflect.*;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 
 public class TypeInfo {
     private final Class<?> type;

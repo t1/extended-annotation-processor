@@ -1,7 +1,8 @@
 package com.github.t1.exap.reflection;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * Creates a dummy implementation of any interface that throw an {@link UnsupportedOperationException} on all method
@@ -20,7 +21,7 @@ public class DummyProxy {
         }
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Object invoke(Object proxy, Method method, Object[] args) {
             if (method.getParameterTypes().length == 0 && "toString".equals(method.getName()))
                 return toString();
             if (method.getParameterTypes().length == 1 && "equals".equals(method.getName()))
@@ -38,7 +39,7 @@ public class DummyProxy {
 
     @SuppressWarnings("unchecked")
     public static <T> T of(Class<T> type) {
-        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
-                new DummyProxyInvocationHandler(type));
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type},
+            new DummyProxyInvocationHandler(type));
     }
 }

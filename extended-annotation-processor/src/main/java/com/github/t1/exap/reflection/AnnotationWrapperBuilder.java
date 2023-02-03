@@ -1,19 +1,24 @@
 package com.github.t1.exap.reflection;
 
-import java.lang.annotation.*;
-import java.util.*;
+import com.github.t1.exap.Round;
 
 import javax.lang.model.AnnotatedConstruct;
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
-
-import com.github.t1.exap.Round;
+import java.lang.annotation.Repeatable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 class AnnotationWrapperBuilder {
     static AnnotationValue getAnnotationValue(AnnotationMirror annotation, String name, Round round) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
-        : elements(round).getElementValuesWithDefaults(annotation).entrySet())
+            : elements(round).getElementValuesWithDefaults(annotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals(name))
                 return entry.getValue();
         throw new IllegalArgumentException("no property \"" + name + "\" found in annotation " + annotation);
@@ -54,8 +59,6 @@ class AnnotationWrapperBuilder {
 
     /**
      * Reverse lookup from the container to the contained class in a {@link Repeatable} annotation
-     *
-     * @param env
      */
     private TypeMirror getRepeatedType(AnnotationMirror containerAnnotation) {
         List<? extends AnnotationValue> valueList = annotationValuesValue(containerAnnotation);
@@ -69,17 +72,16 @@ class AnnotationWrapperBuilder {
         Repeatable repeatable = containedType.getAnnotation(Repeatable.class);
         if (repeatable == null)
             return null;
-        String repeatableValueClassName = getAnnotationClassAttribute(containedType, Repeatable.class, "value");
+        String repeatableValueClassName = getRepeatableClassName(containedType);
         if (!containerAnnotation.getAnnotationType().toString().equals(repeatableValueClassName))
             return null;
         return containedType.asType();
     }
 
-    private <T extends Annotation> String getAnnotationClassAttribute(Element element, Class<T> annotationType,
-            String name) {
+    private String getRepeatableClassName(Element element) {
         for (AnnotationMirror annotation : elements(round).getAllAnnotationMirrors(element))
-            if (annotationType.getName().contentEquals(annotation.getAnnotationType().toString())) {
-                AnnotationValue value = getAnnotationValue(annotation, name, round);
+            if (Repeatable.class.getName().contentEquals(annotation.getAnnotationType().toString())) {
+                AnnotationValue value = getAnnotationValue(annotation, "value", round);
                 return value.getValue().toString();
             }
         return null;
@@ -88,12 +90,12 @@ class AnnotationWrapperBuilder {
     /** if the given annotation has an array property "value", return it; otherwise null */
     private List<? extends AnnotationValue> annotationValuesValue(AnnotationMirror containerAnnotation) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
-        : elements(round).getElementValuesWithDefaults(containerAnnotation).entrySet())
+            : elements(round).getElementValuesWithDefaults(containerAnnotation).entrySet())
             if (entry.getKey().getSimpleName().contentEquals("value"))
                 if (entry.getValue().getValue() instanceof List) {
                     @SuppressWarnings("unchecked")
                     List<? extends AnnotationValue> result =
-                            (List<? extends AnnotationValue>) entry.getValue().getValue();
+                        (List<? extends AnnotationValue>) entry.getValue().getValue();
                     return result;
                 }
         return null;
@@ -103,10 +105,13 @@ class AnnotationWrapperBuilder {
         List<AnnotationWrapper> result = new ArrayList<>();
         for (AnnotationMirror annotation : mirrors(annotated)) {
             TypeMirror repeatedType = getRepeatedType(annotation);
-            if (repeatedType != null)
-                for (AnnotationValue annotationValue : annotationValuesValue(annotation))
-                    result.add(wrapped((AnnotationMirror) annotationValue.getValue()));
-            else if (isInstance(annotation, typeName))
+            if (repeatedType != null) {
+                List<? extends AnnotationValue> annotationValues = annotationValuesValue(annotation);
+                if (annotationValues != null) {
+                    for (AnnotationValue annotationValue : annotationValues)
+                        result.add(wrapped((AnnotationMirror) annotationValue.getValue()));
+                }
+            } else if (isInstance(annotation, typeName))
                 result.add(wrapped(annotation));
         }
         return result;

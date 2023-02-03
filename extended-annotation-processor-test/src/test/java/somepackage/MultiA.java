@@ -1,8 +1,9 @@
 package somepackage;
 
-import static java.lang.annotation.RetentionPolicy.*;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
 
-import java.lang.annotation.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Repeatable(MultiAR.class)
 @Retention(RUNTIME)

@@ -1,12 +1,12 @@
 package com.github.t1.exap;
 
-import java.math.*;
-import java.util.Stack;
+import org.slf4j.Logger;
 
 import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
-
-import org.slf4j.Logger;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Stack;
 
 public class LoggingJsonGenerator implements JsonGenerator {
     public static JsonGenerator of(Logger log, JsonGenerator delegate) {

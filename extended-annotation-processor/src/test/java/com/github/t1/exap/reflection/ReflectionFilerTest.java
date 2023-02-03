@@ -1,17 +1,18 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static javax.tools.StandardLocation.*;
-import static org.assertj.core.api.StrictAssertions.*;
-
-import java.io.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import javax.tools.StandardLocation;
+import java.io.IOException;
+import java.io.Writer;
 
-import org.junit.*;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static javax.tools.StandardLocation.CLASS_OUTPUT;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class ReflectionFilerTest {
-    @After
+    @AfterEach
     public void clearMessages() {
         ENV.getCreatedResources().clear();
     }

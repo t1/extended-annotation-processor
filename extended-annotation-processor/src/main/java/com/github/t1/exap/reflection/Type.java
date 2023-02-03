@@ -2,14 +2,39 @@ package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
 
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
-import java.util.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
-import static java.util.Objects.*;
-import static javax.lang.model.element.ElementKind.*;
-import static javax.lang.model.element.Modifier.*;
-import static javax.lang.model.type.TypeKind.*;
+import static java.util.Objects.requireNonNull;
+import static javax.lang.model.element.ElementKind.ENUM;
+import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
+import static javax.lang.model.element.ElementKind.FIELD;
+import static javax.lang.model.element.ElementKind.METHOD;
+import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.type.TypeKind.ARRAY;
+import static javax.lang.model.type.TypeKind.BOOLEAN;
+import static javax.lang.model.type.TypeKind.BYTE;
+import static javax.lang.model.type.TypeKind.CHAR;
+import static javax.lang.model.type.TypeKind.DECLARED;
+import static javax.lang.model.type.TypeKind.DOUBLE;
+import static javax.lang.model.type.TypeKind.FLOAT;
+import static javax.lang.model.type.TypeKind.INT;
+import static javax.lang.model.type.TypeKind.LONG;
+import static javax.lang.model.type.TypeKind.NONE;
+import static javax.lang.model.type.TypeKind.SHORT;
+import static javax.lang.model.type.TypeKind.TYPEVAR;
+import static javax.lang.model.type.TypeKind.VOID;
 
 public class Type extends Elemental {
     public static Type of(TypeMirror type, Round round) {
@@ -120,14 +145,14 @@ public class Type extends Elemental {
 
     public boolean isInteger() {
         return isKind(BYTE) || isType(Byte.class)//
-                || isKind(SHORT) || isType(Short.class)//
-                || isKind(INT) || isType(Integer.class)//
-                || isKind(LONG) || isType(Long.class);
+               || isKind(SHORT) || isType(Short.class)//
+               || isKind(INT) || isType(Integer.class)//
+               || isKind(LONG) || isType(Long.class);
     }
 
     public boolean isFloating() {
         return isKind(FLOAT) || isType(Float.class)//
-                || isKind(DOUBLE) || isType(Double.class);
+               || isKind(DOUBLE) || isType(Double.class);
     }
 
     public boolean isString() {
@@ -225,8 +250,7 @@ public class Type extends Elemental {
     }
 
     public List<Method> getAllMethods() {
-        List<Method> methods = new ArrayList<>();
-        methods.addAll(getMethods());
+        List<Method> methods = new ArrayList<>(getMethods());
         if (getSuperType() != null)
             methods.addAll(getSuperType().getAllMethods());
         return methods;
@@ -266,8 +290,7 @@ public class Type extends Elemental {
     }
 
     public List<Field> getAllFields() {
-        List<Field> fields = new ArrayList<>();
-        fields.addAll(getFields());
+        List<Field> fields = new ArrayList<>(getFields());
         if (getSuperType() != null)
             fields.addAll(getSuperType().getAllFields());
         return fields;

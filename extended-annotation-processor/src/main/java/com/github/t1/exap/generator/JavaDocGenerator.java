@@ -1,13 +1,13 @@
 package com.github.t1.exap.generator;
 
-import static java.util.Arrays.*;
-
 import java.io.PrintWriter;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 public class JavaDocGenerator {
-    private String indent;
-    private String javaDoc;
+    private final String indent;
+    private final String javaDoc;
 
     public JavaDocGenerator(String indent, String javaDoc) {
         this.indent = indent;
@@ -20,7 +20,7 @@ public class JavaDocGenerator {
             out.append(indent).append("/** ").append(javaDoc).println(" */");
         } else {
             out.append(indent).append("/**\n");
-            lines.stream().forEach(line -> out.append(indent).append(" * ").append(line).append("\n"));
+            lines.forEach(line -> out.append(indent).append(" * ").append(line).append("\n"));
             out.append(indent).append(" */\n");
         }
     }

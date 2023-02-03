@@ -1,13 +1,12 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Arrays.*;
+import com.github.t1.exap.Round;
 
+import javax.lang.model.element.PackageElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import javax.lang.model.element.PackageElement;
-
-import com.github.t1.exap.Round;
+import static java.util.Arrays.asList;
 
 public class ReflectionPackage extends Package {
     public static Package of(Class<?> type, Round round) {

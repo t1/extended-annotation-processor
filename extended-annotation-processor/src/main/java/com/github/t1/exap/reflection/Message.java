@@ -5,7 +5,7 @@ import com.github.t1.exap.Round;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 
 public class Message {
     private static final Round DUMMY_ROUND = new Round(null, null, null, 0);
@@ -74,8 +74,8 @@ public class Message {
             return false;
         Message that = (Message) obj;
         return this.elemental.equals(that.elemental)
-                && this.kind == that.kind
-                && this.text.equals(that.text);
+               && this.kind == that.kind
+               && this.text.equals(that.text);
     }
 
     @Override

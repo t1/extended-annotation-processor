@@ -1,8 +1,8 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Objects.*;
-
 import javax.lang.model.element.VariableElement;
+
+import static java.util.Objects.requireNonNull;
 
 public class Parameter extends Elemental {
     private final VariableElement param;

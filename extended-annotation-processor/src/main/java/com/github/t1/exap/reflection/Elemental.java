@@ -1,20 +1,29 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.*;
+import com.github.t1.exap.JavaDoc;
+import com.github.t1.exap.Round;
 import org.slf4j.Logger;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
-import javax.lang.model.util.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import static java.util.Arrays.*;
-import static java.util.Collections.*;
-import static java.util.Objects.*;
-import static javax.lang.model.element.Modifier.*;
-import static javax.tools.Diagnostic.Kind.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.element.Modifier.TRANSIENT;
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
+import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.Diagnostic.Kind.OTHER;
+import static javax.tools.Diagnostic.Kind.WARNING;
 
 public abstract class Elemental {
     private final Round round;
@@ -98,7 +107,7 @@ public abstract class Elemental {
             return null;
         if (list.size() > 1)
             throw new IllegalArgumentException(
-                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+                "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
         return list.get(0);
     }
 
@@ -107,7 +116,7 @@ public abstract class Elemental {
             return emptyList();
         T[] annotations = this.getElement().getAnnotationsByType(type);
         if (annotations.length == 0 && JavaDoc.class.equals(type) && docComment() != null)
-            return asList(type.cast(javaDoc()));
+            return List.of(type.cast(javaDoc()));
         return asList(annotations);
     }
 
@@ -117,7 +126,7 @@ public abstract class Elemental {
             return null;
         if (list.size() > 1)
             throw new IllegalArgumentException(
-                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+                "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
         return list.get(0);
     }
 

@@ -1,8 +1,8 @@
 package com.github.t1.exap.generator;
 
-import java.io.PrintWriter;
-
 import com.github.t1.exap.reflection.Type;
+
+import java.io.PrintWriter;
 
 public class FieldGenerator {
     final TypeGenerator container;

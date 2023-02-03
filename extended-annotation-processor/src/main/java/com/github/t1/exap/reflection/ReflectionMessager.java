@@ -1,13 +1,18 @@
 package com.github.t1.exap.reflection;
 
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
 import javax.tools.Diagnostic.Kind;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.github.t1.exap.reflection.Message.*;
+import static com.github.t1.exap.reflection.Message.ANY_ELEMENT;
+import static com.github.t1.exap.reflection.Message.NO_ELEMENT;
 
 class ReflectionMessager implements Messager {
     private static final Logger log = LoggerFactory.getLogger(ReflectionMessager.class);
@@ -18,19 +23,19 @@ class ReflectionMessager implements Messager {
     public void printMessage(Kind kind, CharSequence msg) {
         message(NO_ELEMENT, kind, msg);
         switch (kind) {
-        case ERROR:
-            log.error(msg.toString());
-            break;
-        case MANDATORY_WARNING:
-        case WARNING:
-            log.warn(msg.toString());
-            break;
-        case NOTE:
-            log.info(msg.toString());
-            break;
-        case OTHER:
-            log.debug(msg.toString());
-            break;
+            case ERROR:
+                log.error(msg.toString());
+                break;
+            case MANDATORY_WARNING:
+            case WARNING:
+                log.warn(msg.toString());
+                break;
+            case NOTE:
+                log.info(msg.toString());
+                break;
+            case OTHER:
+                log.debug(msg.toString());
+                break;
         }
     }
 
@@ -56,7 +61,7 @@ class ReflectionMessager implements Messager {
         List<String> list = new ArrayList<>();
         for (Message message : messages)
             if ((ANY_ELEMENT.equals(element) || message.getElemental().equals(element))
-                    && message.getKind().equals(kind))
+                && message.getKind().equals(kind))
                 list.add(message.getText().toString());
         return list;
     }

@@ -4,19 +4,29 @@ import com.github.t1.exap.Round;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.tools.Diagnostic;
-import java.lang.annotation.*;
-import java.lang.reflect.*;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Repeatable;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
-import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.*;
-import static java.util.Collections.*;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.ANNOTATION;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.CLASS;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.ENUM;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static java.util.Collections.singletonList;
 
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
-    private static Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
+    private static final Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
     private static final Map<AnnotatedElement, Map<Class<?>, List<AnnotationWrapper>>> annotationsByType =
-            new HashMap<>();
+        new HashMap<>();
 
     public static List<AnnotationWrapper> allOn(AnnotatedElement annotated, Round round) {
         return annotationsOnType.computeIfAbsent(annotated, (k) -> {
@@ -41,7 +51,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         if (!returnType.isArray())
             return null;
         Class<?> valueType = returnType.getComponentType();
-        @SuppressWarnings({ "unchecked" })
+        @SuppressWarnings({"unchecked"})
         Class<? extends Annotation> repeatedType = (Class<? extends Annotation>) valueType;
         Repeatable repeatable = repeatedType.getAnnotation(Repeatable.class);
         if (repeatable == null)
@@ -60,9 +70,9 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type,
-            Round round) {
+                                                                          Round round) {
         Map<Class<?>, List<AnnotationWrapper>> map =
-                annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
+            annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
         return map.computeIfAbsent(type, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (T annotation : annotated.getAnnotationsByType(type))
@@ -130,7 +140,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         List<Method> result = new ArrayList<>();
         for (Method method : annotation.annotationType().getDeclaredMethods())
             if (!Annotation.class.equals(method.getDeclaringClass())
-                    && !Modifier.isStatic(method.getModifiers()))
+                && !Modifier.isStatic(method.getModifiers()))
                 result.add(method);
         return result;
     }
@@ -185,7 +195,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         if (type.isAssignableFrom(Class.class))
             return CLASS;
         throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = " + value
-                + " in " + this + " type:" + new TypeInfo(type));
+                                                + " in " + this + " type:" + new TypeInfo(type));
     }
 
     @Override
@@ -193,8 +203,8 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         Object value = getProperty(name);
         if (Array.getLength(value) != 1)
             throw new IllegalArgumentException(
-                    "expected annotation property array to contain exactly one element but found "
-                            + Array.getLength(value));
+                "expected annotation property array to contain exactly one element but found "
+                + Array.getLength(value));
         return Array.get(value, 0);
     }
 
@@ -211,7 +221,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         if (value instanceof Enum)
             list.add(((Enum<?>) value).name());
         else
-            for (Enum<?> enumValue : (Enum[]) value)
+            for (Enum<?> enumValue : (Enum<?>[]) value)
                 list.add(enumValue.name());
         return list;
     }

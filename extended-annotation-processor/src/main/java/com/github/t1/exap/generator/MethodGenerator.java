@@ -1,11 +1,12 @@
 package com.github.t1.exap.generator;
 
-import static com.github.t1.exap.generator.TypeKind.*;
+import com.github.t1.exap.reflection.Type;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.github.t1.exap.reflection.Type;
+import static com.github.t1.exap.generator.TypeKind.CLASS;
 
 public class MethodGenerator {
     private final TypeGenerator container;

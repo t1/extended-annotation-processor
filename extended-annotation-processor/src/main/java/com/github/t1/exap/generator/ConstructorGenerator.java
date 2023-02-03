@@ -1,7 +1,8 @@
 package com.github.t1.exap.generator;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConstructorGenerator {
     private final TypeGenerator container;

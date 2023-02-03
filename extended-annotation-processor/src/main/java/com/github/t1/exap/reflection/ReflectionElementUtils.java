@@ -1,10 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import java.io.Writer;
-import java.util.*;
-
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.io.Writer;
+import java.util.List;
+import java.util.Map;
 
 class ReflectionElementUtils implements Elements {
 
@@ -20,7 +26,7 @@ class ReflectionElementUtils implements Elements {
 
     @Override
     public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
-            AnnotationMirror a) {
+        AnnotationMirror a) {
         return null;
     }
 

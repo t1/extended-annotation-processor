@@ -1,13 +1,24 @@
 package somepackage;
 
 import com.github.t1.exap.LoggingJsonGenerator;
-import com.github.t1.exap.reflection.*;
-import org.slf4j.*;
+import com.github.t1.exap.reflection.AnnotationPropertyType;
+import com.github.t1.exap.reflection.AnnotationWrapper;
+import com.github.t1.exap.reflection.Elemental;
+import com.github.t1.exap.reflection.Field;
+import com.github.t1.exap.reflection.Method;
+import com.github.t1.exap.reflection.Parameter;
+import com.github.t1.exap.reflection.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
-import javax.json.stream.*;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonGeneratorFactory;
 import java.io.Writer;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class TestGenerator implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(TestGenerator.class);
@@ -93,7 +104,7 @@ class TestGenerator implements AutoCloseable {
     private void writeAnnotationPropertyValue(AnnotationWrapper annotation, String name) {
         AnnotationPropertyType propertyType = annotation.getPropertyType(name);
         log.debug("write annotation property \"{}\" type {}{}", name, propertyType,
-                annotation.isArrayProperty(name) ? "[]" : "");
+            annotation.isArrayProperty(name) ? "[]" : "");
         switch (propertyType) {
             case ANNOTATION:
                 for (Object value : annotation.getAnnotationProperties(name))

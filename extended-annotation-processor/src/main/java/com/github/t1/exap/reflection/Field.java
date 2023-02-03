@@ -1,14 +1,16 @@
 package com.github.t1.exap.reflection;
 
-import static java.util.Objects.*;
-import static javax.lang.model.type.TypeKind.*;
-
-import java.util.*;
-
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
-
 import com.github.t1.exap.Round;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Objects.requireNonNull;
+import static javax.lang.model.type.TypeKind.DECLARED;
 
 public class Field extends Elemental {
     public static Field of(Element element, Round round) {

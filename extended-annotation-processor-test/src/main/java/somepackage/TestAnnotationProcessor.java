@@ -1,20 +1,24 @@
 package somepackage;
 
-import static com.github.t1.exap.generator.TypeKind.*;
-import static javax.lang.model.SourceVersion.*;
-
-import java.io.*;
+import com.github.t1.exap.ExtendedAbstractProcessor;
+import com.github.t1.exap.Round;
+import com.github.t1.exap.SupportedAnnotationClasses;
+import com.github.t1.exap.generator.TypeGenerator;
+import com.github.t1.exap.reflection.Field;
+import com.github.t1.exap.reflection.Resource;
+import com.github.t1.exap.reflection.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.SupportedSourceVersion;
+import java.io.IOException;
+import java.io.Writer;
 
-import org.slf4j.*;
-
-import com.github.t1.exap.*;
-import com.github.t1.exap.generator.TypeGenerator;
-import com.github.t1.exap.reflection.*;
+import static com.github.t1.exap.generator.TypeKind.INTERFACE;
+import static javax.lang.model.SourceVersion.RELEASE_8;
 
 @SupportedSourceVersion(RELEASE_8)
-@SupportedAnnotationClasses({ MarkerAnnotation.class })
+@SupportedAnnotationClasses({MarkerAnnotation.class})
 public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     private static final Logger log = LoggerFactory.getLogger(TestAnnotationProcessor.class);
 
@@ -56,7 +60,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
 
     private void generateInterface(Round round) {
         try (TypeGenerator typeGenerator =
-                round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedInterface")) {
+                 round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedInterface")) {
             typeGenerator.kind(INTERFACE);
             Type annotatedClass = annotatedClass(round);
             typeGenerator.addMethod("method0").returnType(annotatedClass);

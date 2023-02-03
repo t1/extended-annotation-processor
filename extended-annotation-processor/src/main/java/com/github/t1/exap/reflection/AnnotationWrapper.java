@@ -1,17 +1,36 @@
 package com.github.t1.exap.reflection;
 
-import static com.github.t1.exap.reflection.AnnotationPropertyType.*;
-import static java.util.Collections.*;
-import static java.util.Objects.*;
+import com.github.t1.exap.Round;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Repeatable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.lang.model.element.*;
-import javax.lang.model.type.*;
-
-import com.github.t1.exap.Round;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.ANNOTATION;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.BOOLEAN;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.BYTE;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.CHAR;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.CLASS;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.DOUBLE;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.ENUM;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.FLOAT;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.INT;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.LONG;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.SHORT;
+import static com.github.t1.exap.reflection.AnnotationPropertyType.STRING;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 /**
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
@@ -21,8 +40,7 @@ import com.github.t1.exap.Round;
  * access Class object for TypeMirror. You'll have to use {@link Elemental#getAnnotationWrapper(Class)} for those
  * annotation properties, which returns an instance of this class.
  *
- * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">this
- *      blog </a>
+ * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">this blog</a>
  */
 public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
@@ -58,7 +76,7 @@ public class AnnotationWrapper extends Elemental {
         if (TypeMirror.class.isAssignableFrom(type))
             return CLASS;
         throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = "
-                + getProperty(name) + " in " + this + " type:" + new TypeInfo(type));
+                                                + getProperty(name) + " in " + this + " type:" + new TypeInfo(type));
     }
 
     private Class<?> getArrayType(String name) {
@@ -111,7 +129,7 @@ public class AnnotationWrapper extends Elemental {
     public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
         for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues()
-                .entrySet())
+            .entrySet())
             result.put(entry.getKey().getSimpleName().toString(), entry.getValue().getValue());
         return result;
     }
@@ -129,7 +147,7 @@ public class AnnotationWrapper extends Elemental {
         List<?> list = (List<?>) getProperty(name);
         if (list.size() != 1)
             throw new IllegalArgumentException(
-                    "expected annotation property array to contain exactly one element but found " + list.size());
+                "expected annotation property array to contain exactly one element but found " + list.size());
         return list.get(0);
     }
 
@@ -292,8 +310,7 @@ public class AnnotationWrapper extends Elemental {
             return singletonList((String) value);
         List<String> list = new ArrayList<>();
         if (value instanceof String[])
-            for (String s : (String[]) value)
-                list.add(s);
+            Collections.addAll(list, (String[]) value);
         else
             for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
                 list.add((String) annotationValue.getValue());
