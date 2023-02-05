@@ -14,6 +14,7 @@ import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import static com.github.t1.exap.generator.TypeKind.CLASS;
+import static java.lang.String.join;
 import static java.util.Collections.emptyList;
 
 public class TypeGenerator implements AutoCloseable {
@@ -25,6 +26,7 @@ public class TypeGenerator implements AutoCloseable {
     private JavaDocGenerator javaDoc;
     private TypeKind kind = CLASS;
     private List<String> typeParameters;
+    private List<String> implementsList;
     private List<AnnotationGenerator> annotations;
     private List<FieldGenerator> fields;
     private List<ConstructorGenerator> constructors;
@@ -53,6 +55,12 @@ public class TypeGenerator implements AutoCloseable {
     /** You should only need to call this for types needed <em>in</em> your body */
     public TypeGenerator addImport(Type type) {
         imports.add(type);
+        return this;
+    }
+
+    public TypeGenerator addImplements(String type) {
+        if (implementsList == null) implementsList = new ArrayList<>();
+        implementsList.add(type);
         return this;
     }
 
@@ -135,6 +143,8 @@ public class TypeGenerator implements AutoCloseable {
         printAnnotations(out);
         out.append("public ").append(kind.toString()).append(" ").append(typeName);
         printTypeParams(out);
+        if (implementsList != null && !implementsList.isEmpty())
+            out.append(" implements ").append(join(", ", implementsList));
         out.println(" {");
         printMethods(out, MethodGenerator::isStatic);
         printFields(out);

@@ -40,6 +40,10 @@ public class TypeExpressionGenerator {
         return sub;
     }
 
+    public boolean isVoid() {
+        return "void".equals(type);
+    }
+
     @Override
     public String toString() {
         StringBuilder out = new StringBuilder();

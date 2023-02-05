@@ -29,34 +29,34 @@ public class AnnotationProcessorTest {
 
     @Test
     public void shouldHaveGeneratedInterface() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(""
-                                                                                                     + "package somepackage;\n"
-                                                                                                     + "\n"
-                                                                                                     + "public interface GeneratedInterface {\n"
-                                                                                                     + "    public AnnotatedClass method0();\n"
-                                                                                                     + "\n"
-                                                                                                     + "}\n");
+        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(
+            "package somepackage;\n"
+            + "\n"
+            + "public interface GeneratedInterface {\n"
+            + "    public AnnotatedClass method0();\n"
+            + "\n"
+            + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedRootClass() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java")).hasContent(""
-                                                                                         + "public interface GeneratedRootClass {\n"
-                                                                                         + "}\n");
+        assertThat(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java")).hasContent(
+            "public interface GeneratedRootClass {\n"
+            + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedClass() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(""
-                                                                                                 + "package somepackage;\n"
-                                                                                                 + "\n"
-                                                                                                 + "public class GeneratedClass {\n"
-                                                                                                 + "    private AnnotatedClass value;\n"
-                                                                                                 + "\n"
-                                                                                                 + "    public AnnotatedClass method0() {\n"
-                                                                                                 + "        return value;\n"
-                                                                                                 + "    }\n"
-                                                                                                 + "\n"
-                                                                                                 + "}\n");
+        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(
+            "package somepackage;\n"
+            + "\n"
+            + "public class GeneratedClass {\n"
+            + "    private AnnotatedClass value;\n"
+            + "\n"
+            + "    public AnnotatedClass method0() {\n"
+            + "        return value;\n"
+            + "    }\n"
+            + "\n"
+            + "}\n");
     }
 }

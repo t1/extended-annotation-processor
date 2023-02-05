@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.t1.exap.generator.TypeKind.CLASS;
+import static java.lang.String.join;
 
 public class MethodGenerator {
     private final TypeGenerator container;
@@ -16,11 +17,13 @@ public class MethodGenerator {
     private TypeExpressionGenerator returnType;
     private final String name;
     private List<ParameterGenerator> parameters;
+    private List<String> throwsList;
     private String body;
 
     public MethodGenerator(TypeGenerator container, String name) {
         this.container = container;
         this.name = name;
+        this.returnType = new TypeExpressionGenerator(container, "void");
     }
 
     public void javaDoc(String javaDoc) {
@@ -59,6 +62,13 @@ public class MethodGenerator {
         return parameter;
     }
 
+    public MethodGenerator addThrows(Type type) {
+        container.addImport(type);
+        if (throwsList == null) throwsList = new ArrayList<>();
+        throwsList.add(type.getSimpleName());
+        return this;
+    }
+
     public MethodGenerator body(String body) {
         if (container.kind() == CLASS)
             this.body = body;
@@ -66,7 +76,6 @@ public class MethodGenerator {
             throw new IllegalStateException("can't add method body to an " + container.kind() + " method");
         return this;
     }
-
 
     public boolean isStatic() {
         return isStatic;
@@ -82,6 +91,8 @@ public class MethodGenerator {
         out.print(returnType + " " + name + "(");
         ParameterGenerator.print(parameters, out);
         out.print(")");
+        if (throwsList != null)
+            out.append(" throws ").append(join(", ", throwsList));
         if (body == null)
             out.append(";\n");
         else

@@ -89,7 +89,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         return filer.getCreatedResource(location, pack, name);
     }
 
-    public void clearCreatedResource() {
+    public void clearCreatedResources() {
         filer.getCreatedResources().clear();
     }
 }

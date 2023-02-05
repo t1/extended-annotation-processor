@@ -6,7 +6,6 @@ import com.github.t1.exap.reflection.Type;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,9 +48,6 @@ public class ImportGenerator {
                 --i;
                 anyImports = true;
                 String typeName = typeName(type);
-                String stripped = stripLastItem(typeName);
-                if (removeOther(imports, stripped))
-                    typeName = stripped + "*";
                 out.println("import " + typeName + ";");
             }
         }
@@ -65,24 +61,5 @@ public class ImportGenerator {
         if (OTHER.equals(groupName))
             return !ROOT_PACKAGES.contains(type.getPackage().toPath().getName(0).toString());
         return type.getFullName().startsWith(groupName + ".");
-    }
-
-    private String stripLastItem(String typeName) {
-        int i = typeName.lastIndexOf('.');
-        if (i >= 0)
-            typeName = typeName.substring(0, i + 1);
-        return typeName;
-    }
-
-    private boolean removeOther(Iterable<Type> typeNames, String stripped) {
-        boolean removed = false;
-        for (Iterator<Type> iter = typeNames.iterator(); iter.hasNext(); ) {
-            String typeName = typeName(iter.next());
-            if (stripLastItem(typeName).equals(stripped)) {
-                iter.remove();
-                removed = true;
-            }
-        }
-        return removed;
     }
 }

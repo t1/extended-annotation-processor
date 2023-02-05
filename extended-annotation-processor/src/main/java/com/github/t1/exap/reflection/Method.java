@@ -5,11 +5,14 @@ import com.github.t1.exap.Round;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-public class Method extends Elemental {
+public class Method extends Elemental implements Comparable<Method> {
+    private static final Comparator<Method> COMPARATOR = Comparator.comparing(Method::getName);
+
     private final Type declaringType;
     private final ExecutableElement method;
 
@@ -50,5 +53,9 @@ public class Method extends Elemental {
     @Override
     public String toString() {
         return getClass().getSimpleName() + ":" + getDeclaringType().getSimpleName() + "#" + getName();
+    }
+
+    @Override public int compareTo(Method that) {
+        return COMPARATOR.compare(this, that);
     }
 }
