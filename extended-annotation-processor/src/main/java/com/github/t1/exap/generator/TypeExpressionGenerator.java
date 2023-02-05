@@ -31,6 +31,11 @@ public class TypeExpressionGenerator {
         return this;
     }
 
+    public TypeExpressionGenerator withTypeArg(Type typeArg) {
+        typeArg(typeArg);
+        return this;
+    }
+
     public TypeExpressionGenerator typeArg(Type typeArg) {
         container.addImport(typeArg);
         TypeExpressionGenerator sub = new TypeExpressionGenerator(container, typeArg);

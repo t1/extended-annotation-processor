@@ -58,6 +58,10 @@ public class TypeGenerator implements AutoCloseable {
         return this;
     }
 
+    public TypeGenerator addImplements(TypeExpressionGenerator type) {
+        return addImplements(type.toString());
+    }
+
     public TypeGenerator addImplements(String type) {
         if (implementsList == null) implementsList = new ArrayList<>();
         implementsList.add(type);
