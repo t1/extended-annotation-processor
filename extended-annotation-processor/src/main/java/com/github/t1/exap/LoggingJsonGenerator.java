@@ -45,6 +45,12 @@ public class LoggingJsonGenerator implements JsonGenerator {
         return this;
     }
 
+    @Override public JsonGenerator writeKey(String s) {
+        log("key:", s);
+        delegate.writeKey(s);
+        return this;
+    }
+
     @Override
     public JsonGenerator writeStartArray() {
         log("[");
