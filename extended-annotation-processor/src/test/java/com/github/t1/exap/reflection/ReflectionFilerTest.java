@@ -8,7 +8,7 @@ import java.io.Writer;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionFilerTest {
     @AfterEach
