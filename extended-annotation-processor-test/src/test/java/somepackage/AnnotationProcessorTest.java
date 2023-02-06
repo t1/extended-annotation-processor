@@ -23,8 +23,8 @@ public class AnnotationProcessorTest {
     }
 
     private void verifyRoundHasRun(int round) {
-        assertThat(TEST_CLASSES.resolve("round-" + round)).hasSameContentAs(RESOURCES.resolve("round-" + round));
-        assertThat(TEST_CLASSES.resolve("fields-" + round)).hasSameContentAs(RESOURCES.resolve("fields-" + round));
+        assertThat(TEST_CLASSES.resolve("round-" + round)).hasSameTextualContentAs(RESOURCES.resolve("round-" + round));
+        assertThat(TEST_CLASSES.resolve("fields-" + round)).hasSameTextualContentAs(RESOURCES.resolve("fields-" + round));
     }
 
     @Test
