@@ -5,8 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -36,9 +38,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     }
 
     @Override
-    public ReflectionMessager getMessager() {
-        return messager;
-    }
+    public Messager getMessager() {return messager;}
 
     @Override
     public Filer getFiler() {
@@ -73,6 +73,8 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     public Type type(TypeMirror type) {return Type.of(type, DUMMY_ROUND);}
 
+    public Element element(TypeMirror type) {return new ReflectionTypeElement(type(type), DUMMY_ROUND);}
+
     public List<Message> getMessages() {
         return messager.getMessages();
     }
@@ -81,7 +83,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         return messager.getMessages(target, messageKind);
     }
 
-    public List<ReflectionFileObject> getCreatedResources() {
+    List<ReflectionFileObject> getCreatedResources() {
         return filer.getCreatedResources();
     }
 

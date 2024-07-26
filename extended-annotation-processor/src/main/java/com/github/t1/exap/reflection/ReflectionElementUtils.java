@@ -11,6 +11,9 @@ import javax.lang.model.util.Elements;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 class ReflectionElementUtils implements Elements {
 
@@ -25,9 +28,8 @@ class ReflectionElementUtils implements Elements {
     }
 
     @Override
-    public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
-        AnnotationMirror a) {
-        return null;
+    public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(AnnotationMirror a) {
+        return ((ReflectionAnnotationMirror) a).getElementValuesWithDefaults();
     }
 
     @Override
@@ -57,8 +59,13 @@ class ReflectionElementUtils implements Elements {
 
     @Override
     public List<? extends AnnotationMirror> getAllAnnotationMirrors(Element e) {
-        return null;
+        return Stream.concat(
+                        e.getAnnotationMirrors().stream(),
+                        type(e).superTypes().flatMap(Elemental::annotationMirrors))
+                .collect(toList());
     }
+
+    private Type type(Element e) {return ((ReflectionTypeElement) e).type;}
 
     @Override
     public boolean hides(Element hider, Element hidden) {

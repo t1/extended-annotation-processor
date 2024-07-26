@@ -175,11 +175,6 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     @Override
-    public boolean isArrayProperty(String name) {
-        return getProperty(name).getClass().isArray();
-    }
-
-    @Override
     public AnnotationPropertyType getPropertyType(String name) {
         Object value = getProperty(name);
         Class<?> type = value.getClass();

@@ -5,7 +5,6 @@ import com.github.t1.exap.Round;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -15,7 +14,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import static com.github.t1.exap.reflection.AnnotationPropertyType.ANNOTATION;
 import static com.github.t1.exap.reflection.AnnotationPropertyType.BOOLEAN;
@@ -31,6 +30,7 @@ import static com.github.t1.exap.reflection.AnnotationPropertyType.SHORT;
 import static com.github.t1.exap.reflection.AnnotationPropertyType.STRING;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 /**
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
@@ -59,14 +59,11 @@ public class AnnotationWrapper extends Elemental {
         return getRepeatedAnnotation() != null;
     }
 
-    public boolean isArrayProperty(String name) {
-        return getProperty(name) instanceof List;
-    }
-
     public AnnotationPropertyType getPropertyType(String name) {
         // see javax.lang.model.element.AnnotationValue
-        Class<?> type = isArrayProperty(name) ? getArrayType(name) : getProperty(name).getClass();
-        AnnotationPropertyType primitivePropertyType = getPrimitivePropertyType(type);
+        var property = getProperty(name);
+        var type = property instanceof List ? getArrayType(name) : property.getClass();
+        var primitivePropertyType = getPrimitivePropertyType(type);
         if (primitivePropertyType != null)
             return primitivePropertyType;
         if (VariableElement.class.isAssignableFrom(type))
@@ -75,12 +72,11 @@ public class AnnotationWrapper extends Elemental {
             return ANNOTATION;
         if (TypeMirror.class.isAssignableFrom(type))
             return CLASS;
-        throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = "
-                                                + getProperty(name) + " in " + this + " type:" + new TypeInfo(type));
+        throw new UnsupportedOperationException("unexpected property type for property \"" + name + "\" = " + property + " in " + this + " type:" + new TypeInfo(type));
     }
 
     private Class<?> getArrayType(String name) {
-        List<AnnotationValue> list = getAnnotationValueListProperty(name);
+        var list = getAnnotationValueListProperty(name);
         if (list.isEmpty())
             return String.class; // TODO try the method return type instead!
         return list.get(0).getValue().getClass();
@@ -109,7 +105,7 @@ public class AnnotationWrapper extends Elemental {
     }
 
     private AnnotationMirror getRepeatedAnnotation() {
-        for (AnnotationMirror m : annotationMirror.getAnnotationType().getAnnotationMirrors())
+        for (var m : annotationMirror.getAnnotationType().getAnnotationMirrors())
             if (m.getAnnotationType().toString().equals(Repeatable.class.getName()))
                 return m;
         return null;
@@ -121,33 +117,37 @@ public class AnnotationWrapper extends Elemental {
 
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (ExecutableElement element : annotationMirror.getElementValues().keySet())
+        for (var element : annotationMirror.getElementValues().keySet())
             result.add(element.getSimpleName().toString());
         return result;
     }
 
     public Map<String, Object> getPropertyMap() {
         Map<String, Object> result = new LinkedHashMap<>();
-        for (Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues()
-            .entrySet())
+        for (var entry : annotationMirror.getElementValues().entrySet())
             result.put(entry.getKey().getSimpleName().toString(), entry.getValue().getValue());
         return result;
     }
 
+    public <T> T getProperty(String name, Class<T> type) {
+        return type.cast(getProperty(name));
+    }
+
     public Object getProperty(String name) {
-        AnnotationValue annotationValue = AnnotationWrapperBuilder.getAnnotationValue(annotationMirror, name, round());
+        var annotationValue = AnnotationWrapperBuilder.getAnnotationValue(annotationMirror, name, round());
         return (annotationValue == null) ? null : annotationValue.getValue();
     }
 
     protected Object getSingleProperty(String name) {
-        return isArrayProperty(name) ? getSingleArrayProperty(name) : getProperty(name);
+        var property = getProperty(name);
+        return property instanceof List ? getSingleArrayProperty(name) : property;
     }
 
     protected Object getSingleArrayProperty(String name) {
-        List<?> list = (List<?>) getProperty(name);
+        var list = (List<?>) getProperty(name);
         if (list.size() != 1)
             throw new IllegalArgumentException(
-                "expected annotation property array to contain exactly one element but found " + list.size());
+                    "expected annotation property array to contain exactly one element but found " + list.size());
         return list.get(0);
     }
 
@@ -161,15 +161,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Boolean> getBooleanProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Boolean)
             return singletonList((Boolean) value);
         List<Boolean> list = new ArrayList<>();
         if (value instanceof boolean[])
-            for (boolean b : (boolean[]) value)
+            for (var b : (boolean[]) value)
                 list.add(b);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Boolean) annotationValue.getValue());
         return list;
     }
@@ -179,15 +179,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Byte> getByteProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Byte)
             return singletonList((Byte) value);
         List<Byte> list = new ArrayList<>();
         if (value instanceof byte[])
-            for (byte b : (byte[]) value)
+            for (var b : (byte[]) value)
                 list.add(b);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Byte) annotationValue.getValue());
         return list;
     }
@@ -197,15 +197,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Character> getCharProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Character)
             return singletonList((Character) value);
         List<Character> list = new ArrayList<>();
         if (value instanceof char[])
-            for (char c : (char[]) value)
+            for (var c : (char[]) value)
                 list.add(c);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Character) annotationValue.getValue());
         return list;
     }
@@ -215,15 +215,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Short> getShortProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Short)
             return singletonList((Short) value);
         List<Short> list = new ArrayList<>();
         if (value instanceof short[])
-            for (short s : (short[]) value)
+            for (var s : (short[]) value)
                 list.add(s);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Short) annotationValue.getValue());
         return list;
     }
@@ -233,15 +233,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Integer> getIntProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Integer)
             return singletonList((Integer) value);
         List<Integer> list = new ArrayList<>();
         if (value instanceof int[])
-            for (int i : (int[]) value)
+            for (var i : (int[]) value)
                 list.add(i);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Integer) annotationValue.getValue());
         return list;
     }
@@ -251,15 +251,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Long> getLongProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Long)
             return singletonList((Long) value);
         List<Long> list = new ArrayList<>();
         if (value instanceof long[])
-            for (long l : (long[]) value)
+            for (var l : (long[]) value)
                 list.add(l);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Long) annotationValue.getValue());
         return list;
     }
@@ -269,15 +269,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Double> getDoubleProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Double)
             return singletonList((Double) value);
         List<Double> list = new ArrayList<>();
         if (value instanceof double[])
-            for (double d : (double[]) value)
+            for (var d : (double[]) value)
                 list.add(d);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Double) annotationValue.getValue());
         return list;
     }
@@ -287,15 +287,15 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<Float> getFloatProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof Float)
             return singletonList((Float) value);
         List<Float> list = new ArrayList<>();
         if (value instanceof float[])
-            for (float f : (float[]) value)
+            for (var f : (float[]) value)
                 list.add(f);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((Float) annotationValue.getValue());
         return list;
     }
@@ -305,71 +305,70 @@ public class AnnotationWrapper extends Elemental {
     }
 
     public List<String> getStringProperties(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         if (value instanceof String)
             return singletonList((String) value);
         List<String> list = new ArrayList<>();
         if (value instanceof String[])
             Collections.addAll(list, (String[]) value);
         else
-            for (AnnotationValue annotationValue : getAnnotationValueListProperty(name))
+            for (var annotationValue : getAnnotationValueListProperty(name))
                 list.add((String) annotationValue.getValue());
         return list;
     }
 
     public String getEnumProperty(String name) {
-        VariableElement variable = (VariableElement) getSingleProperty(name);
+        var variable = (VariableElement) getSingleProperty(name);
         return variable.getSimpleName().toString();
     }
 
     public List<String> getEnumProperties(String name) {
-        if (isArrayProperty(name)) {
-            List<AnnotationValue> values = getAnnotationValueListProperty(name);
+        var property = getProperty(name);
+        if (property instanceof List) {
+            var values = getAnnotationValueListProperty(name);
             List<String> list = new ArrayList<>();
-            for (AnnotationValue value : values)
+            for (var value : values)
                 list.add(((VariableElement) value.getValue()).getSimpleName().toString());
             return list;
         } else {
-            VariableElement value = (VariableElement) getProperty(name);
+            var value = (VariableElement) property;
             return singletonList(value.getSimpleName().toString());
         }
     }
 
     public Type getTypeProperty(String name) {
-        Object value = getSingleProperty(name);
+        var value = getSingleProperty(name);
         return Type.of((TypeMirror) value, round());
     }
 
     public List<Type> getTypeProperties(String name) {
-        if (isArrayProperty(name)) {
-            List<AnnotationValue> values = getAnnotationValueListProperty(name);
+        var property = getProperty(name);
+        if (property instanceof List) {
+            var values = getAnnotationValueListProperty(name);
             List<Type> list = new ArrayList<>();
-            for (AnnotationValue value : values)
+            for (var value : values)
                 list.add(Type.of((DeclaredType) value.getValue(), round()));
             return list;
         } else {
-            DeclaredType value = (DeclaredType) getProperty(name);
+            var value = (DeclaredType) property;
             return singletonList(Type.of(value, round()));
         }
     }
 
     public AnnotationWrapper getAnnotationProperty(String name) {
-        Object value = getProperty(name);
+        var value = getProperty(name);
         return new AnnotationWrapper((AnnotationMirror) value, round());
     }
 
     public List<AnnotationWrapper> getAnnotationProperties(String name) {
-        List<AnnotationWrapper> list = new ArrayList<>();
-        if (isArrayProperty(name)) {
-            @SuppressWarnings("unchecked")
-            List<AnnotationMirror> values = (List<AnnotationMirror>) getProperty(name);
-            for (AnnotationMirror value : values)
-                list.add(new AnnotationWrapper(value, round()));
-        } else {
-            AnnotationMirror value = (AnnotationMirror) getProperty(name);
-            list.add(new AnnotationWrapper(value, round()));
-        }
-        return list;
+        return getPropertyStream(name)
+                .map(value -> new AnnotationWrapper((AnnotationMirror) value, round()))
+                .collect(toList());
+    }
+
+    private Stream<?> getPropertyStream(String name) {
+        var property = getProperty(name);
+        return (property instanceof List) ? ((List<?>) property).stream() : Stream.of(property);
     }
 
     @Override

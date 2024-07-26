@@ -3,7 +3,6 @@ package com.github.t1.exap.reflection;
 import com.github.t1.exap.Round;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -19,12 +18,7 @@ class ReflectionType extends Type {
     private static final Map<java.lang.reflect.Type, ReflectionType> types = new HashMap<>();
 
     static ReflectionType type(java.lang.reflect.Type type, Round round) {
-        ReflectionType reflectionType = types.get(type);
-        if (reflectionType == null) {
-            reflectionType = new ReflectionType(type, round);
-            types.put(type, reflectionType);
-        }
-        return reflectionType;
+        return types.computeIfAbsent(type, t -> new ReflectionType(t, round));
     }
 
     private final java.lang.reflect.Type type;
@@ -34,7 +28,7 @@ class ReflectionType extends Type {
     private List<Field> staticFields = null;
 
     private ReflectionType(java.lang.reflect.Type type, Round round) {
-        super(DummyProxy.of(TypeMirror.class), round);
+        super(new ReflectionTypeMirror(type, round), round);
         this.type = type;
     }
 
@@ -83,35 +77,17 @@ class ReflectionType extends Type {
         return ReflectionAnnotationWrapper.ofTypeOn(rawType(), type, round());
     }
 
-    @Override
-    public String getSimpleName() {
-        return rawType().getSimpleName();
-    }
+    @Override public String getSimpleName() {return rawType().getSimpleName();}
 
-    @Override
-    public String getFullName() {
-        return type.getTypeName();
-    }
+    @Override public String getFullName() {return type.getTypeName();}
 
-    @Override
-    public boolean isVoid() {
-        return void.class.equals(type) || Void.class.equals(type);
-    }
+    @Override public boolean isVoid() {return void.class.equals(type) || Void.class.equals(type);}
 
-    @Override
-    public boolean isPrimitive() {
-        return rawType().isPrimitive();
-    }
+    @Override public boolean isPrimitive() {return rawType().isPrimitive();}
 
-    @Override
-    public boolean isBoolean() {
-        return boolean.class.equals(type) || Boolean.class.equals(type);
-    }
+    @Override public boolean isBoolean() {return boolean.class.equals(type) || Boolean.class.equals(type);}
 
-    @Override
-    public boolean isCharacter() {
-        return char.class.equals(type) || Character.class.equals(type);
-    }
+    @Override public boolean isCharacter() {return char.class.equals(type) || Character.class.equals(type);}
 
     @Override
     public boolean isFloating() {

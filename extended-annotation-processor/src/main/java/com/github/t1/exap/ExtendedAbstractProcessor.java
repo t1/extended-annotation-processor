@@ -13,7 +13,9 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.joining;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 import static javax.tools.Diagnostic.Kind.NOTE;
@@ -43,8 +45,9 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
             return claimed;
         } catch (Exception e) {
             String message = e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage()));
-            error("annotation processing round " + roundNumber + " failed: " + message);
-            log.error("annotation processing round " + roundNumber + " failed", e);
+            log.error("annotation processing round " + roundNumber + " failed: " + message, e);
+            error("annotation processing round " + roundNumber + " failed: " + message
+                  + Stream.of(e.getStackTrace()).map(StackTraceElement::toString).collect(joining("\n", ":\n", "\n")));
             return true;
         }
     }

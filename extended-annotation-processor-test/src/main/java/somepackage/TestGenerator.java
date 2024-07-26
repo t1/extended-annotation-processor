@@ -103,8 +103,7 @@ class TestGenerator implements AutoCloseable {
 
     private void writeAnnotationPropertyValue(AnnotationWrapper annotation, String name) {
         AnnotationPropertyType propertyType = annotation.getPropertyType(name);
-        log.debug("write annotation property \"{}\" type {}{}", name, propertyType,
-            annotation.isArrayProperty(name) ? "[]" : "");
+        log.debug("write annotation property \"{}\" type {}{}", name, propertyType, annotation.getProperty(name) instanceof List ? "[]" : "");
         switch (propertyType) {
             case ANNOTATION:
                 for (Object value : annotation.getAnnotationProperties(name))

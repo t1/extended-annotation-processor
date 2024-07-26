@@ -14,7 +14,9 @@ import javax.lang.model.type.TypeVariable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.ElementKind.ENUM;
@@ -41,24 +43,28 @@ public class Type extends Elemental {
         return new Type(type, round);
     }
 
-    private final TypeMirror type;
+    final TypeMirror typeMirror;
 
-    protected Type(TypeMirror type, Round round) {
+    protected Type(TypeMirror typeMirror, Round round) {
         super(round);
-        this.type = requireNonNull(type, "type");
+        this.typeMirror = requireNonNull(typeMirror, "type");
     }
 
     @Override
     protected TypeElement getElement() {
-        return asElement(type);
+        return asElement(typeMirror);
     }
 
     private TypeElement asElement(TypeMirror typeMirror) {
         return (TypeElement) types().asElement(typeMirror);
     }
 
+    TypeKind getKind() {
+        return typeMirror.getKind();
+    }
+
     private boolean isKind(TypeKind kind) {
-        return type.getKind() == kind;
+        return typeMirror.getKind() == kind;
     }
 
     public void accept(TypeVisitor scanner) {
@@ -70,7 +76,7 @@ public class Type extends Elemental {
 
     @Override
     public int hashCode() {
-        return type.hashCode();
+        return typeMirror.hashCode();
     }
 
     @Override
@@ -80,7 +86,7 @@ public class Type extends Elemental {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Type that = (Type) obj;
-        return types().isSameType(this.type, that.type);
+        return types().isSameType(this.typeMirror, that.typeMirror);
     }
 
     @Override
@@ -90,7 +96,7 @@ public class Type extends Elemental {
 
     public String getSimpleName() {
         if (getElement() == null)
-            return type.toString();
+            return typeMirror.toString();
         return getElement().getSimpleName().toString();
     }
 
@@ -114,9 +120,9 @@ public class Type extends Elemental {
      */
     public String getFullName() {
         if (isKind(TYPEVAR)) {
-            return ((TypeVariable) type).getUpperBound().toString();
+            return ((TypeVariable) typeMirror).getUpperBound().toString();
         }
-        return type.toString();
+        return typeMirror.toString();
     }
 
     private boolean isType(Class<?> type) {
@@ -128,7 +134,7 @@ public class Type extends Elemental {
     }
 
     public boolean isPrimitive() {
-        return type.getKind().isPrimitive();
+        return typeMirror.getKind().isPrimitive();
     }
 
     public boolean isBoolean() {
@@ -180,14 +186,14 @@ public class Type extends Elemental {
 
     public Type elementType() {
         if (isArray())
-            return Type.of(((ArrayType) type).getComponentType(), round());
+            return Type.of(((ArrayType) typeMirror).getComponentType(), round());
         return null;
     }
 
     public List<Type> getTypeParameters() {
         List<Type> result = new ArrayList<>();
         if (isKind(DECLARED))
-            for (TypeMirror arg : ((DeclaredType) type).getTypeArguments())
+            for (TypeMirror arg : ((DeclaredType) typeMirror).getTypeArguments())
                 result.add(Type.of(arg, round()));
         return result;
     }
@@ -199,7 +205,7 @@ public class Type extends Elemental {
         // types().isSameType(left, right)
         // types().isSubtype(right, left)
         // TODO we could also check the type parameters, i.e. if a List<String> is a List<Number>
-        return isA(toRawString(type.type));
+        return isA(toRawString(type.typeMirror));
     }
 
     public boolean isA(Class<?> type) {
@@ -208,7 +214,7 @@ public class Type extends Elemental {
 
     private boolean isA(String thatTypeName) {
         try {
-            if (toRawString(this.type).equals(thatTypeName))
+            if (toRawString(this.typeMirror).equals(thatTypeName))
                 return true;
             if (isVoid() || isPrimitive())
                 return false;
@@ -217,7 +223,7 @@ public class Type extends Elemental {
                     return true;
             return false;
         } catch (Error e) {
-            throw new Error(this.type + " isSubclassOf " + thatTypeName, e);
+            throw new Error(this.typeMirror + " isSubclassOf " + thatTypeName, e);
         }
     }
 
@@ -230,7 +236,7 @@ public class Type extends Elemental {
 
     private List<TypeMirror> allTypes() {
         Set<TypeMirror> result = new LinkedHashSet<>();
-        for (TypeMirror t = type; t.getKind() != TypeKind.NONE; t = superClass(t)) {
+        for (TypeMirror t = typeMirror; t.getKind() != TypeKind.NONE; t = superClass(t)) {
             result.add(t);
             addInterfaces(result, t);
         }
@@ -249,9 +255,18 @@ public class Type extends Elemental {
         }
     }
 
+    public Stream<Type> interfaces() {
+        return getElement().getInterfaces().stream()
+                .map(i -> new Type(i, round()));
+    }
+
+    public Stream<Type> allInterfaces() {
+        return Stream.concat(this.interfaces(), superTypes().flatMap(Type::interfaces));
+    }
+
     public List<Method> getAllMethods() {
         List<Method> methods = new ArrayList<>(getMethods());
-        if (getSuperType() != null)
+        if (hasSuperType())
             methods.addAll(getSuperType().getAllMethods());
         return methods;
     }
@@ -321,13 +336,25 @@ public class Type extends Elemental {
         throw new RuntimeException("field not found: " + name + ".\n  Only knows: " + getFields());
     }
 
+    public Optional<Type> superType() {
+        return hasSuperType() ? Optional.of(Type.of(getElement().getSuperclass(), round())) : Optional.empty();
+    }
+
     public Type getSuperType() {
-        if (getElement() == null || getElement().getSuperclass().getKind() == NONE)
-            return null;
-        return Type.of(getElement().getSuperclass(), round());
+        return superType().orElseThrow();
+    }
+
+    public boolean hasSuperType() {
+        return getElement() != null && getElement().getSuperclass().getKind() != NONE;
+    }
+
+    public Stream<Type> superTypes() {
+        return hasSuperType() ?
+                Stream.iterate(getSuperType(), Type::hasSuperType, Type::getSuperType) :
+                Stream.empty();
     }
 
     public Package getPackage() {
-        return new Package(elements().getPackageOf(((DeclaredType) type).asElement()), round());
+        return new Package(elements().getPackageOf(((DeclaredType) typeMirror).asElement()), round());
     }
 }

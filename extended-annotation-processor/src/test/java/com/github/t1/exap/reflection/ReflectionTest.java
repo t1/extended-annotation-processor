@@ -723,18 +723,18 @@ public class ReflectionTest {
     }
 
     private void assertIsPropertyArrayMulti(boolean expectedIsArray, AnnotationWrapper wrapper) {
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("booly"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("bytey"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("chary"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("classy"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("doubly"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("floaty"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("inty"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("longy"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("shorty"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("stringy"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("enumy"));
-        assertEquals(expectedIsArray, wrapper.isArrayProperty("annoty"));
+        assertEquals(expectedIsArray, wrapper.getProperty("booly") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("bytey") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("chary") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("classy") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("doubly") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("floaty") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("inty") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("longy") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("shorty") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("stringy") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("enumy") instanceof List);
+        assertEquals(expectedIsArray, wrapper.getProperty("annoty") instanceof List);
     }
 
     private void assertPropertyTypesMulti(AnnotationWrapper wrapper) {

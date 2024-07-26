@@ -15,9 +15,7 @@ import javax.lang.model.util.Types;
 import java.util.List;
 
 public class ReflectionTypes implements Types {
-    @Override public Element asElement(TypeMirror t) {
-        return new ReflectionTypeElement(ReflectionProcessingEnvironment.ENV.type(t));
-    }
+    @Override public Element asElement(TypeMirror t) {return ReflectionProcessingEnvironment.ENV.element(t);}
 
     @Override public boolean isSameType(TypeMirror t1, TypeMirror t2) {
         return false;

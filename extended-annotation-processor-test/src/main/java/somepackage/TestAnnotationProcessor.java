@@ -32,7 +32,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void createRoundOutput(Round round) throws IOException {
-        Resource resource = round.getRootPackage().createResource("round-" + round.number());
+        Resource resource = round.getRootPackage().createResource("round-" + round.number() + ".json");
         try (Writer writer = resource.openWriter()) {
             try (TestGenerator generator = new TestGenerator(writer)) {
                 generator.write(round.typesAnnotatedWith(MarkerAnnotation.class));
@@ -44,7 +44,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         Resource resource = round.getRootPackage().createResource("fields-" + round.number());
         try (Writer writer = resource.openWriter()) {
             for (Field field : round.fieldsAnnotatedWith(MarkerAnnotation.class)) {
-                writer.append(field.getName() + ":" + field.getAnnotation(MarkerAnnotation.class).value() + "\n");
+                writer.append(field.getName()).append(":").append(field.getAnnotation(MarkerAnnotation.class).value()).append("\n");
             }
         }
     }
@@ -60,7 +60,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
 
     private void generateInterface(Round round) {
         try (TypeGenerator typeGenerator =
-                 round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedInterface")) {
+                     round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedInterface")) {
             typeGenerator.kind(INTERFACE);
             Type annotatedClass = annotatedClass(round);
             typeGenerator.addMethod("method0").returnType(annotatedClass);
