@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 import com.github.t1.exap.Round;
 
@@ -43,12 +43,14 @@ public class Type extends Elemental {
         return new Type(type, round);
     }
 
-    final TypeMirror typeMirror;
+    private final TypeMirror typeMirror;
 
     protected Type(TypeMirror typeMirror, Round round) {
         super(round);
         this.typeMirror = requireNonNull(typeMirror, "type");
     }
+
+    public TypeMirror getTypeMirror() {return typeMirror;}
 
     @Override
     protected TypeElement getElement() {
@@ -59,7 +61,7 @@ public class Type extends Elemental {
         return (TypeElement) types().asElement(typeMirror);
     }
 
-    TypeKind getKind() {
+    public TypeKind getKind() {
         return typeMirror.getKind();
     }
 

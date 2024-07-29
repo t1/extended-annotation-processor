@@ -1,6 +1,10 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.AnnotationPropertyType;
+import com.github.t1.exap.insight.AnnotationWrapper;
+import com.github.t1.exap.insight.Type;
+import com.github.t1.exap.insight.TypeInfo;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.tools.Diagnostic;
@@ -17,16 +21,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.t1.exap.reflection.AnnotationPropertyType.ANNOTATION;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.CLASS;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.ENUM;
+import static com.github.t1.exap.insight.AnnotationPropertyType.ANNOTATION;
+import static com.github.t1.exap.insight.AnnotationPropertyType.CLASS;
+import static com.github.t1.exap.insight.AnnotationPropertyType.ENUM;
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private static final Map<AnnotatedElement, List<AnnotationWrapper>> annotationsOnType = new HashMap<>();
     private static final Map<AnnotatedElement, Map<Class<?>, List<AnnotationWrapper>>> annotationsByType =
-        new HashMap<>();
+            new HashMap<>();
 
     public static List<AnnotationWrapper> allOn(AnnotatedElement annotated, Round round) {
         return annotationsOnType.computeIfAbsent(annotated, (k) -> {
@@ -72,7 +77,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type,
                                                                           Round round) {
         Map<Class<?>, List<AnnotationWrapper>> map =
-            annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
+                annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
         return map.computeIfAbsent(type, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (T annotation : annotated.getAnnotationsByType(type))
@@ -166,9 +171,18 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public Object getProperty(String name) {
+        var value = getRawProperty(name);
+        return (value.getClass().isArray()) ? arrayToList(value) : value;
+    }
+
+    private Object getRawProperty(String name) {
+        var method = getMethod(name);
+        return invoke(method);
+    }
+
+    private Method getMethod(String name) {
         try {
-            Method method = annotation.annotationType().getMethod(name);
-            return invoke(method);
+            return annotation.annotationType().getMethod(name);
         } catch (NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
@@ -176,7 +190,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     public AnnotationPropertyType getPropertyType(String name) {
-        Object value = getProperty(name);
+        Object value = getRawProperty(name);
         Class<?> type = value.getClass();
         if (type.isArray())
             type = type.getComponentType();
@@ -195,12 +209,10 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
 
     @Override
     protected Object getSingleArrayProperty(String name) {
-        Object value = getProperty(name);
-        if (Array.getLength(value) != 1)
-            throw new IllegalArgumentException(
-                "expected annotation property array to contain exactly one element but found "
-                + Array.getLength(value));
-        return Array.get(value, 0);
+        List<?> value = (List<?>) getProperty(name);
+        if (value.size() != 1)
+            throw new IllegalArgumentException("expected annotation property array to contain exactly one element but found " + value.size());
+        return value.get(0);
     }
 
     @Override
@@ -212,18 +224,22 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public List<String> getEnumProperties(String name) {
         Object value = getProperty(name);
-        List<String> list = new ArrayList<>();
         if (value instanceof Enum)
-            list.add(((Enum<?>) value).name());
-        else
-            for (Enum<?> enumValue : (Enum<?>[]) value)
-                list.add(enumValue.name());
-        return list;
+            return List.of(((Enum<?>) value).name());
+        //noinspection unchecked
+        return ((List<Enum<?>>) value).stream()
+                .map(Enum::name)
+                .collect(toList());
     }
 
     @Override
     public Type getTypeProperty(String name) {
-        return type((Class<?>) getSingleProperty(name));
+        var typeProperty = getSingleProperty(name);
+        return toType(typeProperty);
+    }
+
+    private Type toType(Object typeProperty) {
+        return (typeProperty instanceof Type) ? (Type) typeProperty : type((Class<?>) typeProperty);
     }
 
     private ReflectionType type(Class<?> value) {
@@ -233,13 +249,11 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public List<Type> getTypeProperties(String name) {
         Object value = getProperty(name);
+        if (value == null)
+            return List.of();
         if (value instanceof Class)
             return singletonList(type((Class<?>) value));
-        List<Type> list = new ArrayList<>();
-        if (value != null)
-            for (Class<?> t : (Class<?>[]) value)
-                list.add(type(t));
-        return list;
+        return ((List<?>) value).stream().map(this::toType).collect(toList());
     }
 
     @Override
@@ -253,8 +267,9 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         Object value = getProperty(name);
         if (value instanceof Annotation)
             return singletonList(new ReflectionAnnotationWrapper((Annotation) value, round()));
-        List<AnnotationWrapper> list = new ArrayList<>();
-        for (Annotation annotation : (Annotation[]) value)
+        var list = new ArrayList<AnnotationWrapper>();
+        //noinspection unchecked
+        for (var annotation : (List<Annotation>) value)
             list.add(new ReflectionAnnotationWrapper(annotation, round()));
         return list;
     }

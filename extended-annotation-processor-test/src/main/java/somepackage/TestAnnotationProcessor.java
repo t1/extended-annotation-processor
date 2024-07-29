@@ -4,9 +4,9 @@ import com.github.t1.exap.ExtendedAbstractProcessor;
 import com.github.t1.exap.Round;
 import com.github.t1.exap.SupportedAnnotationClasses;
 import com.github.t1.exap.generator.TypeGenerator;
-import com.github.t1.exap.reflection.Field;
-import com.github.t1.exap.reflection.Resource;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.Field;
+import com.github.t1.exap.insight.Resource;
+import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

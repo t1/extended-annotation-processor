@@ -1,13 +1,13 @@
 package somepackage;
 
 import com.github.t1.exap.LoggingJsonGenerator;
-import com.github.t1.exap.reflection.AnnotationPropertyType;
-import com.github.t1.exap.reflection.AnnotationWrapper;
-import com.github.t1.exap.reflection.Elemental;
-import com.github.t1.exap.reflection.Field;
-import com.github.t1.exap.reflection.Method;
-import com.github.t1.exap.reflection.Parameter;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.AnnotationPropertyType;
+import com.github.t1.exap.insight.AnnotationWrapper;
+import com.github.t1.exap.insight.Elemental;
+import com.github.t1.exap.insight.Field;
+import com.github.t1.exap.insight.Method;
+import com.github.t1.exap.insight.Parameter;
+import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,96 +1,75 @@
 package com.github.t1.exap.reflection;
 
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.NestingKind;
-import javax.tools.JavaFileManager.Location;
-import javax.tools.JavaFileObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.tools.FileObject;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-class ReflectionFileObject implements JavaFileObject {
-    final Location location;
-    final CharSequence pkg;
-    final CharSequence relativeName;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.deleteIfExists;
+import static java.nio.file.Files.getLastModifiedTime;
+import static java.nio.file.Files.newBufferedReader;
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.util.Objects.requireNonNull;
 
-    private final StringWriter content = new StringWriter();
+public class ReflectionFileObject implements FileObject {
+    private static final Logger log = LoggerFactory.getLogger(ReflectionFileObject.class);
 
-    public ReflectionFileObject(Location location, CharSequence pkg, CharSequence relativeName) {
-        this.location = location;
-        this.pkg = pkg;
-        this.relativeName = relativeName;
+    private final Path path;
+
+    public ReflectionFileObject(Path path) {this.path = requireNonNull(path);}
+
+    @Override public URI toUri() {return path.toUri();}
+
+    @Override public String getName() {return path.getFileName().toString();}
+
+    @Override public InputStream openInputStream() throws IOException {return newInputStream(path);}
+
+    @Override public OutputStream openOutputStream() throws IOException {
+        createParentDir();
+        return newOutputStream(path);
     }
 
-    @Override
-    public URI toUri() {
-        throw new UnsupportedOperationException();
+    @Override public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
+        return newBufferedReader(path);
     }
 
-    @Override
-    public String getName() {
-        return pkg + "." + relativeName;
+    @Override public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+        return Files.readString(path);
     }
 
-    @Override
-    public InputStream openInputStream() {
-        throw new UnsupportedOperationException();
+    @Override public Writer openWriter() throws IOException {
+        createParentDir();
+        return newBufferedWriter(path);
     }
 
-    @Override
-    public OutputStream openOutputStream() {
-        throw new UnsupportedOperationException();
+    @Override public long getLastModified() {
+        try {
+            return getLastModifiedTime(path).toMillis();
+        } catch (IOException e) {
+            log.debug("coult not get last modified time of " + path, e);
+            return 0;
+        }
     }
 
-    @Override
-    public Reader openReader(boolean ignoreEncodingErrors) {
-        throw new UnsupportedOperationException();
+    @Override public boolean delete() {
+        try {
+            return deleteIfExists(path);
+        } catch (IOException e) {
+            log.debug("could not delete " + path, e);
+            return false;
+        }
     }
 
-    @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-        return content.toString();
-    }
-
-    @Override
-    public Writer openWriter() {
-        return content;
-    }
-
-    @Override
-    public long getLastModified() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean delete() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Kind getKind() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isNameCompatible(String simpleName, Kind kind) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public NestingKind getNestingKind() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Modifier getAccessLevel() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString() {
-        return location + ":" + pkg + ":" + relativeName + ":[" + content + "]";
-    }
+    private void createParentDir() throws IOException {createDirectories(path.getParent());}
 }

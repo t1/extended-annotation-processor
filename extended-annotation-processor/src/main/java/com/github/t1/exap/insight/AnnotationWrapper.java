@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 import com.github.t1.exap.Round;
 
@@ -10,32 +10,30 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Repeatable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.github.t1.exap.reflection.AnnotationPropertyType.ANNOTATION;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.BOOLEAN;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.BYTE;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.CHAR;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.CLASS;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.DOUBLE;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.ENUM;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.FLOAT;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.INT;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.LONG;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.SHORT;
-import static com.github.t1.exap.reflection.AnnotationPropertyType.STRING;
-import static java.util.Collections.singletonList;
+import static com.github.t1.exap.insight.AnnotationPropertyType.ANNOTATION;
+import static com.github.t1.exap.insight.AnnotationPropertyType.BOOLEAN;
+import static com.github.t1.exap.insight.AnnotationPropertyType.BYTE;
+import static com.github.t1.exap.insight.AnnotationPropertyType.CHAR;
+import static com.github.t1.exap.insight.AnnotationPropertyType.CLASS;
+import static com.github.t1.exap.insight.AnnotationPropertyType.DOUBLE;
+import static com.github.t1.exap.insight.AnnotationPropertyType.ENUM;
+import static com.github.t1.exap.insight.AnnotationPropertyType.FLOAT;
+import static com.github.t1.exap.insight.AnnotationPropertyType.INT;
+import static com.github.t1.exap.insight.AnnotationPropertyType.LONG;
+import static com.github.t1.exap.insight.AnnotationPropertyType.SHORT;
+import static com.github.t1.exap.insight.AnnotationPropertyType.STRING;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
  * {@link java.lang.annotation.Annotation} object. But this doesn't work for annotation attributes of type Class, as the
- * referenced class is generally not loaded in the annotation processor, only the meta data represented in the
+ * referenced class is generally not loaded in the annotation processor, only the metadata represented in the
  * {@link TypeMirror}s is. You'd get a {@link javax.lang.model.type.MirroredTypeException} with the message: Attempt to
  * access Class object for TypeMirror. You'll have to use {@link Elemental#getAnnotationWrapper(Class)} for those
  * annotation properties, which returns an instance of this class.
@@ -45,7 +43,7 @@ import static java.util.stream.Collectors.toList;
 public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
 
-    AnnotationWrapper(AnnotationMirror annotationMirror, Round round) {
+    public AnnotationWrapper(AnnotationMirror annotationMirror, Round round) {
         super(round);
         this.annotationMirror = requireNonNull(annotationMirror);
     }
@@ -138,7 +136,7 @@ public class AnnotationWrapper extends Elemental {
         return (annotationValue == null) ? null : annotationValue.getValue();
     }
 
-    protected Object getSingleProperty(String name) {
+    public Object getSingleProperty(String name) {
         var property = getProperty(name);
         return property instanceof List ? getSingleArrayProperty(name) : property;
     }
@@ -163,15 +161,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Boolean> getBooleanProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Boolean)
-            return singletonList((Boolean) value);
-        List<Boolean> list = new ArrayList<>();
-        if (value instanceof boolean[])
-            for (var b : (boolean[]) value)
-                list.add(b);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Boolean) annotationValue.getValue());
-        return list;
+            return List.of((Boolean) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Boolean>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Boolean) annotationValue.getValue())
+                .collect(toList());
     }
 
     public byte getByteProperty(String name) {
@@ -181,15 +177,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Byte> getByteProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Byte)
-            return singletonList((Byte) value);
-        List<Byte> list = new ArrayList<>();
-        if (value instanceof byte[])
-            for (var b : (byte[]) value)
-                list.add(b);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Byte) annotationValue.getValue());
-        return list;
+            return List.of((Byte) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Byte>) value;
+        return getAnnotationValueListProperty(name)
+                .stream().map(annotationValue -> (Byte) annotationValue.getValue())
+                .collect(toList());
     }
 
     public char getCharProperty(String name) {
@@ -199,15 +193,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Character> getCharProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Character)
-            return singletonList((Character) value);
-        List<Character> list = new ArrayList<>();
-        if (value instanceof char[])
-            for (var c : (char[]) value)
-                list.add(c);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Character) annotationValue.getValue());
-        return list;
+            return List.of((Character) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Character>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Character) annotationValue.getValue())
+                .collect(toList());
     }
 
     public short getShortProperty(String name) {
@@ -217,15 +209,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Short> getShortProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Short)
-            return singletonList((Short) value);
-        List<Short> list = new ArrayList<>();
-        if (value instanceof short[])
-            for (var s : (short[]) value)
-                list.add(s);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Short) annotationValue.getValue());
-        return list;
+            return List.of((Short) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Short>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Short) annotationValue.getValue())
+                .collect(toList());
     }
 
     public int getIntProperty(String name) {
@@ -235,15 +225,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Integer> getIntProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Integer)
-            return singletonList((Integer) value);
-        List<Integer> list = new ArrayList<>();
-        if (value instanceof int[])
-            for (var i : (int[]) value)
-                list.add(i);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Integer) annotationValue.getValue());
-        return list;
+            return List.of((Integer) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Integer>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Integer) annotationValue.getValue())
+                .collect(toList());
     }
 
     public long getLongProperty(String name) {
@@ -253,15 +241,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Long> getLongProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Long)
-            return singletonList((Long) value);
-        List<Long> list = new ArrayList<>();
-        if (value instanceof long[])
-            for (var l : (long[]) value)
-                list.add(l);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Long) annotationValue.getValue());
-        return list;
+            return List.of((Long) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Long>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Long) annotationValue.getValue())
+                .collect(toList());
     }
 
     public double getDoubleProperty(String name) {
@@ -271,15 +257,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Double> getDoubleProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Double)
-            return singletonList((Double) value);
-        List<Double> list = new ArrayList<>();
-        if (value instanceof double[])
-            for (var d : (double[]) value)
-                list.add(d);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Double) annotationValue.getValue());
-        return list;
+            return List.of((Double) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Double>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Double) annotationValue.getValue())
+                .collect(toList());
     }
 
     public float getFloatProperty(String name) {
@@ -289,15 +273,13 @@ public class AnnotationWrapper extends Elemental {
     public List<Float> getFloatProperties(String name) {
         var value = getProperty(name);
         if (value instanceof Float)
-            return singletonList((Float) value);
-        List<Float> list = new ArrayList<>();
-        if (value instanceof float[])
-            for (var f : (float[]) value)
-                list.add(f);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((Float) annotationValue.getValue());
-        return list;
+            return List.of((Float) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<Float>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (Float) annotationValue.getValue())
+                .collect(toList());
     }
 
     public String getStringProperty(String name) {
@@ -307,14 +289,13 @@ public class AnnotationWrapper extends Elemental {
     public List<String> getStringProperties(String name) {
         var value = getProperty(name);
         if (value instanceof String)
-            return singletonList((String) value);
-        List<String> list = new ArrayList<>();
-        if (value instanceof String[])
-            Collections.addAll(list, (String[]) value);
-        else
-            for (var annotationValue : getAnnotationValueListProperty(name))
-                list.add((String) annotationValue.getValue());
-        return list;
+            return List.of((String) value);
+        if (value instanceof List)
+            //noinspection unchecked
+            return (List<String>) value;
+        return getAnnotationValueListProperty(name).stream()
+                .map(annotationValue -> (String) annotationValue.getValue())
+                .collect(toList());
     }
 
     public String getEnumProperty(String name) {
@@ -332,7 +313,7 @@ public class AnnotationWrapper extends Elemental {
             return list;
         } else {
             var value = (VariableElement) property;
-            return singletonList(value.getSimpleName().toString());
+            return List.of(value.getSimpleName().toString());
         }
     }
 
@@ -351,7 +332,7 @@ public class AnnotationWrapper extends Elemental {
             return list;
         } else {
             var value = (DeclaredType) property;
-            return singletonList(Type.of(value, round()));
+            return List.of(Type.of(value, round()));
         }
     }
 

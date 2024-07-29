@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 @SuppressWarnings("unused")
 public abstract class TypeVisitor {

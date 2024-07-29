@@ -1,6 +1,6 @@
 package com.github.t1.exap.generator;
 
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ public class TypeExpressionGenerator {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public TypeExpressionGenerator typeArg(Type typeArg) {
         container.addImport(typeArg);
         TypeExpressionGenerator sub = new TypeExpressionGenerator(container, typeArg);

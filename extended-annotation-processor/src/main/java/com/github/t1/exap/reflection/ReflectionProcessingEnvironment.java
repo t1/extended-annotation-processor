@@ -1,6 +1,9 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.Elemental;
+import com.github.t1.exap.insight.Message;
+import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +17,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
+import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 import java.util.List;
 import java.util.Locale;
@@ -83,7 +87,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         return messager.getMessages(target, messageKind);
     }
 
-    List<ReflectionFileObject> getCreatedResources() {
+    List<? extends JavaFileObject> getCreatedResources() {
         return filer.getCreatedResources();
     }
 

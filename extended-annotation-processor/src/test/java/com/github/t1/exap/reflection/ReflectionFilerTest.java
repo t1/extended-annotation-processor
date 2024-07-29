@@ -1,5 +1,6 @@
 package com.github.t1.exap.reflection;
 
+import com.github.t1.exap.insight.Type;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

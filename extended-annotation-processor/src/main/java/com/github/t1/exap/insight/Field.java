@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 import com.github.t1.exap.Round;
 
@@ -20,7 +20,7 @@ public class Field extends Elemental {
     private final Type declaringType;
     private final VariableElement field;
 
-    Field(Type declaringType, VariableElement field, Round round) {
+    public Field(Type declaringType, VariableElement field, Round round) {
         super(round);
         this.declaringType = requireNonNull(declaringType);
         this.field = requireNonNull(field);

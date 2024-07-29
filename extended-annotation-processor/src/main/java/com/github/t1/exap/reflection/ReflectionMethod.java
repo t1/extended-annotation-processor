@@ -1,6 +1,10 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.AnnotationWrapper;
+import com.github.t1.exap.insight.Method;
+import com.github.t1.exap.insight.Parameter;
+import com.github.t1.exap.insight.Type;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;

@@ -1,5 +1,8 @@
 package com.github.t1.exap.reflection;
 
+import com.github.t1.exap.insight.Elemental;
+import com.github.t1.exap.insight.Type;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;

@@ -1,5 +1,7 @@
 package com.github.t1.exap.reflection;
 
+import com.github.t1.exap.insight.Elemental;
+import com.github.t1.exap.insight.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +13,8 @@ import javax.tools.Diagnostic.Kind;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.t1.exap.reflection.Message.ANY_ELEMENT;
-import static com.github.t1.exap.reflection.Message.NO_ELEMENT;
+import static com.github.t1.exap.insight.Message.ANY_ELEMENT;
+import static com.github.t1.exap.insight.Message.NO_ELEMENT;
 
 class ReflectionMessager implements Messager {
     private static final Logger log = LoggerFactory.getLogger(ReflectionMessager.class);

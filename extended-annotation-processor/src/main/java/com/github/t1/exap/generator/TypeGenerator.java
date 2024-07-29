@@ -1,8 +1,8 @@
 package com.github.t1.exap.generator;
 
-import com.github.t1.exap.reflection.Package;
-import com.github.t1.exap.reflection.Resource;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.Package;
+import com.github.t1.exap.insight.Resource;
+import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 
 import java.io.IOException;

@@ -42,30 +42,27 @@ class ReflectionAnnotationMirror implements AnnotationMirror {
     }
 
     private AnnotationValue value(Method method) {
-        try {
-            var value = method.invoke(annotation);
-            return new AnnotationValue() {
-                @Override public String toString() {return "ReflectionAnnotationMirrorValue[" + getValue() + "]";}
+        var value = new ReflectionAnnotationWrapper(annotation, round).getProperty(method.getName());
+        return new AnnotationValue() {
+            @Override public String toString() {return "ReflectionAnnotationMirrorValue[" + getValue() + "]";}
 
-                @Override public Object getValue() {
-                    return (value.getClass().isArray()) ? asAnnotationList() // array values have to be represented as a list
-                            : (value instanceof Class) ? new ReflectionTypeMirror((Class<?>) value, round) // Classes have to be represented as a TypeMirror
-                            : value;
-                }
+            @Override public Object getValue() {
+                return (value instanceof List) ? asAnnotationList(value) // array values have to be represented as a list
+                        : (value instanceof Class) ? new ReflectionTypeMirror((Class<?>) value, round) // Classes have to be represented as a TypeMirror
+                        : value;
+            }
 
-                private List<AnnotationMirror> asAnnotationList() {
-                    // the extra step is necessary for the reflection
-                    return Stream.of((Annotation[]) value)
-                            .map(annotation -> new ReflectionAnnotationMirror(annotation.annotationType(), annotation, round))
-                            .collect(toList());
-                }
+            private List<AnnotationMirror> asAnnotationList(Object value) {
+                @SuppressWarnings("unchecked")
+                var list = (List<Annotation>) value;
+                return list.stream()
+                        .map(annotation -> new ReflectionAnnotationMirror(annotation.annotationType(), annotation, round))
+                        .collect(toList());
+            }
 
-                @Override public <R, P> R accept(AnnotationValueVisitor<R, P> v, P p) {
-                    return null;
-                }
-            };
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("could not get value from " + method + " in " + annotation, e);
-        }
+            @Override public <R, P> R accept(AnnotationValueVisitor<R, P> v, P p) {
+                return null;
+            }
+        };
     }
 }

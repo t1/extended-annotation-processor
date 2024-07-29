@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 public enum AnnotationPropertyType {
     BOOLEAN,
@@ -12,5 +12,5 @@ public enum AnnotationPropertyType {
     STRING,
     ENUM,
     ANNOTATION,
-    CLASS;
+    CLASS
 }

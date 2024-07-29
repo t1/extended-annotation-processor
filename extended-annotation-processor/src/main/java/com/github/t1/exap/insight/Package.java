@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 import com.github.t1.exap.Round;
 import com.github.t1.exap.generator.TypeGenerator;

@@ -1,4 +1,4 @@
-package com.github.t1.exap.reflection;
+package com.github.t1.exap.insight;
 
 import com.github.t1.exap.JavaDoc;
 import com.github.t1.exap.Round;
@@ -143,21 +143,19 @@ public abstract class Elemental {
     public List<AnnotationWrapper> getAnnotationWrappers() {
         List<AnnotationWrapper> annotations = annotationWrapperBuilder.allOn(getElement());
         if (!containsJavaDoc(annotations) && docComment() != null)
-            annotations.add(0, new ReflectionAnnotationWrapper(javaDoc(), round));
+            annotations.add(0, annotationWrapperBuilder.wrapped(javaDoc()));
         return annotations;
     }
 
     private boolean containsJavaDoc(List<AnnotationWrapper> annotations) {
-        for (AnnotationWrapper annotation : annotations)
-            if (annotation.getAnnotationType().getFullName().equals(JavaDoc.class.getName()))
-                return true;
-        return false;
+        return annotations.stream()
+                .anyMatch(annotation -> annotation.getAnnotationType().getFullName().equals(JavaDoc.class.getName()));
     }
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
         List<AnnotationWrapper> annotations = annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
         if (annotations.isEmpty() && docComment() != null)
-            annotations.add(new ReflectionAnnotationWrapper(javaDoc(), round));
+            annotations.add(annotationWrapperBuilder.wrapped(javaDoc()));
         return annotations;
     }
 

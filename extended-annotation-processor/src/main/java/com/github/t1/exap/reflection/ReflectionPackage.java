@@ -1,6 +1,8 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.AnnotationWrapper;
+import com.github.t1.exap.insight.Package;
 
 import javax.lang.model.element.PackageElement;
 import java.lang.annotation.Annotation;

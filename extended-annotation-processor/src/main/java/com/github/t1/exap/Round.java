@@ -1,10 +1,10 @@
 package com.github.t1.exap;
 
-import com.github.t1.exap.reflection.Field;
-import com.github.t1.exap.reflection.Package;
-import com.github.t1.exap.reflection.ReflectiveFileObject;
-import com.github.t1.exap.reflection.Resource;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.Field;
+import com.github.t1.exap.insight.Package;
+import com.github.t1.exap.reflection.ReflectionFileObject;
+import com.github.t1.exap.insight.Resource;
+import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -105,7 +105,7 @@ public class Round {
             .getParent() // target
             .resolve("generated-resources")
             .resolve(relativeName);
-        return new Resource(new ReflectiveFileObject(path));
+        return new Resource(new ReflectionFileObject(path));
     }
 
     private URI getOutputUri() {

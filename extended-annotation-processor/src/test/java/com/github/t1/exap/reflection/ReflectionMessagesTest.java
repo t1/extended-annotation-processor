@@ -1,11 +1,22 @@
 package com.github.t1.exap.reflection;
 
+import com.github.t1.exap.insight.AnnotationWrapper;
+import com.github.t1.exap.insight.Elemental;
+import com.github.t1.exap.insight.Field;
+import com.github.t1.exap.insight.Message;
+import com.github.t1.exap.insight.Method;
+import com.github.t1.exap.insight.Parameter;
+import com.github.t1.exap.insight.Type;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.Diagnostic.Kind;
 
 import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
+import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.Diagnostic.Kind.OTHER;
 import static javax.tools.Diagnostic.Kind.WARNING;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,6 +28,7 @@ public class ReflectionMessagesTest {
 
     private void assertMessage(Elemental elemental, Kind kind, String message) {
         assertThat(ENV.getMessages()).containsExactly(new Message(elemental, kind, message));
+        assertThat(ENV.getMessages(elemental, kind)).containsExactly(message);
     }
 
     @Test
@@ -35,9 +47,9 @@ public class ReflectionMessagesTest {
         class Pojo {}
         AnnotationWrapper annotation = ENV.type(Pojo.class).getAnnotationWrapper(Deprecated.class);
 
-        annotation.warning("foo");
+        annotation.error("bar");
 
-        assertMessage(annotation, WARNING, "foo");
+        assertMessage(annotation, ERROR, "bar");
     }
 
     @Test
@@ -48,9 +60,9 @@ public class ReflectionMessagesTest {
         }
         Field field = ENV.type(Pojo.class).getField("field");
 
-        field.warning("foo");
+        field.note("baz");
 
-        assertMessage(field, WARNING, "foo");
+        assertMessage(field, NOTE, "baz");
     }
 
     @Test
@@ -62,9 +74,9 @@ public class ReflectionMessagesTest {
         }
         AnnotationWrapper annotation = ENV.type(Pojo.class).getField("field").getAnnotationWrapper(Deprecated.class);
 
-        annotation.warning("foo");
+        annotation.mandatoryWarning("foo");
 
-        assertMessage(annotation, WARNING, "foo");
+        assertMessage(annotation, MANDATORY_WARNING, "foo");
     }
 
     @Test
@@ -75,9 +87,9 @@ public class ReflectionMessagesTest {
         }
         Method method = ENV.type(Pojo.class).getMethod("method");
 
-        method.warning("foo");
+        method.otherMessage("foo");
 
-        assertMessage(method, WARNING, "foo");
+        assertMessage(method, OTHER, "foo");
     }
 
     @Test
@@ -114,7 +126,7 @@ public class ReflectionMessagesTest {
             public void method(@Deprecated String param) {}
         }
         AnnotationWrapper annotation =
-            ENV.type(Pojo.class).getMethod("method").getParameter(0).getAnnotationWrapper(Deprecated.class);
+                ENV.type(Pojo.class).getMethod("method").getParameter(0).getAnnotationWrapper(Deprecated.class);
 
         annotation.warning("foo");
 

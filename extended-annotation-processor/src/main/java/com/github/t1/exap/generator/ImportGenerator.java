@@ -1,7 +1,7 @@
 package com.github.t1.exap.generator;
 
-import com.github.t1.exap.reflection.Package;
-import com.github.t1.exap.reflection.Type;
+import com.github.t1.exap.insight.Package;
+import com.github.t1.exap.insight.Type;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

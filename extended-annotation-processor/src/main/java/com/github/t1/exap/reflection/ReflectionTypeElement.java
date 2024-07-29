@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
 import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.Type;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -36,7 +37,7 @@ class ReflectionTypeElement implements TypeElement {
     }
 
     @Override public List<? extends AnnotationMirror> getAnnotationMirrors() {
-        return type.typeMirror.getAnnotationMirrors();
+        return type.getTypeMirror().getAnnotationMirrors();
     }
 
     @Override public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
@@ -57,7 +58,7 @@ class ReflectionTypeElement implements TypeElement {
 
     @Override public Name getQualifiedName() {return new ReflectionName(type.getFullName());}
 
-    @Override public TypeMirror asType() {return type.typeMirror;}
+    @Override public TypeMirror asType() {return type.getTypeMirror();}
 
     @Override public ElementKind getKind() {
         switch (type.getKind()) {
@@ -82,7 +83,7 @@ class ReflectionTypeElement implements TypeElement {
     }
 
     private Class<?> getReflectedClass() {
-        return (Class<?>) ((ReflectionTypeMirror) type.typeMirror).type;
+        return (Class<?>) ((ReflectionTypeMirror) type.getTypeMirror()).type;
     }
 
     @Override public List<? extends TypeMirror> getInterfaces() {

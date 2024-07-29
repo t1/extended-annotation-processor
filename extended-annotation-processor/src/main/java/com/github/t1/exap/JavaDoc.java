@@ -19,9 +19,23 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface JavaDoc {
     /**
      * The first sentence of the JavaDoc is often treated as the summary of the rest of the text, which works
-     * astonishingly well. This is this first sentence, without the period.
+     * astonishingly well. This function returns the first sentence, without the period.
      */
-    Function<JavaDoc, String> SUMMARY = JavaDocHelper.JAVADOC_SUMMARY;
+    Function<JavaDoc, String> SUMMARY = javaDoc -> {
+        String value = javaDoc.value();
+        int firstDot = value.indexOf('.');
+        return (firstDot < 0) ? value : value.substring(0, firstDot);
+    };
+
+    /**
+     * The first sentence of the JavaDoc is often treated as the summary of the rest of the text, which works
+     * astonishingly well. This function returns all but the first sentence. If there is no period, return an empty string.
+     */
+    Function<JavaDoc, String> BODY = javaDoc -> {
+        String value = javaDoc.value();
+        int firstDot = value.indexOf('.');
+        return (firstDot < 0) ? "" : value.substring(firstDot + 1).trim();
+    };
 
     /**
      * The full JavaDoc text. To get a more useful subset, you should consider one of the extractor methods defined in
