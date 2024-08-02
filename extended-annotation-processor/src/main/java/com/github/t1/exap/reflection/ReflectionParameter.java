@@ -19,7 +19,7 @@ class ReflectionParameter extends Parameter {
     private final java.lang.reflect.Parameter parameter;
 
     public ReflectionParameter(Method method, java.lang.reflect.Parameter parameter) {
-        super(method, DummyProxy.of(VariableElement.class));
+        super(method, ReflectionDummyProxy.of(VariableElement.class));
         this.method = method;
         this.parameter = parameter;
     }
@@ -56,7 +56,7 @@ class ReflectionParameter extends Parameter {
 
     @Override
     protected boolean is(Modifier modifier) {
-        return Modifiers.on(parameter.getModifiers()).is(modifier);
+        return ReflectionModifiers.on(parameter.getModifiers()).is(modifier);
     }
 
     @Override

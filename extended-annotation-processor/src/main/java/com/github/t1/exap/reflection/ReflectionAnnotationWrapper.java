@@ -89,7 +89,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private final Annotation annotation;
 
     ReflectionAnnotationWrapper(Annotation annotation, Round round) {
-        super(DummyProxy.of(AnnotationMirror.class), round);
+        super(ReflectionDummyProxy.of(AnnotationMirror.class), round);
         this.annotation = annotation;
     }
 

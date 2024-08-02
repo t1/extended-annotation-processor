@@ -19,7 +19,7 @@ class ReflectionPackage extends Package {
     private final java.lang.Package pkg;
 
     private ReflectionPackage(java.lang.Package pack, Round round) {
-        super(DummyProxy.of(PackageElement.class), round);
+        super(ReflectionDummyProxy.of(PackageElement.class), round);
         this.pkg = pack;
     }
 

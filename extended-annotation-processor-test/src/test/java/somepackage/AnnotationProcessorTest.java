@@ -2,8 +2,6 @@ package somepackage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,19 +13,29 @@ class AnnotationProcessorTest {
     private static final Path TEST_CLASSES = Paths.get("target/test-classes");
     private static final Path GENERATED_TEST_SOURCES = Paths.get("target/generated-test-sources/test-annotations");
 
-    @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void verifyRoundHasRun(int round) {
-        assertThat(contentOf(TEST_CLASSES, "round-" + round + ".json"))
-                .as("round-" + round)
-                .isEqualTo(contentOf(RESOURCES, "round-" + round + ".json"));
-        assertThat(contentOf(TEST_CLASSES, "fields-" + round))
-                .as("fields-" + round)
-                .isEqualTo(contentOf(RESOURCES, "fields-" + round));
+    @Test
+    void verifyRound() {
+        assertThat(contentOf(TEST_CLASSES.resolve("round-0.json")))
+                .as("round-0")
+                .isEqualTo(contentOf(RESOURCES.resolve("round-0.json")));
     }
 
-    private static String contentOf(Path testClasses, String round) {
-        return Assertions.contentOf(testClasses.resolve(round).toFile()).trim();
+    @Test
+    void verifyFields() {
+        assertThat(contentOf(TEST_CLASSES.resolve("fields-0")))
+                .as("fields-0")
+                .isEqualTo(contentOf(RESOURCES.resolve("fields-0")));
+    }
+
+    @Test
+    void verifyPackages() {
+        assertThat(contentOf(TEST_CLASSES.resolve("packages-0")))
+                .as("packages-0")
+                .isEqualTo(contentOf(RESOURCES.resolve("packages-0")));
+    }
+
+    private static String contentOf(Path path) {
+        return Assertions.contentOf(path.toFile()).trim();
     }
 
     @Test

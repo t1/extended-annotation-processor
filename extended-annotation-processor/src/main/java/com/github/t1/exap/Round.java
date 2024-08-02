@@ -2,7 +2,6 @@ package com.github.t1.exap;
 
 import com.github.t1.exap.insight.Field;
 import com.github.t1.exap.insight.Package;
-import com.github.t1.exap.insight.Resource;
 import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 
@@ -10,11 +9,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -25,7 +20,6 @@ import static javax.lang.model.element.ElementKind.ENUM;
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.INTERFACE;
 import static javax.lang.model.element.ElementKind.PACKAGE;
-import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 public class Round {
     private static final List<ElementKind> TYPE_KINDS = asList(ENUM, CLASS, ANNOTATION_TYPE, INTERFACE);
@@ -96,22 +90,4 @@ public class Round {
     }
 
     public Package getPackageOf(Class<?> type) {return getPackage(type.getPackage().getName());}
-
-    /** Generate a resource in `target/generated-resources` */
-    public Resource createResource(String relativeName) {
-        Path path = Paths.get(getOutputUri()) // target/generated-sources/annotations
-            .getParent() // target/generated-sources
-            .getParent() // target
-            .resolve("generated-resources")
-            .resolve(relativeName);
-        return new Resource(null/*new ReflectionFileObject(path)*/);
-    }
-
-    private URI getOutputUri() {
-        try {
-            return processingEnv.getFiler().createResource(CLASS_OUTPUT, "", "dummy").toUri();
-        } catch (IOException e) {
-            throw new RuntimeException("could not locate " + CLASS_OUTPUT, e);
-        }
-    }
 }

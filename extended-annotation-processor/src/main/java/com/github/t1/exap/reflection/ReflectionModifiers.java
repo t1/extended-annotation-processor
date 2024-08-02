@@ -2,14 +2,14 @@ package com.github.t1.exap.reflection;
 
 import java.lang.reflect.Modifier;
 
-class Modifiers {
-    public static Modifiers on(int modifiers) {
-        return new Modifiers(modifiers);
+class ReflectionModifiers {
+    public static ReflectionModifiers on(int modifiers) {
+        return new ReflectionModifiers(modifiers);
     }
 
     private final int modifiers;
 
-    private Modifiers(int modifiers) {
+    private ReflectionModifiers(int modifiers) {
         this.modifiers = modifiers;
     }
 

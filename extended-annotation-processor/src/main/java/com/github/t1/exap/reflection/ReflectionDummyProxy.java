@@ -9,7 +9,7 @@ import java.lang.reflect.Proxy;
  * invocations, except for {@link #toString()}, {@link #hashCode()}, and {@link #equals(Object)}. Useful only as a
  * reference instance.
  */
-public class DummyProxy {
+class ReflectionDummyProxy {
     private static final class DummyProxyInvocationHandler implements InvocationHandler {
         private static int nextId = 0;
 
@@ -33,12 +33,12 @@ public class DummyProxy {
 
         @Override
         public String toString() {
-            return "DummyProxy#" + id + ":" + type.getSimpleName();
+            return "ReflectionDummyProxy#" + id + ":" + type.getSimpleName();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T of(Class<T> type) {
+    static <T> T of(Class<T> type) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type},
             new DummyProxyInvocationHandler(type));
     }

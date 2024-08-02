@@ -66,7 +66,7 @@ class ReflectionMethod extends Method {
 
     @Override
     protected boolean is(Modifier modifier) {
-        return Modifiers.on(method.getModifiers()).is(modifier);
+        return ReflectionModifiers.on(method.getModifiers()).is(modifier);
     }
 
     @Override

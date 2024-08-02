@@ -14,10 +14,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
-public class ReflectionVariableElement implements VariableElement, ReflectionTypeMirror {
+class ReflectionVariableElement implements VariableElement, ReflectionTypeMirror {
     private final Field field;
 
-    public ReflectionVariableElement(Field field) {this.field = field;}
+    ReflectionVariableElement(Field field) {this.field = field;}
 
     @Override public AnnotatedElement asAnnotatedElement() {return field;}
 

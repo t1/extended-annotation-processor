@@ -3,9 +3,6 @@ package somepackage;
 import com.github.t1.exap.ExtendedAbstractProcessor;
 import com.github.t1.exap.Round;
 import com.github.t1.exap.SupportedAnnotationClasses;
-import com.github.t1.exap.generator.TypeGenerator;
-import com.github.t1.exap.insight.Field;
-import com.github.t1.exap.insight.Resource;
 import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,26 +24,39 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         log.info("start annotation processor");
         createRoundOutput(round);
         createFieldList(round);
+        createPackageInfos(round);
         generateSourceFile(round);
         return false;
     }
 
     private void createRoundOutput(Round round) throws IOException {
-        Resource resource = round.getRootPackage().createResource("round-" + round.number() + ".json");
-        try (Writer writer = resource.openWriter()) {
-            try (JsonTestFileGenerator generator = new JsonTestFileGenerator(writer)) {
+        var resource = round.getRootPackage().createResource("round-" + round.number() + ".json");
+        try (var writer = resource.openWriter()) {
+            try (var generator = new JsonTestFileGenerator(writer)) {
                 generator.write(round.typesAnnotatedWith(MarkerAnnotation.class));
             }
         }
     }
 
     private void createFieldList(Round round) throws IOException {
-        Resource resource = round.getRootPackage().createResource("fields-" + round.number());
-        try (Writer writer = resource.openWriter()) {
-            for (Field field : round.fieldsAnnotatedWith(MarkerAnnotation.class)) {
+        try (var writer = writerFor(round, "fields")) {
+            for (var field : round.fieldsAnnotatedWith(MarkerAnnotation.class)) {
                 writer.append(field.getName()).append(":").append(field.getAnnotation(MarkerAnnotation.class).value()).append("\n");
             }
         }
+    }
+
+    private void createPackageInfos(Round round) throws IOException {
+        try (var writer = writerFor(round, "packages")) {
+            for (var pkg : round.packagesAnnotatedWith(MarkerAnnotation.class)) {
+                writer.append(pkg.getName()).append(": ").append(pkg.getAnnotation(MarkerAnnotation.class).value()).append("\n")
+                        .append("javadoc: ").append(pkg.javaDoc().orElse("no javadoc")).append("\n");
+            }
+        }
+    }
+
+    private static Writer writerFor(Round round, String name) throws IOException {
+        return round.getRootPackage().createResource(name + "-" + round.number()).openWriter();
     }
 
     private void generateSourceFile(Round round) {
@@ -59,23 +69,23 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     }
 
     private void generateInterface(Round round) {
-        try (TypeGenerator typeGenerator =
+        try (var typeGenerator =
                      round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedInterface")) {
             typeGenerator.kind(INTERFACE);
-            Type annotatedClass = annotatedClass(round);
+            var annotatedClass = annotatedClass(round);
             typeGenerator.addMethod("method0").returnType(annotatedClass);
         }
     }
 
     private void generateRootClass(Round round) {
-        try (TypeGenerator typeGenerator = round.getRootPackage().openTypeGenerator("GeneratedRootClass")) {
+        try (var typeGenerator = round.getRootPackage().openTypeGenerator("GeneratedRootClass")) {
             typeGenerator.kind(INTERFACE);
         }
     }
 
     private void generateClass(Round round) {
-        try (TypeGenerator typeGenerator = round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedClass")) {
-            Type annotatedClass = annotatedClass(round);
+        try (var typeGenerator = round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedClass")) {
+            var annotatedClass = annotatedClass(round);
             typeGenerator.addField("value").type(annotatedClass);
             typeGenerator.addMethod("method0").body("return value;").returnType(annotatedClass);
         }

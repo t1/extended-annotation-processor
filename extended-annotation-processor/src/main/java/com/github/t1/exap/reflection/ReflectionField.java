@@ -27,7 +27,7 @@ class ReflectionField extends Field {
 
     @Override
     protected boolean is(Modifier modifier) {
-        return Modifiers.on(field.getModifiers()).is(modifier);
+        return ReflectionModifiers.on(field.getModifiers()).is(modifier);
     }
 
     @Override
