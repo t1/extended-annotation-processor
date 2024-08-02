@@ -13,7 +13,7 @@ import java.util.List;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
-public class ReflectionFiler implements Filer {
+class ReflectionFiler implements Filer {
     private final List<ReflectionJavaFileObject> list = new ArrayList<>();
 
     @Override

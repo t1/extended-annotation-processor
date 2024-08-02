@@ -74,7 +74,8 @@ public class AnnotationWrapper extends Elemental {
     }
 
     private Class<?> getArrayType(String name) {
-        var list = getAnnotationValueListProperty(name);
+        @SuppressWarnings("unchecked")
+        var list = (List<AnnotationValue>) getProperty(name);
         if (list.isEmpty())
             return String.class; // TODO try the method return type instead!
         return list.get(0).getValue().getClass();
@@ -149,11 +150,6 @@ public class AnnotationWrapper extends Elemental {
         return list.get(0);
     }
 
-    @SuppressWarnings("unchecked")
-    private List<AnnotationValue> getAnnotationValueListProperty(String name) {
-        return (List<AnnotationValue>) getProperty(name);
-    }
-
     public boolean getBooleanProperty(String name) {
         return (boolean) getSingleProperty(name);
     }
@@ -162,12 +158,14 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Boolean)
             return List.of((Boolean) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Boolean>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Boolean) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Boolean.class::cast)
                 .collect(toList());
+    }
+
+    private static Object annotationValue(Object annotationValue) {
+        return (annotationValue instanceof AnnotationValue) ? ((AnnotationValue) annotationValue).getValue() : annotationValue;
     }
 
     public byte getByteProperty(String name) {
@@ -178,11 +176,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Byte)
             return List.of((Byte) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Byte>) value;
-        return getAnnotationValueListProperty(name)
-                .stream().map(annotationValue -> (Byte) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Byte.class::cast)
                 .collect(toList());
     }
 
@@ -194,11 +190,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Character)
             return List.of((Character) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Character>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Character) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Character.class::cast)
                 .collect(toList());
     }
 
@@ -210,11 +204,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Short)
             return List.of((Short) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Short>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Short) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Short.class::cast)
                 .collect(toList());
     }
 
@@ -226,11 +218,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Integer)
             return List.of((Integer) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Integer>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Integer) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Integer.class::cast)
                 .collect(toList());
     }
 
@@ -242,11 +232,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Long)
             return List.of((Long) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Long>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Long) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Long.class::cast)
                 .collect(toList());
     }
 
@@ -258,11 +246,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Double)
             return List.of((Double) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Double>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Double) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Double.class::cast)
                 .collect(toList());
     }
 
@@ -274,11 +260,9 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof Float)
             return List.of((Float) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<Float>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (Float) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::annotationValue)
+                .map(Float.class::cast)
                 .collect(toList());
     }
 
@@ -290,12 +274,15 @@ public class AnnotationWrapper extends Elemental {
         var value = getProperty(name);
         if (value instanceof String)
             return List.of((String) value);
-        if (value instanceof List)
-            //noinspection unchecked
-            return (List<String>) value;
-        return getAnnotationValueListProperty(name).stream()
-                .map(annotationValue -> (String) annotationValue.getValue())
+        return ((List<?>) value).stream()
+                .map(AnnotationWrapper::stringValue)
                 .collect(toList());
+    }
+
+    private static String stringValue(Object annotationValue) {
+        if (annotationValue instanceof AnnotationValue)
+            annotationValue = ((AnnotationValue) annotationValue).getValue();
+        return (annotationValue instanceof String) ? (String) annotationValue : annotationValue.toString();
     }
 
     public String getEnumProperty(String name) {
@@ -306,7 +293,8 @@ public class AnnotationWrapper extends Elemental {
     public List<String> getEnumProperties(String name) {
         var property = getProperty(name);
         if (property instanceof List) {
-            var values = getAnnotationValueListProperty(name);
+            @SuppressWarnings("unchecked")
+            var values = (List<AnnotationValue>) property;
             List<String> list = new ArrayList<>();
             for (var value : values)
                 list.add(((VariableElement) value.getValue()).getSimpleName().toString());
@@ -325,7 +313,8 @@ public class AnnotationWrapper extends Elemental {
     public List<Type> getTypeProperties(String name) {
         var property = getProperty(name);
         if (property instanceof List) {
-            var values = getAnnotationValueListProperty(name);
+            @SuppressWarnings("unchecked")
+            var values = (List<AnnotationValue>) property;
             List<Type> list = new ArrayList<>();
             for (var value : values)
                 list.add(Type.of((DeclaredType) value.getValue(), round()));

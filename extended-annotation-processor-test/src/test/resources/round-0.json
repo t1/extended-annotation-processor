@@ -1,463 +1,444 @@
-
 [
-  {
-    "name": "AnnotatedClass",
-    "fullName": "somepackage.AnnotatedClass<T>",
-    "typeParameters": [
-      "java.lang.Number"
-    ],
-    "collection": false,
-    "void": false,
-    "boolean": false,
-    "number": false,
-    "integer": false,
-    "decimal": false,
-    "string": false,
-    "enum": false,
-    "enumValues": [
-    ],
-    "array": false,
-    "elementType": null,
-    "public": true,
-    "static": false,
-    "transient": false,
-    "annotations": [
-      {
-        "name": "JavaDoc",
-        "fullName": "com.github.t1.exap.JavaDoc",
-        "value": [
-          "javadoc summary. second sentence."
-        ]
-      },
-      {
-        "name": "A",
-        "fullName": "somepackage.A",
-        "value": [
-          "ppp"
-        ]
-      },
-      {
-        "name": "MarkerAnnotation",
-        "fullName": "somepackage.MarkerAnnotation",
-        "value": [
-          "on type"
-        ]
-      },
-      {
-        "name": "SuppressWarnings",
-        "fullName": "java.lang.SuppressWarnings",
-        "value": [
-          "unused"
-        ]
-      }
-    ],
-    "staticFields": [
-      "CONSTANT"
-    ],
-    "fields": {
-      "bool": {
-        "type": {
-          "name": "boolean",
-          "fullName": "boolean",
-          "typeParameters": [
-          ],
-          "collection": false
-        },
-        "public": false,
-        "static": false,
-        "transient": false,
-        "annotations": [
-        ]
-      },
-      "string": {
-        "type": {
-          "name": "String",
-          "fullName": "java.lang.String",
-          "typeParameters": [
-          ],
-          "collection": false
-        },
-        "public": false,
-        "static": false,
-        "transient": false,
-        "annotations": [
-          {
-            "name": "JavaDoc",
-            "fullName": "com.github.t1.exap.JavaDoc",
-            "value": [
-              "field javadoc"
-            ]
-          },
-          {
-            "name": "A",
-            "fullName": "somepackage.A",
-            "value": [
-              "fff"
-            ]
-          },
-          {
-            "name": "MarkerAnnotation",
-            "fullName": "somepackage.MarkerAnnotation",
-            "value": [
-              "on field"
-            ]
-          }
-        ]
-      },
-      "map": {
-        "type": {
-          "name": "Map",
-          "fullName": "java.util.Map<java.lang.String,java.lang.Number>",
-          "typeParameters": [
-            "java.lang.String",
+    {
+        "name": "AnnotatedClass",
+        "fullName": "somepackage.AnnotatedClass<T>",
+        "typeParameters": [
             "java.lang.Number"
-          ],
-          "collection": false
-        },
-        "public": false,
+        ],
+        "javadoc": "javadoc summary. second sentence.",
+        "collection": false,
+        "void": false,
+        "boolean": false,
+        "number": false,
+        "integer": false,
+        "decimal": false,
+        "string": false,
+        "enum": false,
+        "enumValues": [
+        ],
+        "array": false,
+        "elementType": null,
+        "public": true,
         "static": false,
         "transient": false,
         "annotations": [
-          {
-            "name": "FooNumA",
-            "fullName": "somepackage.FooNumA",
-            "value": [
-              "X"
-            ]
-          },
-          {
-            "name": "FooNums",
-            "fullName": "somepackage.FooNums",
-            "value": [
-              "Y",
-              "Z"
-            ]
-          }
-        ]
-      },
-      "fooNum": {
-        "type": {
-          "name": "FooNum",
-          "fullName": "somepackage.FooNum",
-          "typeParameters": [
-          ],
-          "collection": false
-        },
-        "public": false,
-        "static": false,
-        "transient": false,
-        "annotations": [
-          {
-            "name": "Multi",
-            "fullName": "somepackage.Multi",
-            "booly": [
-              false
-            ],
-            "bytey": [
-              1
-            ],
-            "chary": [
-              "!"
-            ],
-            "classy": [
-              "java.lang.Object"
-            ],
-            "doubly": [
-              3.4
-            ],
-            "floaty": [
-              5.0
-            ],
-            "inty": [
-              7
-            ],
-            "longy": [
-              8
-            ],
-            "shorty": [
-              9
-            ],
-            "stringy": [
-              "s"
-            ],
-            "enumy": [
-              "X"
-            ],
-            "annoty": [
-              "@somepackage.A(\"a\")"
-            ]
-          },
-          {
-            "name": "MultiA",
-            "fullName": "somepackage.MultiA",
-            "booly": [
-            ],
-            "bytey": [
-            ],
-            "chary": [
-            ],
-            "classy": [
-            ],
-            "doubly": [
-            ],
-            "floaty": [
-            ],
-            "inty": [
-            ],
-            "longy": [
-            ],
-            "shorty": [
-            ],
-            "stringy": [
-            ],
-            "enumy": [
-            ],
-            "annoty": [
-            ]
-          },
-          {
-            "name": "MultiA",
-            "fullName": "somepackage.MultiA",
-            "booly": [
-              false
-            ],
-            "bytey": [
-              1
-            ],
-            "chary": [
-              "!"
-            ],
-            "classy": [
-              "java.lang.Object"
-            ],
-            "doubly": [
-              3.4
-            ],
-            "floaty": [
-              5.0
-            ],
-            "inty": [
-              7
-            ],
-            "longy": [
-              8
-            ],
-            "shorty": [
-              9
-            ],
-            "stringy": [
-              "s"
-            ],
-            "enumy": [
-              "X"
-            ],
-            "annoty": [
-              "@somepackage.A(\"a\")"
-            ]
-          },
-          {
-            "name": "MultiA",
-            "fullName": "somepackage.MultiA",
-            "booly": [
-              false,
-              true
-            ],
-            "bytey": [
-              1,
-              2
-            ],
-            "chary": [
-              "!",
-              "\""
-            ],
-            "classy": [
-              "java.lang.Object",
-              "java.lang.String"
-            ],
-            "doubly": [
-              3.4,
-              4.3
-            ],
-            "floaty": [
-              5.0,
-              6.5
-            ],
-            "inty": [
-              7,
-              8
-            ],
-            "longy": [
-              8,
-              9
-            ],
-            "shorty": [
-              9,
-              8
-            ],
-            "stringy": [
-              "s",
-              "t"
-            ],
-            "enumy": [
-              "X",
-              "Y"
-            ],
-            "annoty": [
-              "@somepackage.A(\"a\")",
-              "@somepackage.A(\"b\")"
-            ]
-          }
-        ]
-      }
-    },
-    "staticMethods": [
-      "constant"
-    ],
-    "methods": [
-      {
-        "name": "method0",
-        "containerType": "Type:somepackage.AnnotatedClass<T>",
-        "returnType": {
-          "name": "void",
-          "fullName": "void",
-          "typeParameters": [
-          ],
-          "is-a-collection": false,
-          "is-a-container": false
-        },
-        "annotations": [
-          {
-            "name": "JavaDoc",
-            "fullName": "com.github.t1.exap.JavaDoc",
-            "value": [
-              "method javadoc"
-            ]
-          },
-          {
-            "name": "A",
-            "fullName": "somepackage.A",
-            "value": [
-              "mmm"
-            ]
-          },
-          {
-            "name": "A",
-            "fullName": "somepackage.A",
-            "value": [
-              "nnn"
-            ]
-          },
-          {
-            "name": "B",
-            "fullName": "somepackage.B",
-            "value": [
-              "bbb"
-            ]
-          },
-          {
-            "name": "MarkerAnnotation",
-            "fullName": "somepackage.MarkerAnnotation",
-            "value": [
-              "on method"
-            ]
-          }
-        ],
-        "parameters": [
-        ]
-      },
-      {
-        "name": "method1",
-        "containerType": "Type:somepackage.AnnotatedClass<T>",
-        "returnType": {
-          "name": "List",
-          "fullName": "java.util.List<java.lang.String>",
-          "typeParameters": [
-            "java.lang.String"
-          ],
-          "is-a-collection": true,
-          "is-a-container": false
-        },
-        "annotations": [
-          {
-            "name": "A",
-            "fullName": "somepackage.A",
-            "value": [
-              "ooo"
-            ]
-          },
-          {
-            "name": "BB",
-            "fullName": "somepackage.BB",
-            "value": [
-              "@somepackage.B(\"b0\")",
-              "@somepackage.B(\"b1\")"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "name": "string",
-            "method": "method1",
-            "type": "java.lang.String",
-            "typeParameters": [
-            ],
-            "collection": false,
-            "annotations": [
-            ]
-          },
-          {
-            "name": "bool",
-            "method": "method1",
-            "type": "boolean",
-            "typeParameters": [
-            ],
-            "collection": false,
-            "annotations": [
-              {
-                "name": "MarkerAnnotation",
-                "fullName": "somepackage.MarkerAnnotation",
-                "value": [
-                  "on param"
-                ]
-              },
-              {
+            {
                 "name": "A",
                 "fullName": "somepackage.A",
                 "value": [
-                  "ppp"
+                    "ppp"
                 ]
-              }
-            ]
-          },
-          {
-            "name": "strings",
-            "method": "method1",
-            "type": "java.util.List<java.lang.String>",
-            "typeParameters": [
-              "java.lang.String"
-            ],
-            "collection": true,
-            "annotations": [
-            ]
-          }
-        ]
-      },
-      {
-        "name": "method2",
-        "containerType": "Type:somepackage.AnnotatedClass<T>",
-        "returnType": {
-          "name": "Nested",
-          "fullName": "somepackage.Container.Nested",
-          "typeParameters": [
-          ],
-          "is-a-collection": false,
-          "is-a-container": true
-        },
-        "annotations": [
+            },
+            {
+                "name": "MarkerAnnotation",
+                "fullName": "somepackage.MarkerAnnotation",
+                "value": [
+                    "on type"
+                ]
+            },
+            {
+                "name": "SuppressWarnings",
+                "fullName": "java.lang.SuppressWarnings",
+                "value": [
+                    "unused"
+                ]
+            }
         ],
-        "parameters": [
+        "staticFields": [
+            "CONSTANT"
+        ],
+        "fields": {
+            "bool": {
+                "type": {
+                    "name": "boolean",
+                    "fullName": "boolean",
+                    "typeParameters": [
+                    ],
+                    "collection": false
+                },
+                "public": false,
+                "static": false,
+                "transient": false,
+                "annotations": [
+                ]
+            },
+            "string": {
+                "javadoc": "field javadoc",
+                "type": {
+                    "name": "String",
+                    "fullName": "java.lang.String",
+                    "typeParameters": [
+                    ],
+                    "collection": false
+                },
+                "public": false,
+                "static": false,
+                "transient": false,
+                "annotations": [
+                    {
+                        "name": "A",
+                        "fullName": "somepackage.A",
+                        "value": [
+                            "fff"
+                        ]
+                    },
+                    {
+                        "name": "MarkerAnnotation",
+                        "fullName": "somepackage.MarkerAnnotation",
+                        "value": [
+                            "on field"
+                        ]
+                    }
+                ]
+            },
+            "map": {
+                "type": {
+                    "name": "Map",
+                    "fullName": "java.util.Map<java.lang.String,java.lang.Number>",
+                    "typeParameters": [
+                        "java.lang.String",
+                        "java.lang.Number"
+                    ],
+                    "collection": false
+                },
+                "public": false,
+                "static": false,
+                "transient": false,
+                "annotations": [
+                    {
+                        "name": "FooNumA",
+                        "fullName": "somepackage.FooNumA",
+                        "value": [
+                            "X"
+                        ]
+                    },
+                    {
+                        "name": "FooNums",
+                        "fullName": "somepackage.FooNums",
+                        "value": [
+                            "Y",
+                            "Z"
+                        ]
+                    }
+                ]
+            },
+            "fooNum": {
+                "type": {
+                    "name": "FooNum",
+                    "fullName": "somepackage.FooNum",
+                    "typeParameters": [
+                    ],
+                    "collection": false
+                },
+                "public": false,
+                "static": false,
+                "transient": false,
+                "annotations": [
+                    {
+                        "name": "Multi",
+                        "fullName": "somepackage.Multi",
+                        "booly": [
+                            false
+                        ],
+                        "bytey": [
+                            1
+                        ],
+                        "chary": [
+                            "!"
+                        ],
+                        "classy": [
+                            "java.lang.Object"
+                        ],
+                        "doubly": [
+                            3.4
+                        ],
+                        "floaty": [
+                            5.0
+                        ],
+                        "inty": [
+                            7
+                        ],
+                        "longy": [
+                            8
+                        ],
+                        "shorty": [
+                            9
+                        ],
+                        "stringy": [
+                            "s"
+                        ],
+                        "enumy": [
+                            "X"
+                        ],
+                        "annoty": [
+                            "@somepackage.A(\"a\")"
+                        ]
+                    },
+                    {
+                        "name": "MultiA",
+                        "fullName": "somepackage.MultiA",
+                        "booly": [
+                        ],
+                        "bytey": [
+                        ],
+                        "chary": [
+                        ],
+                        "classy": [
+                        ],
+                        "doubly": [
+                        ],
+                        "floaty": [
+                        ],
+                        "inty": [
+                        ],
+                        "longy": [
+                        ],
+                        "shorty": [
+                        ],
+                        "stringy": [
+                        ],
+                        "enumy": [
+                        ],
+                        "annoty": [
+                        ]
+                    },
+                    {
+                        "name": "MultiA",
+                        "fullName": "somepackage.MultiA",
+                        "booly": [
+                            false
+                        ],
+                        "bytey": [
+                            1
+                        ],
+                        "chary": [
+                            "!"
+                        ],
+                        "classy": [
+                            "java.lang.Object"
+                        ],
+                        "doubly": [
+                            3.4
+                        ],
+                        "floaty": [
+                            5.0
+                        ],
+                        "inty": [
+                            7
+                        ],
+                        "longy": [
+                            8
+                        ],
+                        "shorty": [
+                            9
+                        ],
+                        "stringy": [
+                            "s"
+                        ],
+                        "enumy": [
+                            "X"
+                        ],
+                        "annoty": [
+                            "@somepackage.A(\"a\")"
+                        ]
+                    },
+                    {
+                        "name": "MultiA",
+                        "fullName": "somepackage.MultiA",
+                        "booly": [
+                            false,
+                            true
+                        ],
+                        "bytey": [
+                            1,
+                            2
+                        ],
+                        "chary": [
+                            "!",
+                            "\""
+                        ],
+                        "classy": [
+                            "java.lang.Object",
+                            "java.lang.String"
+                        ],
+                        "doubly": [
+                            3.4,
+                            4.3
+                        ],
+                        "floaty": [
+                            5.0,
+                            6.5
+                        ],
+                        "inty": [
+                            7,
+                            8
+                        ],
+                        "longy": [
+                            8,
+                            9
+                        ],
+                        "shorty": [
+                            9,
+                            8
+                        ],
+                        "stringy": [
+                            "s",
+                            "t"
+                        ],
+                        "enumy": [
+                            "X",
+                            "Y"
+                        ],
+                        "annoty": [
+                            "@somepackage.A(\"a\")",
+                            "@somepackage.A(\"b\")"
+                        ]
+                    }
+                ]
+            }
+        },
+        "staticMethods": [
+            "constant"
+        ],
+        "methods": [
+            {
+                "name": "method0",
+                "javadoc": "method javadoc",
+                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "returnType": {
+                    "name": "void",
+                    "fullName": "void",
+                    "typeParameters": [
+                    ],
+                    "is-a-collection": false,
+                    "is-a-container": false
+                },
+                "annotations": [
+                    {
+                        "name": "A",
+                        "fullName": "somepackage.A",
+                        "value": [
+                            "mmm"
+                        ]
+                    },
+                    {
+                        "name": "A",
+                        "fullName": "somepackage.A",
+                        "value": [
+                            "nnn"
+                        ]
+                    },
+                    {
+                        "name": "B",
+                        "fullName": "somepackage.B",
+                        "value": [
+                            "bbb"
+                        ]
+                    },
+                    {
+                        "name": "MarkerAnnotation",
+                        "fullName": "somepackage.MarkerAnnotation",
+                        "value": [
+                            "on method"
+                        ]
+                    }
+                ],
+                "parameters": [
+                ]
+            },
+            {
+                "name": "method1",
+                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "returnType": {
+                    "name": "List",
+                    "fullName": "java.util.List<java.lang.String>",
+                    "typeParameters": [
+                        "java.lang.String"
+                    ],
+                    "is-a-collection": true,
+                    "is-a-container": false
+                },
+                "annotations": [
+                    {
+                        "name": "A",
+                        "fullName": "somepackage.A",
+                        "value": [
+                            "ooo"
+                        ]
+                    },
+                    {
+                        "name": "BB",
+                        "fullName": "somepackage.BB",
+                        "value": [
+                            "@somepackage.B(\"b0\")",
+                            "@somepackage.B(\"b1\")"
+                        ]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "string",
+                        "method": "method1",
+                        "type": "java.lang.String",
+                        "typeParameters": [
+                        ],
+                        "collection": false,
+                        "annotations": [
+                        ]
+                    },
+                    {
+                        "name": "bool",
+                        "method": "method1",
+                        "type": "boolean",
+                        "typeParameters": [
+                        ],
+                        "collection": false,
+                        "annotations": [
+                            {
+                                "name": "MarkerAnnotation",
+                                "fullName": "somepackage.MarkerAnnotation",
+                                "value": [
+                                    "on param"
+                                ]
+                            },
+                            {
+                                "name": "A",
+                                "fullName": "somepackage.A",
+                                "value": [
+                                    "ppp"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "strings",
+                        "method": "method1",
+                        "type": "java.util.List<java.lang.String>",
+                        "typeParameters": [
+                            "java.lang.String"
+                        ],
+                        "collection": true,
+                        "annotations": [
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "method2",
+                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "returnType": {
+                    "name": "Nested",
+                    "fullName": "somepackage.Container.Nested",
+                    "typeParameters": [
+                    ],
+                    "is-a-collection": false,
+                    "is-a-container": true
+                },
+                "annotations": [
+                ],
+                "parameters": [
+                ]
+            }
         ]
-      }
-    ]
-  }
+    }
 ]

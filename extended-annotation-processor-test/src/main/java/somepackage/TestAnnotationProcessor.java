@@ -34,7 +34,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     private void createRoundOutput(Round round) throws IOException {
         Resource resource = round.getRootPackage().createResource("round-" + round.number() + ".json");
         try (Writer writer = resource.openWriter()) {
-            try (TestGenerator generator = new TestGenerator(writer)) {
+            try (JsonTestFileGenerator generator = new JsonTestFileGenerator(writer)) {
                 generator.write(round.typesAnnotatedWith(MarkerAnnotation.class));
             }
         }

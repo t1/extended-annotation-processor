@@ -10,7 +10,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-public class ReflectionPackage extends Package {
+class ReflectionPackage extends Package {
     public static Package of(Class<?> type, Round round) {
         java.lang.Package pkg = type.getPackage();
         return (pkg == null) ? null : new ReflectionPackage(pkg, round);

@@ -6,7 +6,6 @@ import com.github.t1.exap.insight.Field;
 import com.github.t1.exap.insight.Type;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -18,19 +17,13 @@ class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
     public ReflectionField(ReflectionType declaringType, java.lang.reflect.Field field, Round round) {
-        super(declaringType, DummyProxy.of(VariableElement.class), round);
+        super(declaringType, new ReflectionVariableElement(field), round);
         this.field = field;
     }
 
-    @Override
-    public String getName() {
-        return field.getName();
-    }
+    @Override public String getName() {return field.getName();}
 
-    @Override
-    public Type getType() {
-        return ReflectionType.type(field.getGenericType(), round());
-    }
+    @Override public Type getType() {return ReflectionType.type(field.getGenericType(), round());}
 
     @Override
     protected boolean is(Modifier modifier) {

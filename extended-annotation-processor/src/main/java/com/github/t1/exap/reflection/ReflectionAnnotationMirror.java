@@ -30,7 +30,7 @@ class ReflectionAnnotationMirror implements AnnotationMirror {
     @Override public String toString() {return type.getSimpleName() + "::" + annotation;}
 
     @Override
-    public DeclaredType getAnnotationType() {return new ReflectionTypeMirror(annotation.annotationType(), round);}
+    public DeclaredType getAnnotationType() {return new ReflectionDeclaredTypeMirror(annotation.annotationType(), round);}
 
     public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults() {
         return getElementValues();
@@ -48,7 +48,7 @@ class ReflectionAnnotationMirror implements AnnotationMirror {
 
             @Override public Object getValue() {
                 return (value instanceof List) ? asAnnotationList(value) // array values have to be represented as a list
-                        : (value instanceof Class) ? new ReflectionTypeMirror((Class<?>) value, round) // Classes have to be represented as a TypeMirror
+                        : (value instanceof Class) ? new ReflectionDeclaredTypeMirror((Class<?>) value, round) // Classes have to be represented as a TypeMirror
                         : value;
             }
 

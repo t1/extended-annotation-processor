@@ -19,9 +19,11 @@ import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private static final Logger log = LoggerFactory.getLogger(ReflectionProcessingEnvironment.class);
@@ -35,6 +37,7 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private final ReflectionMessager messager = new ReflectionMessager();
     private final ReflectionFiler filer = new ReflectionFiler();
     private final ReflectionTypes types = new ReflectionTypes();
+    private final Map<String, String> javadocMocks = new ConcurrentHashMap<>();
 
     @Override
     public Map<String, String> getOptions() {
@@ -97,5 +100,19 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
 
     public void clearCreatedResources() {
         filer.getCreatedResources().clear();
+    }
+
+    public void mockJavadoc(AnnotatedElement annotatedElement, String javadoc) {
+        javadocMocks.put(annotatedElement.toString(), javadoc);
+    }
+
+    public String getJavadocMockFor(Element element) {
+        if (element instanceof ReflectionTypeMirror)
+            return getJavadocMockFor(((ReflectionTypeMirror) element).asAnnotatedElement());
+        return getJavadocMockFor(((ReflectionTypeMirror) element.asType()).asAnnotatedElement());
+    }
+
+    private String getJavadocMockFor(AnnotatedElement annotatedElement) {
+        return javadocMocks.get(annotatedElement.toString());
     }
 }

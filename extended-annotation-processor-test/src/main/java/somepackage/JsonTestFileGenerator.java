@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class TestGenerator implements AutoCloseable {
-    private static final Logger log = LoggerFactory.getLogger(TestGenerator.class);
+class JsonTestFileGenerator implements AutoCloseable {
+    private static final Logger log = LoggerFactory.getLogger(JsonTestFileGenerator.class);
 
     private final JsonGenerator json;
 
-    public TestGenerator(Writer writer) {
+    public JsonTestFileGenerator(Writer writer) {
         this.json = LoggingJsonGenerator.of(log, createJsonGenerator(writer));
     }
 
@@ -53,6 +53,7 @@ class TestGenerator implements AutoCloseable {
         json.write("name", type.getSimpleName());
         json.write("fullName", type.getFullName());
         writeTypeParameters(type);
+        type.javaDoc().ifPresent(javadoc -> json.write("javadoc", javadoc));
         json.write("collection", type.isA(Collection.class));
         json.write("void", type.isVoid());
         json.write("boolean", type.isBoolean());
@@ -78,15 +79,15 @@ class TestGenerator implements AutoCloseable {
         writeAnnotations(type);
     }
 
-    private void writeAnnotations(Elemental type) {
-        log.debug("write annotations on {}", type);
-        if (type.isAnnotated(MarkerAnnotation.class))
-            type.warning("#" + type.getAnnotation(MarkerAnnotation.class).value());
+    private void writeAnnotations(Elemental elemental) {
+        log.debug("write annotations on {}", elemental);
+        if (elemental.isAnnotated(MarkerAnnotation.class))
+            elemental.warning("#" + elemental.getAnnotation(MarkerAnnotation.class).value());
         json.writeStartArray("annotations");
 
-        for (AnnotationWrapper annotation : type.getAnnotationWrappers()) {
+        for (AnnotationWrapper annotation : elemental.getAnnotationWrappers()) {
             String simpleName = annotation.getAnnotationType().getSimpleName();
-            log.debug("write annotation {} on {}: {}", simpleName, type, annotation);
+            log.debug("write annotation {} on {}: {}", simpleName, elemental, annotation);
             json.writeStartObject();
             json.write("name", simpleName);
             json.write("fullName", annotation.getAnnotationType().getFullName());
@@ -169,6 +170,7 @@ class TestGenerator implements AutoCloseable {
         for (Field field : type.getFields()) {
             log.debug("write field \"{}\"", field.getName());
             json.writeStartObject(field.getName());
+            field.javaDoc().ifPresent(javadoc -> json.write("javadoc", javadoc));
 
             json.writeStartObject("type");
             json.write("name", field.getType().getSimpleName());
@@ -200,6 +202,7 @@ class TestGenerator implements AutoCloseable {
             json.writeStartObject();
 
             json.write("name", method.getName());
+            method.javaDoc().ifPresent(javadoc -> json.write("javadoc", javadoc));
             json.write("containerType", method.getDeclaringType().toString());
 
             writeReturnType(method.getReturnType());

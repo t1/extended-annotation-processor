@@ -33,7 +33,7 @@ class ReflectionType extends Type {
     private List<Field> staticFields = null;
 
     private ReflectionType(java.lang.reflect.Type type, Round round) {
-        super(new ReflectionTypeMirror(type, round), round);
+        super(new ReflectionDeclaredTypeMirror(type, round), round);
         this.type = type;
     }
 

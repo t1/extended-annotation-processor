@@ -37,7 +37,7 @@ class ReflectionElementUtils implements Elements {
 
     @Override
     public String getDocComment(Element e) {
-        return null;
+        return ReflectionProcessingEnvironment.ENV.getJavadocMockFor(e);
     }
 
     @Override

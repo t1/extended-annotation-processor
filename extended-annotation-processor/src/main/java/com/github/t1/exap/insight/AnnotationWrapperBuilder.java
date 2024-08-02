@@ -9,7 +9,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
-import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,11 +111,6 @@ class AnnotationWrapperBuilder {
                 result.add(wrapped(annotation));
         }
         return result;
-    }
-
-    public AnnotationWrapper wrapped(Annotation annotation) {
-        //elements(round).getAllAnnotationMirrors();
-        return wrapped((AnnotationMirror) null);
     }
 
     private AnnotationWrapper wrapped(AnnotationMirror annotation) {

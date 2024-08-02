@@ -6,7 +6,6 @@ import com.github.t1.exap.insight.Method;
 import com.github.t1.exap.insight.Parameter;
 import com.github.t1.exap.insight.Type;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
@@ -21,7 +20,7 @@ class ReflectionMethod extends Method {
     private List<Parameter> parameters;
 
     public ReflectionMethod(Type declaringType, java.lang.reflect.Method method, Round round) {
-        super(declaringType, DummyProxy.of(ExecutableElement.class), round);
+        super(declaringType, new ReflectionExecutableElement(method), round);
         this.method = method;
     }
 

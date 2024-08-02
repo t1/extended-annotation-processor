@@ -1,30 +1,33 @@
 package somepackage;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AnnotationProcessorTest {
+class AnnotationProcessorTest {
     private static final Path RESOURCES = Paths.get("src/test/resources");
     private static final Path TEST_CLASSES = Paths.get("target/test-classes");
     private static final Path GENERATED_TEST_SOURCES = Paths.get("target/generated-test-sources/test-annotations");
 
-    @Test
-    public void shouldHaveRunRound0() {
-        verifyRoundHasRun(0);
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    void verifyRoundHasRun(int round) {
+        assertThat(contentOf(TEST_CLASSES, "round-" + round + ".json"))
+                .as("round-" + round)
+                .isEqualTo(contentOf(RESOURCES, "round-" + round + ".json"));
+        assertThat(contentOf(TEST_CLASSES, "fields-" + round))
+                .as("fields-" + round)
+                .isEqualTo(contentOf(RESOURCES, "fields-" + round));
     }
 
-    @Test
-    public void shouldHaveRunRound1() {
-        verifyRoundHasRun(1);
-    }
-
-    private void verifyRoundHasRun(int round) {
-        assertThat(TEST_CLASSES.resolve("round-" + round + ".json")).hasSameTextualContentAs(RESOURCES.resolve("round-" + round + ".json"));
-        assertThat(TEST_CLASSES.resolve("fields-" + round)).hasSameTextualContentAs(RESOURCES.resolve("fields-" + round));
+    private static String contentOf(Path testClasses, String round) {
+        return Assertions.contentOf(testClasses.resolve(round).toFile()).trim();
     }
 
     @Test

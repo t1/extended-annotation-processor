@@ -1,6 +1,5 @@
 package com.github.t1.exap.insight;
 
-import com.github.t1.exap.JavaDoc;
 import com.github.t1.exap.Round;
 import org.slf4j.Logger;
 
@@ -13,6 +12,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
@@ -36,9 +36,7 @@ public abstract class Elemental {
         this.annotationWrapperBuilder = new AnnotationWrapperBuilder(round);
     }
 
-    public Round round() {
-        return round;
-    }
+    public Round round() {return round;}
 
     @Deprecated
     protected ProcessingEnvironment env() {
@@ -109,17 +107,14 @@ public abstract class Elemental {
             return null;
         if (list.size() > 1)
             throw new IllegalArgumentException(
-                "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
         return list.get(0);
     }
 
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
         if (this.getElement() == null)
             return emptyList();
-        T[] annotations = this.getElement().getAnnotationsByType(type);
-        if (annotations.length == 0 && JavaDoc.class.equals(type) && docComment() != null)
-            return List.of(type.cast(javaDoc()));
-        return asList(annotations);
+        return asList(this.getElement().getAnnotationsByType(type));
     }
 
     public <T extends Annotation> AnnotationWrapper getAnnotationWrapper(Class<T> type) {
@@ -128,7 +123,7 @@ public abstract class Elemental {
             return null;
         if (list.size() > 1)
             throw new IllegalArgumentException(
-                "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
+                    "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
         return list.get(0);
     }
 
@@ -141,41 +136,19 @@ public abstract class Elemental {
     }
 
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        List<AnnotationWrapper> annotations = annotationWrapperBuilder.allOn(getElement());
-        if (!containsJavaDoc(annotations) && docComment() != null)
-            annotations.add(0, annotationWrapperBuilder.wrapped(javaDoc()));
-        return annotations;
-    }
-
-    private boolean containsJavaDoc(List<AnnotationWrapper> annotations) {
-        return annotations.stream()
-                .anyMatch(annotation -> annotation.getAnnotationType().getFullName().equals(JavaDoc.class.getName()));
+        return annotationWrapperBuilder.allOn(getElement());
     }
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        List<AnnotationWrapper> annotations = annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
-        if (annotations.isEmpty() && docComment() != null)
-            annotations.add(annotationWrapperBuilder.wrapped(javaDoc()));
-        return annotations;
+        return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
     }
 
-    private JavaDoc javaDoc() {
-        return new JavaDoc() {
-            private final String docComment = docComment();
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return JavaDoc.class;
-            }
-
-            @Override
-            public String value() {
-                return docComment.trim();
-            }
-        };
+    public Optional<String> javaDoc() {
+        return Optional.ofNullable(elements().getDocComment(this.getElement()))
+                .map(String::trim);
     }
 
-    public String docComment() {
-        return elements().getDocComment(this.getElement());
+    public String getJavaDoc() {
+        return javaDoc().orElse(null);
     }
 }

@@ -4,7 +4,7 @@ import javax.lang.model.element.Name;
 
 import static java.util.Objects.requireNonNull;
 
-public class ReflectionName implements Name {
+class ReflectionName implements Name {
     private final String name;
 
     public ReflectionName(String name) {this.name = requireNonNull(name);}

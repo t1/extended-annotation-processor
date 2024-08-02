@@ -65,7 +65,7 @@ class ReflectionTypeElement implements TypeElement {
             case DECLARED:
                 return ElementKind.CLASS;
             default:
-                throw new RuntimeException("unknown type kind: " + type.getKind());
+                throw new RuntimeException("unsupported type kind: " + type.getKind());
         }
     }
 
@@ -79,16 +79,16 @@ class ReflectionTypeElement implements TypeElement {
 
     @Override public TypeMirror getSuperclass() {
         Class<?> superclass = getReflectedClass().getSuperclass();
-        return (superclass == null) ? NO_TYPE : new ReflectionTypeMirror(superclass, round);
+        return (superclass == null) ? NO_TYPE : new ReflectionDeclaredTypeMirror(superclass, round);
     }
 
     private Class<?> getReflectedClass() {
-        return (Class<?>) ((ReflectionTypeMirror) type.getTypeMirror()).type;
+        return (Class<?>) ((ReflectionDeclaredTypeMirror) type.getTypeMirror()).type;
     }
 
     @Override public List<? extends TypeMirror> getInterfaces() {
         return Stream.of(getReflectedClass().getInterfaces())
-                .map(i -> new ReflectionTypeMirror(i, round))
+                .map(i -> new ReflectionDeclaredTypeMirror(i, round))
                 .collect(toList());
     }
 

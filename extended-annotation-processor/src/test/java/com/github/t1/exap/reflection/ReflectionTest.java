@@ -1,6 +1,5 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.JavaDoc;
 import com.github.t1.exap.insight.AnnotationPropertyType;
 import com.github.t1.exap.insight.AnnotationWrapper;
 import com.github.t1.exap.insight.Field;
@@ -161,8 +160,11 @@ public class ReflectionTest {
         public static class Nested extends Inner {}
     }
 
-    @SuppressWarnings("unused") @A("ttt")
-    @JavaDoc(value = "s. v")
+    /**
+     * Pojo javadoc
+     */
+    @A("ttt")
+    @SuppressWarnings("unused")
     public static class Pojo {
         public static final String CONSTANT = "dummy";
 
@@ -172,8 +174,10 @@ public class ReflectionTest {
 
         boolean bool;
 
+        /**
+         * String field javadoc
+         */
         @A("fff")
-        @JavaDoc(value = "s")
         String string;
 
         @FooNumA(X)
@@ -192,6 +196,9 @@ public class ReflectionTest {
                 annoty = {@A("a"), @A("b")})
         transient FooNum fooNum;
 
+        /**
+         * Method javadoc
+         */
         @A("mmm")
         @A("nnn")
         @B("bbb")
@@ -328,40 +335,33 @@ public class ReflectionTest {
         assertNotNull(ENV.type(String.class));
     }
 
-    // TODO extract JavaDoc tags
-    // TODO convert JavaDoc-HTML to Markdown
-
     @Test
     public void assertTypeAnnotations() {
+        ReflectionProcessingEnvironment.ENV.mockJavadoc(Pojo.class, "Pojo javadoc");
+
         assertTrue(type.isAnnotated(A.class));
         assertEquals(1, type.getAnnotations(A.class).size());
         assertEquals("ttt", type.getAnnotations(A.class).get(0).value());
         assertEquals(1, type.getAnnotationWrappers(A.class).size());
         assertEquals("ttt", type.getAnnotationWrappers(A.class).get(0).getProperty("value"));
 
-        assertTrue(type.isAnnotated(JavaDoc.class));
-        assertEquals("s", JavaDoc.SUMMARY.apply(type.getAnnotation(JavaDoc.class)));
-        assertEquals("v", JavaDoc.BODY.apply(type.getAnnotation(JavaDoc.class)));
-        assertEquals("s. v", type.getAnnotation(JavaDoc.class).value());
+        assertEquals("Pojo javadoc", type.getJavaDoc());
+        assertEquals("Pojo javadoc", type.javaDoc().orElseThrow());
 
         List<AnnotationWrapper> wrappers = type.getAnnotationWrappers();
-        assertEquals(2, wrappers.size());
+        assertEquals(1, wrappers.size());
 
         AnnotationWrapper a0 = wrappers.get(0);
         assertEquals("A", a0.getAnnotationType().getSimpleName());
         assertEquals(A.class.getName(), a0.getAnnotationType().getFullName());
         assertEquals(1, a0.getPropertyMap().size());
         assertEquals("ttt", a0.getPropertyMap().get("value"));
-
-        AnnotationWrapper a1 = wrappers.get(1);
-        assertEquals("JavaDoc", a1.getAnnotationType().getSimpleName());
-        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getFullName());
-        assertEquals(1, a1.getPropertyMap().size());
-        assertEquals("s. v", a1.getPropertyMap().get("value"));
     }
 
     @Test
-    public void shouldGetFields() {
+    public void shouldGetFields() throws NoSuchFieldException {
+        ReflectionProcessingEnvironment.ENV.mockJavadoc(Pojo.class.getDeclaredField("string"), "String field javadoc");
+
         List<Field> fields = type.getFields();
 
         assertEquals(4, fields.size(), "fields: " + fields);
@@ -396,7 +396,7 @@ public class ReflectionTest {
         assertEquals(1, stringField.getAnnotationWrappers(A.class).size());
         assertEquals("fff", stringField.getAnnotationWrappers(A.class).get(0).getProperty("value"));
 
-        assertEquals(2, stringField.getAnnotationWrappers().size());
+        assertEquals(1, stringField.getAnnotationWrappers().size());
 
         AnnotationWrapper a0 = stringField.getAnnotationWrappers().get(0);
         assertEquals("A", a0.getAnnotationType().getSimpleName());
@@ -404,13 +404,8 @@ public class ReflectionTest {
         assertEquals(1, a0.getPropertyMap().size());
         assertEquals("fff", a0.getPropertyMap().get("value"));
 
-        AnnotationWrapper a1 = stringField.getAnnotationWrappers().get(1);
-        assertEquals("JavaDoc", a1.getAnnotationType().getSimpleName());
-        assertEquals(JavaDoc.class.getName(), a1.getAnnotationType().getFullName());
-        assertEquals(1, a1.getPropertyMap().size());
-        assertEquals("s", a1.getPropertyMap().get("value"));
-        assertEquals("s", JavaDoc.SUMMARY.apply(stringField.getAnnotation(JavaDoc.class)));
-        assertEquals("", JavaDoc.BODY.apply(stringField.getAnnotation(JavaDoc.class)));
+        assertEquals("String field javadoc", stringField.getJavaDoc());
+        assertEquals("String field javadoc", stringField.javaDoc().orElseThrow());
     }
 
     private void assertMapField(Field mapField) {
@@ -762,7 +757,9 @@ public class ReflectionTest {
     }
 
     @Test
-    public void shouldGetMethods() {
+    public void shouldGetMethods() throws NoSuchMethodException {
+        ReflectionProcessingEnvironment.ENV.mockJavadoc(Pojo.class.getMethod("method0"), "Method javadoc");
+
         List<Method> methods = type.getMethods();
 
         assertEquals(3, methods.size(), "methods: " + methods.stream().map(Method::getName).collect(joining("\n")));
@@ -782,6 +779,8 @@ public class ReflectionTest {
         assertEquals(0, method.getParameters().size());
 
         assertMethod0Annotations(method);
+        assertEquals("Method javadoc", method.getJavaDoc());
+        assertEquals("Method javadoc", method.javaDoc().orElseThrow());
     }
 
     private void assertMethod0Annotations(Method method) {
