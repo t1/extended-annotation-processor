@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.io.Writer;
 
 import static com.github.t1.exap.generator.TypeKind.INTERFACE;
+import static com.github.t1.exap.generator.Visibility.PACKAGE_PRIVATE;
+import static com.github.t1.exap.generator.Visibility.PRIVATE;
+import static com.github.t1.exap.generator.Visibility.PUBLIC;
+import static com.github.t1.exap.reflection.ReflectionProcessingEnvironment.ENV;
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
 @SupportedSourceVersion(RELEASE_8)
@@ -87,7 +91,15 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
         try (var typeGenerator = round.getPackageOf(this.getClass()).openTypeGenerator("GeneratedClass")) {
             var annotatedClass = annotatedClass(round);
             typeGenerator.addField("value").type(annotatedClass);
-            typeGenerator.addMethod("method0").body("return value;").returnType(annotatedClass);
+            typeGenerator.addMethod(PUBLIC, "method0")
+                    .body("return method1();")
+                    .returnType(annotatedClass);
+            var method1 = typeGenerator
+                    .addMethod(PACKAGE_PRIVATE, "method1")
+                    .addThrows(ENV.type(RuntimeException.class))
+                    .body("return value;");
+            method1.visibility(PRIVATE) // cover this API
+                    .returnType(annotatedClass);
         }
     }
 

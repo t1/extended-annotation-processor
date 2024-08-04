@@ -117,30 +117,32 @@ public abstract class Elemental {
         return asList(this.getElement().getAnnotationsByType(type));
     }
 
+
     public <T extends Annotation> AnnotationWrapper getAnnotationWrapper(Class<T> type) {
+        return annotationWrapper(type).orElse(null);
+    }
+
+    public <T extends Annotation> Optional<AnnotationWrapper> annotationWrapper(Class<T> type) {
         List<AnnotationWrapper> list = getAnnotationWrappers(type);
         if (list.isEmpty())
-            return null;
+            return Optional.empty();
         if (list.size() > 1)
             throw new IllegalArgumentException(
                     "Found " + list.size() + " annotations of type " + type.getName() + " when expecting only one");
-        return list.get(0);
+        return Optional.of(list.get(0));
     }
 
-    public Stream<? extends AnnotationMirror> annotationMirrors() {
-        return getElement().getAnnotationMirrors().stream();
-    }
+    public Stream<AnnotationWrapper> annotationWrappers() {return getAnnotationWrappers().stream();}
 
-    public Stream<AnnotationWrapper> annotationWrappers() {
-        return getAnnotationWrappers().stream();
-    }
-
-    public List<AnnotationWrapper> getAnnotationWrappers() {
-        return annotationWrapperBuilder.allOn(getElement());
-    }
+    public List<AnnotationWrapper> getAnnotationWrappers() {return annotationWrapperBuilder.allOn(getElement());}
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
         return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());
+    }
+
+
+    public Stream<? extends AnnotationMirror> annotationMirrors() {
+        return getElement().getAnnotationMirrors().stream();
     }
 
     public Optional<String> javaDoc() {

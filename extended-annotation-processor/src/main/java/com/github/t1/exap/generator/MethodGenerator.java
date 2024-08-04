@@ -3,12 +3,14 @@ package com.github.t1.exap.generator;
 import com.github.t1.exap.insight.Type;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.t1.exap.generator.TypeKind.CLASS;
 import static java.lang.String.join;
 
+@SuppressWarnings("UnusedReturnValue")
 public class MethodGenerator {
     private final TypeGenerator container;
     private JavaDocGenerator javaDoc;
@@ -19,11 +21,19 @@ public class MethodGenerator {
     private List<ParameterGenerator> parameters;
     private List<String> throwsList;
     private String body;
+    private Visibility visibility;
 
-    public MethodGenerator(TypeGenerator container, String name) {
+    public MethodGenerator(TypeGenerator container, Visibility visibility, String name) {
         this.container = container;
         this.name = name;
         this.returnType = new TypeExpressionGenerator(container, "void");
+        this.visibility = visibility;
+    }
+
+    @Override public String toString() {
+        var out = new StringWriter();
+        print(new PrintWriter(out));
+        return out.toString();
     }
 
     public void javaDoc(String javaDoc) {
@@ -36,10 +46,15 @@ public class MethodGenerator {
         return this;
     }
 
+    public MethodGenerator visibility(Visibility visibility) {
+        this.visibility = visibility;
+        return this;
+    }
+
     public AnnotationGenerator annotation(Type type) {
         if (annotations == null)
             annotations = new ArrayList<>();
-        AnnotationGenerator annotationGenerator = new AnnotationGenerator(container, type);
+        var annotationGenerator = new AnnotationGenerator(container, type);
         annotations.add(annotationGenerator);
         return annotationGenerator;
     }
@@ -57,7 +72,7 @@ public class MethodGenerator {
     public ParameterGenerator addParameter(String name) {
         if (parameters == null)
             parameters = new ArrayList<>();
-        ParameterGenerator parameter = new ParameterGenerator(container, name);
+        var parameter = new ParameterGenerator(container, name);
         parameters.add(parameter);
         return parameter;
     }
@@ -82,10 +97,12 @@ public class MethodGenerator {
     }
 
     public void print(PrintWriter out) {
+        out.println();
         if (javaDoc != null)
             javaDoc.print(out);
         printAnnotations(out);
-        out.print("    public ");
+        out.print("    ");
+        out.print(visibility);
         if (isStatic)
             out.print("static ");
         out.print(returnType + " " + name + "(");
@@ -97,14 +114,13 @@ public class MethodGenerator {
             out.append(";\n");
         else
             out.append(" {\n").append("        ").append(body).append("\n    }\n");
-        out.println();
     }
 
 
     private void printAnnotations(PrintWriter out) {
         if (annotations == null)
             return;
-        for (AnnotationGenerator annotation : annotations)
+        for (var annotation : annotations)
             out.println("    " + annotation);
     }
 }

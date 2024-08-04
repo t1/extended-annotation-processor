@@ -34,40 +34,43 @@ class AnnotationProcessorTest {
                 .isEqualTo(contentOf(RESOURCES.resolve("packages-0")));
     }
 
-    private static String contentOf(Path path) {
-        return Assertions.contentOf(path.toFile()).trim();
-    }
-
     @Test
     public void shouldHaveGeneratedInterface() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java")).hasContent(
+        assertThat(contentOf(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedInterface.java"))).isEqualTo(
                 "package somepackage;\n"
                 + "\n"
                 + "public interface GeneratedInterface {\n"
-                + "    public AnnotatedClass method0();\n"
                 + "\n"
+                + "    AnnotatedClass method0();\n"
                 + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedRootClass() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java")).hasContent(
+        assertThat(contentOf(GENERATED_TEST_SOURCES.resolve("GeneratedRootClass.java"))).isEqualTo(
                 "public interface GeneratedRootClass {\n"
                 + "}\n");
     }
 
     @Test
     public void shouldHaveGeneratedClass() {
-        assertThat(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java")).hasContent(
+        assertThat(contentOf(GENERATED_TEST_SOURCES.resolve("somepackage/GeneratedClass.java"))).isEqualTo(
                 "package somepackage;\n"
                 + "\n"
                 + "public class GeneratedClass {\n"
                 + "    private AnnotatedClass value;\n"
                 + "\n"
                 + "    public AnnotatedClass method0() {\n"
-                + "        return value;\n"
+                + "        return method1();\n"
                 + "    }\n"
                 + "\n"
+                + "    private AnnotatedClass method1() throws RuntimeException {\n"
+                + "        return value;\n"
+                + "    }\n"
                 + "}\n");
+    }
+
+    private static String contentOf(Path path) {
+        return Assertions.contentOf(path.toFile()).trim() + "\n"; // maybe remove a leading newline
     }
 }

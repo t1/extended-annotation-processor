@@ -6,7 +6,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Repeatable;
 import java.util.ArrayList;
@@ -310,6 +309,10 @@ public class AnnotationWrapper extends Elemental {
         return Type.of((TypeMirror) value, round());
     }
 
+    public Stream<Type> typeProperties(String name) {
+        return getTypeProperties(name).stream();
+    }
+
     public List<Type> getTypeProperties(String name) {
         var property = getProperty(name);
         if (property instanceof List) {
@@ -317,10 +320,10 @@ public class AnnotationWrapper extends Elemental {
             var values = (List<AnnotationValue>) property;
             List<Type> list = new ArrayList<>();
             for (var value : values)
-                list.add(Type.of((DeclaredType) value.getValue(), round()));
+                list.add(Type.of((TypeMirror) value.getValue(), round()));
             return list;
         } else {
-            var value = (DeclaredType) property;
+            var value = (TypeMirror) property;
             return List.of(Type.of(value, round()));
         }
     }

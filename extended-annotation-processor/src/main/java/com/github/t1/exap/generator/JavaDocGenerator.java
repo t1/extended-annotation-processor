@@ -1,6 +1,7 @@
 package com.github.t1.exap.generator;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -12,6 +13,12 @@ public class JavaDocGenerator {
     public JavaDocGenerator(String indent, String javaDoc) {
         this.indent = indent;
         this.javaDoc = javaDoc;
+    }
+
+    @Override public String toString() {
+        var out = new StringWriter();
+        print(new PrintWriter(out));
+        return out.toString();
     }
 
     public void print(PrintWriter out) {

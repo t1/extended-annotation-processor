@@ -8,14 +8,14 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.joining;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 import static javax.tools.Diagnostic.Kind.NOTE;
@@ -46,8 +46,9 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
         } catch (Exception e) {
             String message = e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage()));
             log.error("annotation processing round " + roundNumber + " failed: " + message, e);
-            error("annotation processing round " + roundNumber + " failed: " + message
-                  + Stream.of(e.getStackTrace()).map(StackTraceElement::toString).collect(joining("\n", ":\n", "\n")));
+            var stackTrace = new StringWriter();
+            e.printStackTrace(new PrintWriter(stackTrace));
+            error("annotation processing round " + roundNumber + " failed: " + message + "\n" + stackTrace);
             return true;
         }
     }

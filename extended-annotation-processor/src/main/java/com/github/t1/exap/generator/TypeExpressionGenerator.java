@@ -12,7 +12,7 @@ public class TypeExpressionGenerator {
     private List<Object> args;
 
     public TypeExpressionGenerator(TypeGenerator container, Type type) {
-        this(container, type.getSimpleName());
+        this(container, type.getRelativeName());
         container.addImport(type);
     }
 

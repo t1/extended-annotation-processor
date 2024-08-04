@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.file.Paths;
 
 class ReflectionJavaFileObject implements JavaFileObject {
     final Location location;
@@ -25,72 +26,44 @@ class ReflectionJavaFileObject implements JavaFileObject {
     }
 
     @Override
-    public URI toUri() {
-        throw new UnsupportedOperationException();
-    }
+    public URI toUri() {return Paths.get(getName()).toUri();}
 
     @Override
-    public String getName() {
-        return pkg + "." + relativeName;
-    }
+    public String getName() {return pkg + "." + relativeName;}
 
     @Override
-    public InputStream openInputStream() {
-        throw new UnsupportedOperationException();
-    }
+    public InputStream openInputStream() {throw new UnsupportedOperationException();}
 
     @Override
-    public OutputStream openOutputStream() {
-        throw new UnsupportedOperationException();
-    }
+    public OutputStream openOutputStream() {throw new UnsupportedOperationException();}
 
     @Override
-    public Reader openReader(boolean ignoreEncodingErrors) {
-        throw new UnsupportedOperationException();
-    }
+    public Reader openReader(boolean ignoreEncodingErrors) {throw new UnsupportedOperationException();}
 
     @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-        return content.toString();
-    }
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) {return content.toString();}
 
     @Override
-    public Writer openWriter() {
-        return content;
-    }
+    public Writer openWriter() {return content;}
 
     @Override
-    public long getLastModified() {
-        throw new UnsupportedOperationException();
-    }
+    public long getLastModified() {throw new UnsupportedOperationException();}
 
     @Override
-    public boolean delete() {
-        throw new UnsupportedOperationException();
-    }
+    public boolean delete() {throw new UnsupportedOperationException();}
 
     @Override
-    public Kind getKind() {
-        throw new UnsupportedOperationException();
-    }
+    public Kind getKind() {throw new UnsupportedOperationException();}
 
     @Override
-    public boolean isNameCompatible(String simpleName, Kind kind) {
-        throw new UnsupportedOperationException();
-    }
+    public boolean isNameCompatible(String simpleName, Kind kind) {throw new UnsupportedOperationException();}
 
     @Override
-    public NestingKind getNestingKind() {
-        throw new UnsupportedOperationException();
-    }
+    public NestingKind getNestingKind() {throw new UnsupportedOperationException();}
 
     @Override
-    public Modifier getAccessLevel() {
-        throw new UnsupportedOperationException();
-    }
+    public Modifier getAccessLevel() {throw new UnsupportedOperationException();}
 
     @Override
-    public String toString() {
-        return location + ":" + pkg + ":" + relativeName + ":[" + content + "]";
-    }
+    public String toString() {return location + ":" + pkg + ":" + relativeName + ":[" + content + "]";}
 }

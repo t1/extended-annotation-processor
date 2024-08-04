@@ -1,22 +1,21 @@
 package com.github.t1.exap.generator;
 
 import com.github.t1.exap.insight.Package;
-import com.github.t1.exap.insight.Resource;
 import com.github.t1.exap.insight.Type;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import static com.github.t1.exap.generator.TypeKind.CLASS;
+import static com.github.t1.exap.generator.Visibility.PACKAGE_PRIVATE;
 import static java.lang.String.join;
-import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
 
+@SuppressWarnings("UnusedReturnValue")
 public class TypeGenerator implements AutoCloseable {
     private final Logger log;
     private final Package pkg;
@@ -25,12 +24,12 @@ public class TypeGenerator implements AutoCloseable {
     private final ImportGenerator imports;
     private JavaDocGenerator javaDoc;
     private TypeKind kind = CLASS;
-    private List<String> typeParameters;
-    private List<String> implementsList;
-    private List<AnnotationGenerator> annotations;
-    private List<FieldGenerator> fields;
-    private List<ConstructorGenerator> constructors;
-    private List<MethodGenerator> methods;
+    private final List<String> typeParameters = new ArrayList<>();
+    private final List<String> implementsList = new ArrayList<>();
+    private final List<AnnotationGenerator> annotations = new ArrayList<>();
+    private final List<ConstructorGenerator> constructors = new ArrayList<>();
+    private final List<FieldGenerator> fields = new ArrayList<>();
+    public final List<MethodGenerator> methods = new ArrayList<>();
 
     public TypeGenerator(Logger log, Package pkg, String typeName) {
         this.log = log;
@@ -63,45 +62,36 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     public TypeGenerator addImplements(String type) {
-        if (implementsList == null) implementsList = new ArrayList<>();
         implementsList.add(type);
         return this;
     }
 
     public void addTypeParameter(String typeParameter) {
-        if (typeParameters == null)
-            typeParameters = new ArrayList<>();
         typeParameters.add(typeParameter);
     }
 
     public AnnotationGenerator annotation(Type type) {
-        if (annotations == null)
-            annotations = new ArrayList<>();
-        AnnotationGenerator annotationGenerator = new AnnotationGenerator(this, type);
+        var annotationGenerator = new AnnotationGenerator(this, type);
         annotations.add(annotationGenerator);
         return annotationGenerator;
     }
 
     public FieldGenerator addField(String name) {
-        if (fields == null)
-            fields = new ArrayList<>();
-        FieldGenerator fieldGenerator = new FieldGenerator(this, name);
+        var fieldGenerator = new FieldGenerator(this, name);
         fields.add(fieldGenerator);
         return fieldGenerator;
     }
 
     public ConstructorGenerator addConstructor() {
-        if (constructors == null)
-            constructors = new ArrayList<>();
-        ConstructorGenerator constructorGenerator = new ConstructorGenerator(this);
+        var constructorGenerator = new ConstructorGenerator(this);
         constructors.add(constructorGenerator);
         return constructorGenerator;
     }
 
-    public MethodGenerator addMethod(String name) {
-        if (methods == null)
-            methods = new ArrayList<>();
-        MethodGenerator methodGenerator = new MethodGenerator(this, name);
+    public MethodGenerator addMethod(String name) {return addMethod(PACKAGE_PRIVATE, name);}
+
+    public MethodGenerator addMethod(Visibility visibility, String name) {
+        var methodGenerator = new MethodGenerator(this, visibility, name);
         methods.add(methodGenerator);
         return methodGenerator;
     }
@@ -112,17 +102,16 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     public List<String> getTypeParameters() {
-        return (typeParameters == null) ? emptyList() : typeParameters;
+        return typeParameters;
     }
 
 
     @Override
     public void close() {
-        Resource resource = pkg.createSource(typeName);
-        log.debug("write {} to {}", typeName, resource.getName());
-        try (Writer writer = resource.openWriter()) {
-            PrintWriter out = new PrintWriter(writer);
-            print(out);
+        var resource = pkg.createSource(typeName);
+        log.debug("write {} to {}", typeName, resource.getPath().getParent());
+        try (var writer = resource.openWriter()) {
+            print(new PrintWriter(writer));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -147,9 +136,12 @@ public class TypeGenerator implements AutoCloseable {
         printAnnotations(out);
         out.append("public ").append(kind.toString()).append(" ").append(typeName);
         printTypeParams(out);
-        if (implementsList != null && !implementsList.isEmpty())
+        if (!implementsList.isEmpty())
             out.append(" implements ").append(join(", ", implementsList));
         out.println(" {");
+        // In the body we print a newline before every constructor and method but not before fields.
+        // So it's possible to start with a superfluous empty line if there are no fields
+        // (which happens in most interfaces) or before static method, but not to end with one. Good enough.
         printMethods(out, MethodGenerator::isStatic);
         printFields(out);
         printConstructors(out);
@@ -158,45 +150,26 @@ public class TypeGenerator implements AutoCloseable {
     }
 
     private void printAnnotations(PrintWriter out) {
-        if (annotations == null)
-            return;
-        for (AnnotationGenerator annotation : annotations)
-            out.println(annotation.toString());
+        annotations.stream().map(AnnotationGenerator::toString).forEach(out::println);
     }
 
     private void printTypeParams(PrintWriter out) {
-        if (typeParameters == null)
-            return;
-        StringJoiner joiner = new StringJoiner(", ", "<", ">");
-        for (String typeParameter : typeParameters)
-            joiner.add(typeParameter);
-        out.print(joiner);
-    }
-
-    private void printMethods(PrintWriter out, Predicate<MethodGenerator> filter) {
-        if (methods == null)
-            return;
-        for (MethodGenerator method : methods) {
-            if (!filter.test(method))
-                continue;
-            method.print(out);
+        if (!typeParameters.isEmpty()) {
+            out.print(typeParameters.stream().collect(joining(", ", "<", ">")));
         }
-    }
-
-    private void printFields(PrintWriter out) {
-        if (fields == null)
-            return;
-        for (FieldGenerator field : fields) {
-            field.print(out);
-        }
-        out.println();
     }
 
     private void printConstructors(PrintWriter out) {
-        if (constructors == null)
-            return;
-        for (ConstructorGenerator constructor : constructors) {
-            constructor.print(out);
-        }
+        constructors.forEach(constructor -> constructor.print(out));
+    }
+
+    private void printFields(PrintWriter out) {
+        fields.forEach(field -> field.print(out));
+    }
+
+    private void printMethods(PrintWriter out, Predicate<MethodGenerator> filter) {
+        methods.stream()
+                .filter(filter)
+                .forEach(method -> method.print(out));
     }
 }

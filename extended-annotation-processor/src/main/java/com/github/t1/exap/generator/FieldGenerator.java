@@ -3,6 +3,7 @@ package com.github.t1.exap.generator;
 import com.github.t1.exap.insight.Type;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class FieldGenerator {
     final TypeGenerator container;
@@ -13,6 +14,12 @@ public class FieldGenerator {
     public FieldGenerator(TypeGenerator container, String name) {
         this.container = container;
         this.name = name;
+    }
+
+    @Override public String toString() {
+        var out = new StringWriter();
+        print(new PrintWriter(out));
+        return out.toString();
     }
 
     public FieldGenerator setFinal() {

@@ -4,6 +4,7 @@ import com.github.t1.exap.Round;
 import com.github.t1.exap.generator.TypeGenerator;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.FilerException;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import java.io.IOException;
@@ -44,9 +45,15 @@ public class Package extends Elemental {
     }
 
     public Resource createSource(String relativeName) {
-        try {
             String sourceName = sourceName(relativeName);
+        try {
             return new Resource(filer().createSourceFile(sourceName));
+        } catch (FilerException e) {
+            if (e.getMessage().contains("Attempt to recreate a file for type")) {
+                throw new SourceAlreadyExistsException(sourceName);
+            } else {
+                throw new RuntimeException(e);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

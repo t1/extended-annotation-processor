@@ -103,17 +103,21 @@ public class Type extends Elemental {
     }
 
     /**
-     * The {@link #getFullName() full name}, but without the package. This is generally the same as the
-     * {@link #getSimpleName() simple name}, but for nested types, it makes a difference. And a nested '$' is replaced
-     * with a '.', so it can be used in source.
+     * The {@link #getFullName() full name}, but without the package and without type arguments.
+     * In simple cases, this is the same as the {@link #getSimpleName() simple name}, but for nested types,
+     * it makes a difference.
+     * <p>
+     * If you want to use it as a source file name, you should replace the '.'s with '$'s.
      */
     public String getRelativeName() {
-        String result = getFullName();
-        String pkg = getPackage().getName();
-        if (!pkg.isEmpty())
-            pkg += ".";
-        result = result.substring(pkg.length());
-        return result.replace('$', '.');
+        var packageLength = getPackage().getName().length();
+        if (packageLength > 0)
+            ++packageLength; // for the final dot
+        var relativeName = getFullName().substring(packageLength);
+        var typeParameters = relativeName.indexOf('<');
+        if (typeParameters >= 0)
+            relativeName = relativeName.substring(0, typeParameters);
+        return relativeName;
     }
 
     /**

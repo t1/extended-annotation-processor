@@ -123,8 +123,8 @@ class JsonTestFileGenerator implements AutoCloseable {
                     json.write(value.toString());
                 return;
             case CLASS:
-                for (Type value : annotation.getTypeProperties(name))
-                    json.write(value.getFullName());
+                annotation.typeProperties(name).forEach(value ->
+                        json.write(value.getFullName()));
                 return;
             case DOUBLE:
                 for (Double value : annotation.getDoubleProperties(name))
