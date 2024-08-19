@@ -39,9 +39,7 @@ import static javax.lang.model.type.TypeKind.TYPEVAR;
 import static javax.lang.model.type.TypeKind.VOID;
 
 public class Type extends Elemental {
-    public static Type of(TypeMirror type, Round round) {
-        return new Type(type, round);
-    }
+    public static Type of(TypeMirror type, Round round) {return new Type(type, round);}
 
     private final TypeMirror typeMirror;
 
@@ -52,22 +50,20 @@ public class Type extends Elemental {
 
     public TypeMirror getTypeMirror() {return typeMirror;}
 
-    @Override
-    protected TypeElement getElement() {
-        return asElement(typeMirror);
-    }
+    protected boolean isTypeElement() {return getElement() instanceof TypeElement;}
 
-    private TypeElement asElement(TypeMirror typeMirror) {
+    protected TypeElement getTypeElement() {return (TypeElement) getElement();}
+
+    @Override
+    protected Element getElement() {return types().asElement(typeMirror);}
+
+    private TypeElement asTypeElement(TypeMirror typeMirror) {
         return (TypeElement) types().asElement(typeMirror);
     }
 
-    public TypeKind getKind() {
-        return typeMirror.getKind();
-    }
+    public TypeKind getKind() {return typeMirror.getKind();}
 
-    private boolean isKind(TypeKind kind) {
-        return typeMirror.getKind() == kind;
-    }
+    private boolean isKind(TypeKind kind) {return typeMirror.getKind() == kind;}
 
     public void accept(TypeVisitor scanner) {
         for (Method method : getMethods())
@@ -77,9 +73,7 @@ public class Type extends Elemental {
     }
 
     @Override
-    public int hashCode() {
-        return typeMirror.hashCode();
-    }
+    public int hashCode() {return typeMirror.hashCode();}
 
     @Override
     public boolean equals(Object obj) {
@@ -92,14 +86,17 @@ public class Type extends Elemental {
     }
 
     @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + getFullName();
-    }
+    public String toString() {return getClass().getSimpleName() + ":" + getFullName();}
 
     public String getSimpleName() {
-        if (getElement() == null)
-            return typeMirror.toString();
-        return getElement().getSimpleName().toString();
+        try {
+            var element = getElement();
+            if (element == null)
+                return typeMirror.toString();
+            return element.getSimpleName().toString();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("failed to get simple name of " + typeMirror, e);
+        }
     }
 
     /**
@@ -131,29 +128,17 @@ public class Type extends Elemental {
         return typeMirror.toString();
     }
 
-    private boolean isType(Class<?> type) {
-        return isKind(DECLARED) && getFullName().equals(type.getName());
-    }
+    private boolean isType(Class<?> type) {return isKind(DECLARED) && getFullName().equals(type.getName());}
 
-    public boolean isVoid() {
-        return isKind(VOID) || isType(Void.class);
-    }
+    public boolean isVoid() {return isKind(VOID) || isType(Void.class);}
 
-    public boolean isPrimitive() {
-        return typeMirror.getKind().isPrimitive();
-    }
+    public boolean isPrimitive() {return typeMirror.getKind().isPrimitive();}
 
-    public boolean isBoolean() {
-        return isKind(BOOLEAN) || isType(Boolean.class);
-    }
+    public boolean isBoolean() {return isKind(BOOLEAN) || isType(Boolean.class);}
 
-    public boolean isCharacter() {
-        return isKind(CHAR) || isType(Character.class);
-    }
+    public boolean isCharacter() {return isKind(CHAR) || isType(Character.class);}
 
-    public boolean isNumber() {
-        return isInteger() || isFloating();
-    }
+    public boolean isNumber() {return isInteger() || isFloating();}
 
     public boolean isInteger() {
         return isKind(BYTE) || isType(Byte.class)//
@@ -167,13 +152,9 @@ public class Type extends Elemental {
                || isKind(DOUBLE) || isType(Double.class);
     }
 
-    public boolean isString() {
-        return isType(String.class);
-    }
+    public boolean isString() {return isType(String.class);}
 
-    public boolean isEnum() {
-        return getElement() != null && getElement().getKind() == ENUM;
-    }
+    public boolean isEnum() {return getElement() != null && getElement().getKind() == ENUM;}
 
     public List<String> getEnumValues() {
         if (!isEnum())
@@ -186,9 +167,7 @@ public class Type extends Elemental {
         return values;
     }
 
-    public boolean isArray() {
-        return isKind(ARRAY);
-    }
+    public boolean isArray() {return isKind(ARRAY);}
 
     public Type elementType() {
         if (isArray())
@@ -214,9 +193,7 @@ public class Type extends Elemental {
         return isA(toRawString(type.typeMirror));
     }
 
-    public boolean isA(Class<?> type) {
-        return isA(type.getName());
-    }
+    public boolean isA(Class<?> type) {return isA(type.getName());}
 
     private boolean isA(String thatTypeName) {
         try {
@@ -250,19 +227,19 @@ public class Type extends Elemental {
     }
 
     private TypeMirror superClass(TypeMirror typeMirror) {
-        TypeElement element = asElement(typeMirror);
+        TypeElement element = asTypeElement(typeMirror);
         return element.getSuperclass();
     }
 
     private void addInterfaces(Set<TypeMirror> result, TypeMirror t) {
-        for (TypeMirror i : asElement(t).getInterfaces()) {
+        for (TypeMirror i : asTypeElement(t).getInterfaces()) {
             result.add(i);
             addInterfaces(result, i);
         }
     }
 
     public Stream<Type> interfaces() {
-        return getElement().getInterfaces().stream()
+        return getTypeElement().getInterfaces().stream()
                 .map(i -> new Type(i, round()));
     }
 
@@ -277,13 +254,9 @@ public class Type extends Elemental {
         return methods;
     }
 
-    public List<Method> getMethods() {
-        return getMethods(false);
-    }
+    public List<Method> getMethods() {return getMethods(false);}
 
-    public List<Method> getStaticMethods() {
-        return getMethods(true);
-    }
+    public List<Method> getStaticMethods() {return getMethods(true);}
 
     private List<Method> getMethods(boolean isStatic) {
         List<Method> list = new ArrayList<>();
@@ -312,18 +285,14 @@ public class Type extends Elemental {
 
     public List<Field> getAllFields() {
         List<Field> fields = new ArrayList<>(getFields());
-        if (getSuperType() != null)
-            fields.addAll(getSuperType().getAllFields());
+        superType().ifPresent(superType ->
+                fields.addAll(superType.getAllFields()));
         return fields;
     }
 
-    public List<Field> getFields() {
-        return getFields(false);
-    }
+    public List<Field> getFields() {return getFields(false);}
 
-    public List<Field> getStaticFields() {
-        return getFields(true);
-    }
+    public List<Field> getStaticFields() {return getFields(true);}
 
     private List<Field> getFields(boolean isStatic) {
         List<Field> fields = new ArrayList<>();
@@ -343,16 +312,12 @@ public class Type extends Elemental {
     }
 
     public Optional<Type> superType() {
-        return hasSuperType() ? Optional.of(Type.of(getElement().getSuperclass(), round())) : Optional.empty();
+        return hasSuperType() ? Optional.of(Type.of(getTypeElement().getSuperclass(), round())) : Optional.empty();
     }
 
-    public Type getSuperType() {
-        return superType().orElseThrow();
-    }
+    public Type getSuperType() {return superType().orElseThrow();}
 
-    public boolean hasSuperType() {
-        return getElement() != null && getElement().getSuperclass().getKind() != NONE;
-    }
+    public boolean hasSuperType() {return isTypeElement() && getTypeElement().getSuperclass().getKind() != NONE;}
 
     public Stream<Type> superTypes() {
         return hasSuperType() ?

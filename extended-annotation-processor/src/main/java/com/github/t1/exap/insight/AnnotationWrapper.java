@@ -319,8 +319,16 @@ public class AnnotationWrapper extends Elemental {
             @SuppressWarnings("unchecked")
             var values = (List<AnnotationValue>) property;
             List<Type> list = new ArrayList<>();
-            for (var value : values)
-                list.add(Type.of((TypeMirror) value.getValue(), round()));
+            for (var annotationValue : values) {
+                var valueObject = annotationValue.getValue();
+                TypeMirror typeMirror;
+                try {
+                    typeMirror = (TypeMirror) valueObject;
+                } catch (Exception e) {
+                    throw new RuntimeException("can't cast " + valueObject.getClass() + ": " + valueObject, e);
+                }
+                list.add(Type.of(typeMirror, round()));
+            }
             return list;
         } else {
             var value = (TypeMirror) property;

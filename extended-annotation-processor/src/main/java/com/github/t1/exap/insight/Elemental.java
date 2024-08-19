@@ -18,6 +18,10 @@ import java.util.stream.Stream;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static javax.lang.model.element.Modifier.ABSTRACT;
+import static javax.lang.model.element.Modifier.DEFAULT;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.lang.model.element.Modifier.TRANSIENT;
@@ -39,59 +43,45 @@ public abstract class Elemental {
     public Round round() {return round;}
 
     @Deprecated
-    protected ProcessingEnvironment env() {
-        return round.env();
-    }
+    protected ProcessingEnvironment env() {return round.env();}
 
-    public Logger log() {
-        return round.log();
-    }
+    public Logger log() {return round.log();}
 
     protected abstract Element getElement();
 
-    protected Elements elements() {
-        return env().getElementUtils();
-    }
+    protected Elements elements() {return env().getElementUtils();}
 
-    protected Types types() {
-        return env().getTypeUtils();
-    }
+    protected Types types() {return env().getTypeUtils();}
 
-    public void error(CharSequence message) {
-        message(ERROR, message);
-    }
+    public void error(CharSequence message) {message(ERROR, message);}
 
-    public void mandatoryWarning(CharSequence message) {
-        message(MANDATORY_WARNING, message);
-    }
+    public void mandatoryWarning(CharSequence message) {message(MANDATORY_WARNING, message);}
 
-    public void warning(CharSequence message) {
-        message(WARNING, message);
-    }
+    public void warning(CharSequence message) {message(WARNING, message);}
 
-    public void note(CharSequence message) {
-        message(NOTE, message);
-    }
+    public void note(CharSequence message) {message(NOTE, message);}
 
-    public void otherMessage(CharSequence message) {
-        message(OTHER, message);
-    }
+    public void otherMessage(CharSequence message) {message(OTHER, message);}
 
     protected void message(Diagnostic.Kind kind, CharSequence message) {
         env().getMessager().printMessage(kind, message, getElement());
     }
 
-    public boolean isPublic() {
-        return is(PUBLIC);
-    }
+    public boolean isPackagePrivate() {return !isPublic() && !isProtected() && !isPrivate();}
 
-    public boolean isStatic() {
-        return is(STATIC);
-    }
+    public boolean isPrivate() {return is(PRIVATE);}
 
-    public boolean isTransient() {
-        return is(TRANSIENT);
-    }
+    public boolean isProtected() {return is(PROTECTED);}
+
+    public boolean isPublic() {return is(PUBLIC);}
+
+    public boolean isAbstract() {return is(ABSTRACT);}
+
+    public boolean isDefault() {return is(DEFAULT);}
+
+    public boolean isStatic() {return is(STATIC);}
+
+    public boolean isTransient() {return is(TRANSIENT);}
 
     protected boolean is(Modifier modifier) {
         return getElement().getModifiers().contains(modifier);
