@@ -33,7 +33,7 @@ class ReflectionTypeElement implements TypeElement {
     }
 
     @Override public List<? extends Element> getEnclosedElements() {
-        return null;
+        return List.of();
     }
 
     @Override public List<? extends AnnotationMirror> getAnnotationMirrors() {
