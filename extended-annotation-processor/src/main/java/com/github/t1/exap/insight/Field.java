@@ -26,14 +26,9 @@ public class Field extends Elemental {
         this.field = requireNonNull(field);
     }
 
-    @Override
-    protected VariableElement getElement() {
-        return field;
-    }
+    @Override public VariableElement getElement() {return field;}
 
-    public String getName() {
-        return field.getSimpleName().toString();
-    }
+    public String name() {return field.getSimpleName().toString();}
 
     public Type getDeclaringType() {
         return declaringType;
@@ -59,6 +54,6 @@ public class Field extends Elemental {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":" + getType().getSimpleName() + "#" + getName();
+        return "field " + declaringType.getSimpleName() + "#" + name();
     }
 }

@@ -47,6 +47,10 @@ public abstract class Elemental {
 
     public Logger log() {return round.log();}
 
+    public String name() {
+        var element = getElement();
+        return (element == null) ? toString() : element.getSimpleName().toString();}
+
     protected abstract Element getElement();
 
     protected Elements elements() {return env().getElementUtils();}
@@ -125,6 +129,8 @@ public abstract class Elemental {
     public Stream<AnnotationWrapper> annotationWrappers() {return getAnnotationWrappers().stream();}
 
     public List<AnnotationWrapper> getAnnotationWrappers() {return annotationWrapperBuilder.allOn(getElement());}
+
+    public ElementalAnnotations annotations() {return new ElementalAnnotations(getAnnotationWrappers());}
 
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
         return annotationWrapperBuilder.ofTypeOn(getElement(), type.getName());

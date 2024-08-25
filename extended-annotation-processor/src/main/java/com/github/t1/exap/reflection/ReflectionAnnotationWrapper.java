@@ -1,6 +1,5 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.Round;
 import com.github.t1.exap.insight.AnnotationPropertyType;
 import com.github.t1.exap.insight.AnnotationWrapper;
 import com.github.t1.exap.insight.Type;
@@ -33,15 +32,15 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     private static final Map<AnnotatedElement, Map<Class<?>, List<AnnotationWrapper>>> annotationsByType =
             new HashMap<>();
 
-    public static List<AnnotationWrapper> allOn(AnnotatedElement annotated, Round round) {
+    public static List<AnnotationWrapper> allOn(AnnotatedElement annotated) {
         return annotationsOnType.computeIfAbsent(annotated, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (Annotation annotation : annotated.getAnnotations()) {
                 Class<? extends Annotation> repeatedType = getRepeatedType(annotation);
                 if (repeatedType == null)
-                    result.add(new ReflectionAnnotationWrapper(annotation, round));
+                    result.add(new ReflectionAnnotationWrapper(annotation));
                 else
-                    result.addAll(ofTypeOn(annotated, repeatedType, round));
+                    result.addAll(ofTypeOn(annotated, repeatedType));
             }
             return result;
         });
@@ -74,22 +73,21 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
         return null;
     }
 
-    public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type,
-                                                                          Round round) {
+    public static <T extends Annotation> List<AnnotationWrapper> ofTypeOn(AnnotatedElement annotated, Class<T> type) {
         Map<Class<?>, List<AnnotationWrapper>> map =
                 annotationsByType.computeIfAbsent(annotated, (k) -> new HashMap<>());
         return map.computeIfAbsent(type, (k) -> {
             List<AnnotationWrapper> result = new ArrayList<>();
             for (T annotation : annotated.getAnnotationsByType(type))
-                result.add(new ReflectionAnnotationWrapper(annotation, round));
+                result.add(new ReflectionAnnotationWrapper(annotation));
             return result;
         });
     }
 
     private final Annotation annotation;
 
-    ReflectionAnnotationWrapper(Annotation annotation, Round round) {
-        super(ReflectionDummyProxy.of(AnnotationMirror.class), round);
+    ReflectionAnnotationWrapper(Annotation annotation) {
+        super(ReflectionDummyProxy.of(AnnotationMirror.class), ENV.round());
         this.annotation = annotation;
     }
 
@@ -243,7 +241,7 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     }
 
     private ReflectionType type(Class<?> value) {
-        return ReflectionType.type(value, round());
+        return ReflectionType.type(value);
     }
 
     @Override
@@ -259,18 +257,18 @@ class ReflectionAnnotationWrapper extends AnnotationWrapper {
     @Override
     public AnnotationWrapper getAnnotationProperty(String name) {
         Annotation value = (Annotation) getSingleProperty(name);
-        return new ReflectionAnnotationWrapper(value, round());
+        return new ReflectionAnnotationWrapper(value);
     }
 
     @Override
     public List<AnnotationWrapper> getAnnotationProperties(String name) {
         Object value = getProperty(name);
         if (value instanceof Annotation)
-            return singletonList(new ReflectionAnnotationWrapper((Annotation) value, round()));
+            return singletonList(new ReflectionAnnotationWrapper((Annotation) value));
         var list = new ArrayList<AnnotationWrapper>();
         //noinspection unchecked
         for (var annotation : (List<Annotation>) value)
-            list.add(new ReflectionAnnotationWrapper(annotation, round()));
+            list.add(new ReflectionAnnotationWrapper(annotation));
         return list;
     }
 

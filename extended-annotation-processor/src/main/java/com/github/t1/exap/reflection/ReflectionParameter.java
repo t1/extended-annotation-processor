@@ -25,14 +25,10 @@ class ReflectionParameter extends Parameter {
     }
 
     @Override
-    public Method getMethod() {
-        return method;
-    }
+    public Method getMethod() {return method;}
 
     @Override
-    public String getName() {
-        return parameter.getName();
-    }
+    public String getName() {return parameter.getName();}
 
     @Override
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
@@ -41,26 +37,20 @@ class ReflectionParameter extends Parameter {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(parameter, round());
+        return ReflectionAnnotationWrapper.allOn(parameter);
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(parameter, type, round());
+        return ReflectionAnnotationWrapper.ofTypeOn(parameter, type);
     }
 
     @Override
-    public Type getType() {
-        return ReflectionType.type(parameter.getParameterizedType(), round());
-    }
+    public Type getType() {return ReflectionType.type(parameter.getParameterizedType());}
 
     @Override
-    protected boolean is(Modifier modifier) {
-        return ReflectionModifiers.on(parameter.getModifiers()).is(modifier);
-    }
+    protected boolean is(Modifier modifier) {return ReflectionModifiers.on(parameter.getModifiers()).is(modifier);}
 
     @Override
-    protected void message(Diagnostic.Kind kind, CharSequence message) {
-        ENV.message(this, kind, message);
-    }
+    protected void message(Diagnostic.Kind kind, CharSequence message) {ENV.message(this, kind, message);}
 }

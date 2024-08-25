@@ -23,10 +23,7 @@ public class Package extends Elemental {
         this.round = round;
     }
 
-    @Override
-    protected Element getElement() {
-        return packageElement;
-    }
+    @Override protected Element getElement() {return packageElement;}
 
     public String getName() {
         return (packageElement == null) ? "" : packageElement.getQualifiedName().toString();
@@ -81,7 +78,7 @@ public class Package extends Elemental {
     }
 
     public TypeGenerator openTypeGenerator(String name) {
-        return new TypeGenerator(round.log(), this, name);
+        return new TypeGenerator(round, this, name);
     }
 
     @Override
@@ -91,10 +88,7 @@ public class Package extends Elemental {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Package))
-            return false;
-        Package that = (Package) obj;
-        return this.toString().equals(that.toString());
+        return (obj instanceof Package that) && this.toString().equals(that.toString());
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.Round;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.AnnotationValueVisitor;
@@ -17,20 +15,24 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 class ReflectionAnnotationMirror implements AnnotationMirror {
-    private final Class<?> type;
-    private final Annotation annotation;
-    private final Round round;
-
-    ReflectionAnnotationMirror(Class<?> type, Annotation annotation, Round round) {
-        this.type = type;
-        this.annotation = annotation;
-        this.round = round;
+    public static List<? extends AnnotationMirror> of(String toStringPrefix, Annotation[] annotations) {
+        return Stream.of(annotations)
+                .map(annotation -> new ReflectionAnnotationMirror(toStringPrefix, annotation))
+                .toList();
     }
 
-    @Override public String toString() {return type.getSimpleName() + "::" + annotation;}
+    private final String toStringPrefix;
+    private final Annotation annotation;
+
+    ReflectionAnnotationMirror(String toStringPrefix, Annotation annotation) {
+        this.toStringPrefix = toStringPrefix;
+        this.annotation = annotation;
+    }
+
+    @Override public String toString() {return toStringPrefix + "::" + annotation;}
 
     @Override
-    public DeclaredType getAnnotationType() {return new ReflectionDeclaredTypeMirror(annotation.annotationType(), round);}
+    public DeclaredType getAnnotationType() {return new ReflectionDeclaredTypeMirror(annotation.annotationType());}
 
     public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults() {
         return getElementValues();
@@ -42,13 +44,13 @@ class ReflectionAnnotationMirror implements AnnotationMirror {
     }
 
     private AnnotationValue value(Method method) {
-        var value = new ReflectionAnnotationWrapper(annotation, round).getProperty(method.getName());
+        var value = new ReflectionAnnotationWrapper(annotation).getProperty(method.getName());
         return new AnnotationValue() {
             @Override public String toString() {return "ReflectionAnnotationMirrorValue[" + getValue() + "]";}
 
             @Override public Object getValue() {
                 return (value instanceof List) ? asAnnotationList(value) // array values have to be represented as a list
-                        : (value instanceof Class) ? new ReflectionDeclaredTypeMirror((Class<?>) value, round) // Classes have to be represented as a TypeMirror
+                        : (value instanceof Class) ? new ReflectionDeclaredTypeMirror((Class<?>) value) // Classes have to be represented as a TypeMirror
                         : value;
             }
 
@@ -56,7 +58,7 @@ class ReflectionAnnotationMirror implements AnnotationMirror {
                 @SuppressWarnings("unchecked")
                 var list = (List<Annotation>) value;
                 return list.stream()
-                        .map(annotation -> new ReflectionAnnotationMirror(annotation.annotationType(), annotation, round))
+                        .map(annotation -> new ReflectionAnnotationMirror(annotation.annotationType().getName(), annotation))
                         .collect(toList());
             }
 

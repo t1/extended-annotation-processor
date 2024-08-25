@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.github.t1.exap.insight.AnnotationPropertyType.ANNOTATION;
@@ -33,8 +34,8 @@ import static java.util.stream.Collectors.toList;
  * It's easiest to call {@link Elemental#getAnnotations(Class)} etc. and then directly use the typesafe, convenient
  * {@link java.lang.annotation.Annotation} object. But this doesn't work for annotation attributes of type Class, as the
  * referenced class is generally not loaded in the annotation processor, only the metadata represented in the
- * {@link TypeMirror}s is. You'd get a {@link javax.lang.model.type.MirroredTypeException} with the message: Attempt to
- * access Class object for TypeMirror. You'll have to use {@link Elemental#getAnnotationWrapper(Class)} for those
+ * {@link TypeMirror}s is. You'd get a {@link javax.lang.model.type.MirroredTypeException} with the message: "Attempt to
+ * access Class object for TypeMirror." You'll have to use {@link Elemental#getAnnotationWrapper(Class)} for those
  * annotation properties, which returns an instance of this class.
  *
  * @see <a href="http://blog.retep.org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor">this blog</a>
@@ -47,10 +48,7 @@ public class AnnotationWrapper extends Elemental {
         this.annotationMirror = requireNonNull(annotationMirror);
     }
 
-    @Override
-    protected Element getElement() {
-        return types().asElement(annotationMirror.getAnnotationType());
-    }
+    @Override protected Element getElement() {return types().asElement(annotationMirror.getAnnotationType());}
 
     public boolean isRepeatable() {
         return getRepeatedAnnotation() != null;
@@ -352,8 +350,15 @@ public class AnnotationWrapper extends Elemental {
         return (property instanceof List) ? ((List<?>) property).stream() : Stream.of(property);
     }
 
-    @Override
-    public String toString() {
-        return annotationMirror.toString();
+    @Override public String toString() {return annotationMirror.toString();}
+
+    @Override public boolean equals(Object that) {
+        if (this == that) return true;
+        if (!(that instanceof AnnotationWrapper)) return false;
+        return Objects.equals(annotationMirror, ((AnnotationWrapper) that).annotationMirror);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hashCode(annotationMirror);
     }
 }

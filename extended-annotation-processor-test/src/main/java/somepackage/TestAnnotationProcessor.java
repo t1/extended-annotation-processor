@@ -45,7 +45,7 @@ public class TestAnnotationProcessor extends ExtendedAbstractProcessor {
     private void createFieldList(Round round) throws IOException {
         try (var writer = writerFor(round, "fields")) {
             for (var field : round.fieldsAnnotatedWith(MarkerAnnotation.class)) {
-                writer.append(field.getName()).append(":").append(field.getAnnotation(MarkerAnnotation.class).value()).append("\n");
+                writer.append(field.name()).append(":").append(field.getAnnotation(MarkerAnnotation.class).value()).append("\n");
             }
         }
     }

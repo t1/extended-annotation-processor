@@ -1,8 +1,8 @@
 package com.github.t1.exap.generator;
 
+import com.github.t1.exap.Round;
 import com.github.t1.exap.insight.Package;
 import com.github.t1.exap.insight.Type;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.joining;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TypeGenerator implements AutoCloseable {
-    private final Logger log;
+    private final Round round;
     private final Package pkg;
     private final String typeName;
 
@@ -31,8 +31,8 @@ public class TypeGenerator implements AutoCloseable {
     private final List<FieldGenerator> fields = new ArrayList<>();
     public final List<MethodGenerator> methods = new ArrayList<>();
 
-    public TypeGenerator(Logger log, Package pkg, String typeName) {
-        this.log = log;
+    public TypeGenerator(Round round, Package pkg, String typeName) {
+        this.round = round;
         this.pkg = pkg;
         this.typeName = typeName;
         this.imports = new ImportGenerator(pkg);
@@ -49,6 +49,11 @@ public class TypeGenerator implements AutoCloseable {
 
     public TypeKind kind() {
         return kind;
+    }
+
+    /** You should only need to call this for types needed <em>in</em> your body */
+    public TypeGenerator addImport(String type) {
+        return addImport(round.type(type));
     }
 
     /** You should only need to call this for types needed <em>in</em> your body */
@@ -109,7 +114,7 @@ public class TypeGenerator implements AutoCloseable {
     @Override
     public void close() {
         var resource = pkg.createSource(typeName);
-        log.debug("write {} to {}", typeName, resource.getPath().getParent());
+        round.log().debug("write {} to {}", typeName, resource.getPath().getParent());
         try (var writer = resource.openWriter()) {
             print(new PrintWriter(writer));
         } catch (IOException e) {

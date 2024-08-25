@@ -162,14 +162,14 @@ class JsonTestFileGenerator implements AutoCloseable {
         if (!type.getStaticFields().isEmpty()) {
             json.writeStartArray("staticFields");
             for (Field field : type.getStaticFields())
-                json.write(field.getName());
+                json.write(field.name());
             json.writeEnd();
         }
 
         json.writeStartObject("fields");
         for (Field field : type.getFields()) {
-            log.debug("write field \"{}\"", field.getName());
-            json.writeStartObject(field.getName());
+            log.debug("write field \"{}\"", field.name());
+            json.writeStartObject(field.name());
             field.javaDoc().ifPresent(javadoc -> json.write("javadoc", javadoc));
 
             json.writeStartObject("type");
@@ -192,16 +192,16 @@ class JsonTestFileGenerator implements AutoCloseable {
         if (!type.getStaticMethods().isEmpty()) {
             json.writeStartArray("staticMethods");
             for (Method method : type.getStaticMethods())
-                json.write(method.getName());
+                json.write(method.name());
             json.writeEnd();
         }
 
         json.writeStartArray("methods");
         for (Method method : type.getMethods()) {
-            log.debug("write method \"{}\"", method.getName());
+            log.debug("write method \"{}\"", method.name());
             json.writeStartObject();
 
-            json.write("name", method.getName());
+            json.write("name", method.name());
             method.javaDoc().ifPresent(javadoc -> json.write("javadoc", javadoc));
             json.write("containerType", method.getDeclaringType().toString());
 
@@ -236,7 +236,7 @@ class JsonTestFileGenerator implements AutoCloseable {
         for (Parameter parameter : method.getParameters()) {
             json.writeStartObject();
             json.write("name", parameter.getName());
-            json.write("method", parameter.getMethod().getName());
+            json.write("method", parameter.getMethod().name());
             json.write("type", parameter.getType().getFullName());
             writeTypeParameters(parameter.getType());
             json.write("collection", parameter.getType().isA(Collection.class));

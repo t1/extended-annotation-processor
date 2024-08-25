@@ -11,7 +11,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 public class Method extends Elemental implements Comparable<Method> {
-    private static final Comparator<Method> COMPARATOR = Comparator.comparing(Method::getName);
+    private static final Comparator<Method> COMPARATOR = Comparator.comparing(Method::name);
 
     private final Type declaringType;
     private final ExecutableElement method;
@@ -22,14 +22,9 @@ public class Method extends Elemental implements Comparable<Method> {
         this.method = requireNonNull(method);
     }
 
-    @Override
-    protected ExecutableElement getElement() {
-        return method;
-    }
+    @Override public ExecutableElement getElement() {return method;}
 
-    public String getName() {
-        return method.getSimpleName().toString();
-    }
+    public String name() {return method.getSimpleName().toString();}
 
     public List<Parameter> getParameters() {
         List<Parameter> result = new ArrayList<>();
@@ -38,24 +33,13 @@ public class Method extends Elemental implements Comparable<Method> {
         return result;
     }
 
-    public Parameter getParameter(int index) {
-        return new Parameter(this, method.getParameters().get(index));
-    }
+    public Parameter getParameter(int index) {return new Parameter(this, method.getParameters().get(index));}
 
-    public Type getDeclaringType() {
-        return declaringType;
-    }
+    public Type getDeclaringType() {return declaringType;}
 
-    public Type getReturnType() {
-        return Type.of(method.getReturnType(), round());
-    }
+    public Type getReturnType() {return Type.of(method.getReturnType(), round());}
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + getDeclaringType().getSimpleName() + "#" + getName();
-    }
+    @Override public String toString() {return "method " + getDeclaringType().getSimpleName() + "#" + name();}
 
-    @Override public int compareTo(Method that) {
-        return COMPARATOR.compare(this, that);
-    }
+    @Override public int compareTo(Method that) {return COMPARATOR.compare(this, that);}
 }

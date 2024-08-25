@@ -290,12 +290,12 @@ public class ReflectionTest {
         assertEquals(1, type.getAnnotationWrappers(A.class).size());
         assertEquals("a", type.getAnnotationWrappers(A.class).get(0).getProperty("value"));
 
-        assertEquals(2, type.getFields().size(), "fields: " + type.getFields());
-        assertThat(type.getFields()).extracting(Field::getName).containsOnly("field", "this$0");
+        assertEquals(1, type.getFields().size(), "fields: " + type.getFields());
+        assertThat(type.getFields()).extracting(Field::name).containsOnly("field");
 
         assertEquals(1, type.getMethods().size());
         Method method = type.getMethods().get(0);
-        assertEquals("method", method.getName());
+        assertEquals("method", method.name());
         assertTrue(method.getReturnType().isVoid());
     }
 
@@ -372,7 +372,7 @@ public class ReflectionTest {
     }
 
     private void assertBoolField(Field boolField) {
-        assertEquals("bool", boolField.getName());
+        assertEquals("bool", boolField.name());
         assertEquals("boolean", boolField.getType().getSimpleName());
         assertEquals("boolean", boolField.getType().getFullName());
 
@@ -383,7 +383,7 @@ public class ReflectionTest {
     }
 
     private void assertStringField(Field stringField) {
-        assertEquals("string", stringField.getName());
+        assertEquals("string", stringField.name());
         assertEquals("String", stringField.getType().getSimpleName());
         assertEquals("java.lang.String", stringField.getType().getFullName());
         assertFalse(stringField.isPublic());
@@ -409,7 +409,7 @@ public class ReflectionTest {
     }
 
     private void assertMapField(Field mapField) {
-        assertEquals("map", mapField.getName());
+        assertEquals("map", mapField.name());
         assertEquals("Map", mapField.getType().getSimpleName());
         assertEquals("java.util.Map<java.lang.String, java.lang.Number>", mapField.getType().getFullName());
         assertTrue(mapField.getType().isA(Map.class));
@@ -443,7 +443,7 @@ public class ReflectionTest {
     }
 
     private void assertEnumField(Field enumField) {
-        assertEquals("fooNum", enumField.getName());
+        assertEquals("fooNum", enumField.name());
         assertEquals("FooNum", enumField.getType().getSimpleName());
         assertEquals(FooNum.class.getName(), enumField.getType().getFullName());
         assertFalse(enumField.isPublic());
@@ -762,14 +762,14 @@ public class ReflectionTest {
 
         List<Method> methods = type.getMethods();
 
-        assertEquals(3, methods.size(), "methods: " + methods.stream().map(Method::getName).collect(joining("\n")));
+        assertEquals(3, methods.size(), "methods: " + methods.stream().map(Method::name).collect(joining("\n")));
         assertMethod0(type.getMethod("method0"));
         assertMethod1(type.getMethod("method1"));
         assertMethod2(type.getMethod("method2"));
     }
 
     private void assertMethod0(Method method) {
-        assertEquals("method0", method.getName());
+        assertEquals("method0", method.name());
         assertEquals(type, method.getDeclaringType());
         assertEquals(ENV.type(void.class), method.getReturnType());
         assertTrue(method.isPublic());
@@ -826,7 +826,7 @@ public class ReflectionTest {
     }
 
     private void assertMethod1(Method method) {
-        assertEquals("method1", method.getName());
+        assertEquals("method1", method.name());
         assertEquals(type, method.getDeclaringType());
 
         assertMethod1ReturnType(method.getReturnType());
@@ -920,7 +920,7 @@ public class ReflectionTest {
     }
 
     private void assertMethod2(Method method) {
-        assertEquals("method2", method.getName());
+        assertEquals("method2", method.name());
         assertEquals(type, method.getDeclaringType());
         assertEquals(ENV.type(Nested.class), method.getReturnType());
         assertTrue(method.getReturnType().isA(Nested.class));
@@ -937,13 +937,13 @@ public class ReflectionTest {
         type.accept(new TypeVisitor() {
             @Override
             public void visit(Method method) {
-                assertThat(method.getName()).matches("method[012]");
+                assertThat(method.name()).matches("method[012]");
                 count.getAndIncrement();
             }
 
             @Override
             public void visit(Field field) {
-                assertThat(field.getName()).matches("string|bool|map|fooNum");
+                assertThat(field.name()).matches("string|bool|map|fooNum");
                 count.getAndIncrement();
             }
         });

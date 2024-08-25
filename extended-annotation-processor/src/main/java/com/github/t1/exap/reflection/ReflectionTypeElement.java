@@ -1,6 +1,7 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.Round;
+import com.github.t1.exap.insight.Field;
+import com.github.t1.exap.insight.Method;
 import com.github.t1.exap.insight.Type;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -25,15 +26,20 @@ import static java.util.stream.Collectors.toList;
 
 class ReflectionTypeElement implements TypeElement {
     final Type type;
-    final Round round;
 
-    public ReflectionTypeElement(Type type, Round round) {
+    public ReflectionTypeElement(Type type) {
         this.type = type;
-        this.round = round;
     }
 
     @Override public List<? extends Element> getEnclosedElements() {
-        return List.of();
+        return Stream.concat(
+                Stream.of(getReflectedClass().getDeclaredFields())
+                        .map(field -> new ReflectionField(type, field))
+                        .map(Field::getElement),
+                Stream.of(getReflectedClass().getDeclaredMethods())
+                        .map(method -> new ReflectionMethod(type, method))
+                        .map(Method::getElement))
+                .collect(toList());
     }
 
     @Override public List<? extends AnnotationMirror> getAnnotationMirrors() {
@@ -74,12 +80,12 @@ class ReflectionTypeElement implements TypeElement {
     }
 
     @Override public Name getSimpleName() {
-        return null;
+        return new ReflectionName(getReflectedClass().getSimpleName());
     }
 
     @Override public TypeMirror getSuperclass() {
         Class<?> superclass = getReflectedClass().getSuperclass();
-        return (superclass == null) ? NO_TYPE : new ReflectionDeclaredTypeMirror(superclass, round);
+        return (superclass == null) ? NO_TYPE : new ReflectionDeclaredTypeMirror(superclass);
     }
 
     private Class<?> getReflectedClass() {
@@ -88,7 +94,7 @@ class ReflectionTypeElement implements TypeElement {
 
     @Override public List<? extends TypeMirror> getInterfaces() {
         return Stream.of(getReflectedClass().getInterfaces())
-                .map(i -> new ReflectionDeclaredTypeMirror(i, round))
+                .map(ReflectionDeclaredTypeMirror::new)
                 .collect(toList());
     }
 

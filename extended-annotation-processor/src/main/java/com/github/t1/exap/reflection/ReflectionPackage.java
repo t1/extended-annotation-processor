@@ -35,11 +35,11 @@ class ReflectionPackage extends Package {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(pkg, round());
+        return ReflectionAnnotationWrapper.allOn(pkg);
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(pkg, type, round());
+        return ReflectionAnnotationWrapper.ofTypeOn(pkg, type);
     }
 }

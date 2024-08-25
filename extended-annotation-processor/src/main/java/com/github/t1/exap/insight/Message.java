@@ -15,10 +15,7 @@ public class Message {
             return "#NO_ELEMENT#";
         }
 
-        @Override
-        protected Element getElement() {
-            return null;
-        }
+        @Override protected Element getElement() {return null;}
     };
     public static final Elemental ANY_ELEMENT = new Elemental(DUMMY_ROUND) {
         @Override
@@ -26,10 +23,7 @@ public class Message {
             return "#ANY_ELEMENT#";
         }
 
-        @Override
-        protected Element getElement() {
-            return null;
-        }
+        @Override protected Element getElement() {return null;}
     };
 
     private final Elemental elemental;

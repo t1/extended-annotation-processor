@@ -1,6 +1,5 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.Round;
 import com.github.t1.exap.insight.AnnotationWrapper;
 import com.github.t1.exap.insight.Field;
 import com.github.t1.exap.insight.Type;
@@ -16,14 +15,14 @@ import static java.util.Arrays.asList;
 class ReflectionField extends Field {
     private final java.lang.reflect.Field field;
 
-    public ReflectionField(ReflectionType declaringType, java.lang.reflect.Field field, Round round) {
-        super(declaringType, new ReflectionVariableElement(field), round);
+    public ReflectionField(Type declaringType, java.lang.reflect.Field field) {
+        super(declaringType, new ReflectionVariableElement(field), ENV.round());
         this.field = field;
     }
 
-    @Override public String getName() {return field.getName();}
+    @Override public String name() {return field.getName();}
 
-    @Override public Type getType() {return ReflectionType.type(field.getGenericType(), round());}
+    @Override public Type getType() {return ReflectionType.type(field.getGenericType());}
 
     @Override
     protected boolean is(Modifier modifier) {
@@ -37,12 +36,12 @@ class ReflectionField extends Field {
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(field, round());
+        return ReflectionAnnotationWrapper.allOn(field);
     }
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(field, type, round());
+        return ReflectionAnnotationWrapper.ofTypeOn(field, type);
     }
 
     @Override

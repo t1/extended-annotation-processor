@@ -90,4 +90,8 @@ public class Round {
     }
 
     public Package getPackageOf(Class<?> type) {return getPackage(type.getPackage().getName());}
+
+    public Type type(String typeName) {
+        return Type.of(env().getElementUtils().getTypeElement(typeName).asType(), this);
+    }
 }

@@ -14,10 +14,7 @@ public class Parameter extends Elemental {
         this.param = requireNonNull(param);
     }
 
-    @Override
-    protected VariableElement getElement() {
-        return param;
-    }
+    @Override protected VariableElement getElement() {return param;}
 
     public Method getMethod() {
         return method;

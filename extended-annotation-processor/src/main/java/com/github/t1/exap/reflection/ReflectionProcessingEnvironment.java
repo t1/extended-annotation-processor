@@ -76,11 +76,13 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
         messager.message(elemental, kind, message);
     }
 
-    public Type type(Class<?> type) {return ReflectionType.type(type, DUMMY_ROUND);}
+    public Type type(Class<?> type) {return ReflectionType.type(type);}
 
     public Type type(TypeMirror type) {return Type.of(type, DUMMY_ROUND);}
 
-    public Element element(TypeMirror type) {return new ReflectionTypeElement(type(type), DUMMY_ROUND);}
+    public Element element(TypeMirror type) {return new ReflectionTypeElement(type(type));}
+
+    public Round round() {return DUMMY_ROUND;}
 
     public List<Message> getMessages() {
         return messager.getMessages();

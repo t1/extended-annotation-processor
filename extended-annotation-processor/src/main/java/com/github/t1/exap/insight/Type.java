@@ -54,12 +54,9 @@ public class Type extends Elemental {
 
     protected TypeElement getTypeElement() {return (TypeElement) getElement();}
 
-    @Override
-    protected Element getElement() {return types().asElement(typeMirror);}
+    @Override protected Element getElement() {return types().asElement(typeMirror);}
 
-    private TypeElement asTypeElement(TypeMirror typeMirror) {
-        return (TypeElement) types().asElement(typeMirror);
-    }
+    private TypeElement asTypeElement(TypeMirror typeMirror) {return (TypeElement) types().asElement(typeMirror);}
 
     public TypeKind getKind() {return typeMirror.getKind();}
 
@@ -270,7 +267,7 @@ public class Type extends Elemental {
 
     public Method getMethod(String name) {
         for (Method method : getMethods())
-            if (method.getName().equals(name))
+            if (method.name().equals(name))
                 return method;
         throw new RuntimeException("method not found: " + name + ".\n  Only knows: " + getMethods());
     }
@@ -278,7 +275,7 @@ public class Type extends Elemental {
 
     public boolean hasMethod(String name) {
         for (Method method : getMethods())
-            if (method.getName().equals(name))
+            if (method.name().equals(name))
                 return true;
         return false;
     }
@@ -306,7 +303,7 @@ public class Type extends Elemental {
 
     public Field getField(String name) {
         for (Field field : getFields())
-            if (field.getName().equals(name))
+            if (field.name().equals(name))
                 return field;
         throw new RuntimeException("field not found: " + name + ".\n  Only knows: " + getFields());
     }

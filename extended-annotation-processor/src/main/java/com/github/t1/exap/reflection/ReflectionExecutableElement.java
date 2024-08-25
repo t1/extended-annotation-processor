@@ -30,7 +30,7 @@ class ReflectionExecutableElement implements ReflectionTypeMirror, ExecutableEle
 
     @Override public ElementKind getKind() {return METHOD;}
 
-    @Override public Set<Modifier> getModifiers() {return Set.of();}
+    @Override public Set<Modifier> getModifiers() {return ReflectionModifiers.on(method.getModifiers()).toSet();}
 
     @Override public List<? extends TypeParameterElement> getTypeParameters() {return List.of();}
 

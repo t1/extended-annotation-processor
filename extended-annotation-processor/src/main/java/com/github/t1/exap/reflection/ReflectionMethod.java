@@ -1,6 +1,5 @@
 package com.github.t1.exap.reflection;
 
-import com.github.t1.exap.Round;
 import com.github.t1.exap.insight.AnnotationWrapper;
 import com.github.t1.exap.insight.Method;
 import com.github.t1.exap.insight.Parameter;
@@ -19,19 +18,17 @@ class ReflectionMethod extends Method {
     private final java.lang.reflect.Method method;
     private List<Parameter> parameters;
 
-    public ReflectionMethod(Type declaringType, java.lang.reflect.Method method, Round round) {
-        super(declaringType, new ReflectionExecutableElement(method), round);
+    public ReflectionMethod(Type declaringType, java.lang.reflect.Method method) {
+        super(declaringType, new ReflectionExecutableElement(method), ENV.round());
         this.method = method;
     }
 
     @Override
-    public String getName() {
-        return method.getName();
-    }
+    public String name() {return method.getName();}
 
     @Override
     public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(method, round());
+        return ReflectionAnnotationWrapper.allOn(method);
     }
 
     @Override
@@ -41,7 +38,7 @@ class ReflectionMethod extends Method {
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {
-        return ReflectionAnnotationWrapper.ofTypeOn(method, type, round());
+        return ReflectionAnnotationWrapper.ofTypeOn(method, type);
     }
 
     @Override
@@ -55,22 +52,14 @@ class ReflectionMethod extends Method {
     }
 
     @Override
-    public Parameter getParameter(int index) {
-        return getParameters().get(index);
-    }
+    public Parameter getParameter(int index) {return getParameters().get(index);}
 
     @Override
-    public Type getReturnType() {
-        return ReflectionType.type(method.getGenericReturnType(), round());
-    }
+    public Type getReturnType() {return ReflectionType.type(method.getGenericReturnType());}
 
     @Override
-    protected boolean is(Modifier modifier) {
-        return ReflectionModifiers.on(method.getModifiers()).is(modifier);
-    }
+    protected boolean is(Modifier modifier) {return ReflectionModifiers.on(method.getModifiers()).is(modifier);}
 
     @Override
-    protected void message(Diagnostic.Kind kind, CharSequence message) {
-        ENV.message(this, kind, message);
-    }
+    protected void message(Diagnostic.Kind kind, CharSequence message) {ENV.message(this, kind, message);}
 }
