@@ -5,6 +5,8 @@ import com.github.t1.exap.Round;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 public class Message {
@@ -16,6 +18,8 @@ public class Message {
         }
 
         @Override protected Element getElement() {return null;}
+
+        @Override public Optional<Elemental> enclosingElement() {return Optional.empty();}
     };
     public static final Elemental ANY_ELEMENT = new Elemental(DUMMY_ROUND) {
         @Override
@@ -24,6 +28,8 @@ public class Message {
         }
 
         @Override protected Element getElement() {return null;}
+
+        @Override public Optional<Elemental> enclosingElement() {return Optional.empty();}
     };
 
     private final Elemental elemental;

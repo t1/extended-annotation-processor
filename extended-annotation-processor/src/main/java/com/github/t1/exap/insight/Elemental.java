@@ -49,7 +49,8 @@ public abstract class Elemental {
 
     public String name() {
         var element = getElement();
-        return (element == null) ? toString() : element.getSimpleName().toString();}
+        return (element == null) ? toString() : element.getSimpleName().toString();
+    }
 
     protected abstract Element getElement();
 
@@ -93,6 +94,17 @@ public abstract class Elemental {
 
     public <T extends Annotation> boolean isAnnotated(Class<T> type) {
         return !getAnnotations(type).isEmpty();
+    }
+
+    /**
+     * Find an annotation on this element or any of its enclosing elements.
+     */
+    public <T extends Annotation> Optional<T> findAnnotation(Class<T> type) {
+        return annotation(type).or(() -> enclosingElement().flatMap(t -> t.findAnnotation(type)));
+    }
+
+    public <T extends Annotation> Optional<T> annotation(Class<T> type) {
+        return Optional.ofNullable(getAnnotation(type));
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> type) {
@@ -140,6 +152,8 @@ public abstract class Elemental {
     public Stream<? extends AnnotationMirror> annotationMirrors() {
         return getElement().getAnnotationMirrors().stream();
     }
+
+    public abstract Optional<Elemental> enclosingElement();
 
     public Optional<String> javaDoc() {
         return Optional.ofNullable(elements().getDocComment(this.getElement()))

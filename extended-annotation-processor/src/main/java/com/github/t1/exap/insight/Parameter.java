@@ -2,6 +2,8 @@ package com.github.t1.exap.insight;
 
 import javax.lang.model.element.VariableElement;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 public class Parameter extends Elemental {
@@ -15,6 +17,8 @@ public class Parameter extends Elemental {
     }
 
     @Override protected VariableElement getElement() {return param;}
+
+    @Override public Optional<Elemental> enclosingElement() {return Optional.of(method);}
 
     public Method getMethod() {
         return method;

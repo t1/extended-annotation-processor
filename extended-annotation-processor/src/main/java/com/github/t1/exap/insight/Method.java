@@ -7,6 +7,7 @@ import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,6 +24,8 @@ public class Method extends Elemental implements Comparable<Method> {
     }
 
     @Override public ExecutableElement getElement() {return method;}
+
+    @Override public Optional<Elemental> enclosingElement() {return Optional.of(declaringType);}
 
     public String name() {return method.getSimpleName().toString();}
 

@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.github.t1.exap.insight.AnnotationPropertyType.ANNOTATION;
@@ -49,6 +50,10 @@ public class AnnotationWrapper extends Elemental {
     }
 
     @Override protected Element getElement() {return types().asElement(annotationMirror.getAnnotationType());}
+
+    @Override public Optional<Elemental> enclosingElement() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
 
     public boolean isRepeatable() {
         return getRepeatedAnnotation() != null;

@@ -10,6 +10,7 @@ import javax.lang.model.element.PackageElement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
@@ -25,21 +26,24 @@ public class Package extends Elemental {
 
     @Override protected Element getElement() {return packageElement;}
 
+    @Override public Optional<Elemental> enclosingElement() {
+        if (isRoot()) return Optional.empty(); // TODO return the module
+        var name = getName();
+        var parentPackage = name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : "";
+        return Optional.of(round.getPackage(parentPackage));
+    }
+
     public String getName() {
         return (packageElement == null) ? "" : packageElement.getQualifiedName().toString();
     }
 
-    public boolean isRoot() {
-        return packageElement == null;
-    }
+    public boolean isRoot() {return packageElement == null;}
 
     public boolean isSuperPackageOf(Package that) {
         return toPath().startsWith(that.toPath());
     }
 
-    public Path toPath() {
-        return Paths.get(toString());
-    }
+    public Path toPath() {return Paths.get(getName().replace('.', '/'));}
 
     public Resource createSource(String relativeName) {
             String sourceName = sourceName(relativeName);

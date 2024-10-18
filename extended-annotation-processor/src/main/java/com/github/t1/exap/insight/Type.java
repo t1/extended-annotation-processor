@@ -56,6 +56,8 @@ public class Type extends Elemental {
 
     @Override protected Element getElement() {return types().asElement(typeMirror);}
 
+    @Override public Optional<Elemental> enclosingElement() {return Optional.of(getPackage());}
+
     private TypeElement asTypeElement(TypeMirror typeMirror) {return (TypeElement) types().asElement(typeMirror);}
 
     public TypeKind getKind() {return typeMirror.getKind();}

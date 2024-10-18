@@ -8,6 +8,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.type.TypeKind.DECLARED;
@@ -27,6 +28,8 @@ public class Field extends Elemental {
     }
 
     @Override public VariableElement getElement() {return field;}
+
+    @Override public Optional<Elemental> enclosingElement() {return Optional.of(declaringType);}
 
     public String name() {return field.getSimpleName().toString();}
 
