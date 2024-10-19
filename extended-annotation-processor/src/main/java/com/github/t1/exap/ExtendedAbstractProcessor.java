@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.PrintWriter;
@@ -58,6 +60,12 @@ public abstract class ExtendedAbstractProcessor extends AbstractProcessor {
     }
 
     public abstract boolean process(Round round) throws Exception;
+
+    @Override public SourceVersion getSupportedSourceVersion() {
+        return (this.getClass().getAnnotation(SupportedSourceVersion.class) == null)
+                ? SourceVersion.latest()
+                : super.getSupportedSourceVersion();
+    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
