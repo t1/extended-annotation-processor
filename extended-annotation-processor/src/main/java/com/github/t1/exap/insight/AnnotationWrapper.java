@@ -49,7 +49,9 @@ public class AnnotationWrapper extends Elemental {
         this.annotationMirror = requireNonNull(annotationMirror);
     }
 
-    @Override protected Element getElement() {return types().asElement(annotationMirror.getAnnotationType());}
+    @Override protected Element getElement() {
+        return requireNonNull(types().asElement(annotationMirror.getAnnotationType()));
+    }
 
     @Override public Optional<Elemental> enclosingElement() {
         throw new UnsupportedOperationException("not yet implemented");

@@ -54,7 +54,7 @@ public class Type extends Elemental {
 
     protected TypeElement getTypeElement() {return (TypeElement) getElement();}
 
-    @Override protected Element getElement() {return types().asElement(typeMirror);}
+    @Override protected Element getElement() {return requireNonNull(types().asElement(typeMirror));}
 
     @Override public Optional<Elemental> enclosingElement() {return Optional.of(getPackage());}
 
@@ -89,7 +89,7 @@ public class Type extends Elemental {
 
     public String getSimpleName() {
         try {
-            var element = getElement();
+            var element = types().asElement(typeMirror);
             if (element == null)
                 return typeMirror.toString();
             return element.getSimpleName().toString();

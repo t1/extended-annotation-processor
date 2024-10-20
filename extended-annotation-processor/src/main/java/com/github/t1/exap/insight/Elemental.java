@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.DEFAULT;
@@ -118,8 +117,6 @@ public abstract class Elemental {
     }
 
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
-        if (this.getElement() == null)
-            return emptyList();
         return asList(this.getElement().getAnnotationsByType(type));
     }
 

@@ -1,37 +1,10 @@
 package com.github.t1.exap.insight;
 
-import com.github.t1.exap.Round;
-
-import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
-
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
 public class Message {
-    private static final Round DUMMY_ROUND = new Round(null, null, null, 0);
-    public static final Elemental NO_ELEMENT = new Elemental(DUMMY_ROUND) {
-        @Override
-        public String toString() {
-            return "#NO_ELEMENT#";
-        }
-
-        @Override protected Element getElement() {return null;}
-
-        @Override public Optional<Elemental> enclosingElement() {return Optional.empty();}
-    };
-    public static final Elemental ANY_ELEMENT = new Elemental(DUMMY_ROUND) {
-        @Override
-        public String toString() {
-            return "#ANY_ELEMENT#";
-        }
-
-        @Override protected Element getElement() {return null;}
-
-        @Override public Optional<Elemental> enclosingElement() {return Optional.empty();}
-    };
-
     private final Elemental elemental;
     private final Diagnostic.Kind kind;
     private final CharSequence text;

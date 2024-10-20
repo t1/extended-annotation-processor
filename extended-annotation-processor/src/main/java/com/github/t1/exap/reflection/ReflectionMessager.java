@@ -12,9 +12,7 @@ import javax.lang.model.element.Element;
 import javax.tools.Diagnostic.Kind;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.t1.exap.insight.Message.ANY_ELEMENT;
-import static com.github.t1.exap.insight.Message.NO_ELEMENT;
+import java.util.stream.Collectors;
 
 class ReflectionMessager implements Messager {
     private static final Logger log = LoggerFactory.getLogger(ReflectionMessager.class);
@@ -23,7 +21,7 @@ class ReflectionMessager implements Messager {
 
     @Override
     public void printMessage(Kind kind, CharSequence msg) {
-        message(NO_ELEMENT, kind, msg);
+        message(null, kind, msg);
         switch (kind) {
             case ERROR:
                 log.error(msg.toString());
@@ -59,13 +57,14 @@ class ReflectionMessager implements Messager {
         printMessage(kind, msg + " ### " + e + " # " + a + "=" + v);
     }
 
+    /**
+     * get all messages of that kind (or null for all kinds) for that element (or null for all elements)
+     */
     List<String> getMessages(Elemental element, Kind kind) {
-        List<String> list = new ArrayList<>();
-        for (Message message : messages)
-            if ((ANY_ELEMENT.equals(element) || message.getElemental().equals(element))
-                && message.getKind().equals(kind))
-                list.add(message.getText().toString());
-        return list;
+        return messages.stream()
+                .filter(message -> (element == null || message.getElemental().equals(element))
+                                   && (kind == null || message.getKind().equals(kind)))
+                .map(message -> message.getText().toString()).collect(Collectors.toList());
     }
 
     List<Message> getMessages() {
@@ -73,7 +72,10 @@ class ReflectionMessager implements Messager {
     }
 
     public void message(Elemental elemental, Kind kind, CharSequence message) {
-        log.debug("{}: {}: {}", kind, elemental, message);
+        if (elemental == null)
+            log.debug("{}: {}", kind, message);
+        else
+            log.debug("{}: {}: {}", kind, elemental, message);
         messages.add(new Message(elemental, kind, message));
     }
 }

@@ -8,10 +8,13 @@ import javax.annotation.processing.FilerException;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 public class Package extends Elemental {
@@ -24,7 +27,13 @@ public class Package extends Elemental {
         this.round = round;
     }
 
-    @Override protected Element getElement() {return packageElement;}
+    @Override protected Element getElement() {
+        return requireNonNull(packageElement, "there is no element for the root package");
+    }
+
+    @Override public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
+        return (packageElement == null) ? List.of() : super.getAnnotations(type);
+    }
 
     @Override public Optional<Elemental> enclosingElement() {
         if (isRoot()) return Optional.empty(); // TODO return the module
@@ -46,7 +55,7 @@ public class Package extends Elemental {
     public Path toPath() {return Paths.get(getName().replace('.', '/'));}
 
     public Resource createSource(String relativeName) {
-            String sourceName = sourceName(relativeName);
+        String sourceName = sourceName(relativeName);
         try {
             return new Resource(filer().createSourceFile(sourceName));
         } catch (FilerException e) {
