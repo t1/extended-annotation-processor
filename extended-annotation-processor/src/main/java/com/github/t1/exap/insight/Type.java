@@ -84,8 +84,7 @@ public class Type extends Elemental {
         return types().isSameType(this.typeMirror, that.typeMirror);
     }
 
-    @Override
-    public String toString() {return getClass().getSimpleName() + ":" + getFullName();}
+    @Override public String toString() {return getFullName();}
 
     public String getSimpleName() {
         try {

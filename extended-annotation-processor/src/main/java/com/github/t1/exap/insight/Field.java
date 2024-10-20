@@ -55,8 +55,5 @@ public class Field extends Elemental {
         return list;
     }
 
-    @Override
-    public String toString() {
-        return "field " + declaringType.getSimpleName() + "#" + name();
-    }
+    @Override public String toString() {return declaringType + "#" + name();}
 }

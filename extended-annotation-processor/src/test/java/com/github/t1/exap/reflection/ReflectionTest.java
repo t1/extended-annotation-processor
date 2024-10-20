@@ -328,7 +328,7 @@ public class ReflectionTest {
 
         assertEquals(ENV.type(Number.class), ENV.type(Integer.class).getSuperType());
 
-        assertEquals("ReflectionType:java.lang.Integer", ENV.type(Integer.class).toString());
+        assertEquals("java.lang.Integer", ENV.type(Integer.class).toString());
 
         assertEquals(ENV.type(String.class), ENV.type(String.class));
         assertNotEquals(ENV.type(String.class), ENV.type(Long.class));

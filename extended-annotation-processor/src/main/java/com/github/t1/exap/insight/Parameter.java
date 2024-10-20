@@ -1,7 +1,6 @@
 package com.github.t1.exap.insight;
 
 import javax.lang.model.element.VariableElement;
-
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -32,8 +31,5 @@ public class Parameter extends Elemental {
         return Type.of(param.asType(), round());
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + getMethod() + "#" + getName();
-    }
+    @Override public String toString() {return getType() + " " + getName();}
 }

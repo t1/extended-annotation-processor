@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 public class Method extends Elemental implements Comparable<Method> {
     private static final Comparator<Method> COMPARATOR = Comparator.comparing(Method::name);
@@ -42,7 +43,10 @@ public class Method extends Elemental implements Comparable<Method> {
 
     public Type getReturnType() {return Type.of(method.getReturnType(), round());}
 
-    @Override public String toString() {return "method " + getDeclaringType().getSimpleName() + "#" + name();}
+    @Override public String toString() {
+        return declaringType + "#" + name() + getParameters().stream()
+                .map(Parameter::toString).collect(joining(", ", "(", ")"));
+    }
 
     @Override public int compareTo(Method that) {return COMPARATOR.compare(this, that);}
 }

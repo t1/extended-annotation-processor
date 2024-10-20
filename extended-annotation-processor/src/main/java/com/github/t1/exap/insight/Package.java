@@ -94,10 +94,7 @@ public class Package extends Elemental {
         return new TypeGenerator(round, this, name);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + getName();
-    }
+    @Override public String toString() {return getName();}
 
     @Override
     public boolean equals(Object obj) {

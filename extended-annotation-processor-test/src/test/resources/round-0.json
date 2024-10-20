@@ -304,7 +304,7 @@
             {
                 "name": "method0",
                 "javadoc": "method javadoc",
-                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "containerType": "somepackage.AnnotatedClass<T>",
                 "returnType": {
                     "name": "void",
                     "fullName": "void",
@@ -348,7 +348,7 @@
             },
             {
                 "name": "method1",
-                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "containerType": "somepackage.AnnotatedClass<T>",
                 "returnType": {
                     "name": "List",
                     "fullName": "java.util.List<java.lang.String>",
@@ -425,7 +425,7 @@
             },
             {
                 "name": "method2",
-                "containerType": "Type:somepackage.AnnotatedClass<T>",
+                "containerType": "somepackage.AnnotatedClass<T>",
                 "returnType": {
                     "name": "Nested",
                     "fullName": "somepackage.Container.Nested",
