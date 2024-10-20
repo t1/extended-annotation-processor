@@ -41,19 +41,16 @@ class ReflectionMessager implements Messager {
 
     @Override
     public void printMessage(Kind kind, CharSequence msg, Element e) {
-        assert e == null : "messages for elements should go via Elemental#message()";
         printMessage(kind, msg + " ### " + e);
     }
 
     @Override
     public void printMessage(Kind kind, CharSequence msg, Element e, AnnotationMirror a) {
-        assert e == null : "messages for elements should go via Elemental#message()";
         printMessage(kind, msg + " ### " + e + " # " + a);
     }
 
     @Override
     public void printMessage(Kind kind, CharSequence msg, Element e, AnnotationMirror a, AnnotationValue v) {
-        assert e == null : "messages for elements should go via Elemental#message()";
         printMessage(kind, msg + " ### " + e + " # " + a + "=" + v);
     }
 

@@ -95,9 +95,7 @@ public abstract class Elemental {
         return !getAnnotations(type).isEmpty();
     }
 
-    /**
-     * Find an annotation on this element or any of its enclosing elements.
-     */
+    /** Find an annotation on this element or any of its enclosing elements. */
     public <T extends Annotation> Optional<T> findAnnotation(Class<T> type) {
         return annotation(type).or(() -> enclosingElement().flatMap(t -> t.findAnnotation(type)));
     }

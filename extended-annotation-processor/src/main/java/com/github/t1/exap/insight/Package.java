@@ -7,6 +7,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.FilerException;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.file.Path;
@@ -27,12 +28,18 @@ public class Package extends Elemental {
         this.round = round;
     }
 
+    @Override protected void message(Diagnostic.Kind kind, CharSequence message) {
+        if (isRoot()) //noinspection deprecation
+            env().getMessager().printMessage(kind, message);
+        else super.message(kind, message);
+    }
+
     @Override protected Element getElement() {
         return requireNonNull(packageElement, "there is no element for the root package");
     }
 
     @Override public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
-        return (packageElement == null) ? List.of() : super.getAnnotations(type);
+        return (isRoot()) ? List.of() : super.getAnnotations(type);
     }
 
     @Override public Optional<Elemental> enclosingElement() {
@@ -42,9 +49,7 @@ public class Package extends Elemental {
         return Optional.of(round.getPackage(parentPackage));
     }
 
-    public String getName() {
-        return (packageElement == null) ? "" : packageElement.getQualifiedName().toString();
-    }
+    public String getName() {return (isRoot()) ? "" : packageElement.getQualifiedName().toString();}
 
     public boolean isRoot() {return packageElement == null;}
 
@@ -94,7 +99,7 @@ public class Package extends Elemental {
         return new TypeGenerator(round, this, name);
     }
 
-    @Override public String toString() {return getName();}
+    @Override public String toString() {return isRoot() ? "<root-package>" : getName();}
 
     @Override
     public boolean equals(Object obj) {
