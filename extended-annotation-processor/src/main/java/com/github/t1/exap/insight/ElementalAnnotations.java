@@ -3,6 +3,7 @@ package com.github.t1.exap.insight;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -14,6 +15,16 @@ public class ElementalAnnotations {
     public ElementalAnnotations(List<AnnotationWrapper> annotations) {
         this.annotations = annotations;
     }
+
+    @Override public String toString() {return annotations.toString();}
+
+    @Override public boolean equals(Object o) {
+        return (this == o)
+               || ((o instanceof ElementalAnnotations that)
+                   && Objects.equals(this.annotations, that.annotations));
+    }
+
+    @Override public int hashCode() {return Objects.hashCode(annotations);}
 
     public Optional<AnnotationWrapper> get(Class<? extends Annotation> annotationType) {
         return get(annotationType.getName());

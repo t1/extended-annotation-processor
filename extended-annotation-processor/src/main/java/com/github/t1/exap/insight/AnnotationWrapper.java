@@ -49,6 +49,19 @@ public class AnnotationWrapper extends Elemental {
         this.annotationMirror = requireNonNull(annotationMirror);
     }
 
+    @Override public String toString() {return annotationMirror.toString();}
+
+    @Override public boolean equals(Object that) {
+        if (this == that) return true;
+        if (!(that instanceof AnnotationWrapper)) return false;
+        return Objects.equals(annotationMirror, ((AnnotationWrapper) that).annotationMirror);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hashCode(annotationMirror);
+    }
+
+
     @Override protected Element getElement() {
         return requireNonNull(types().asElement(annotationMirror.getAnnotationType()));
     }
@@ -355,17 +368,5 @@ public class AnnotationWrapper extends Elemental {
     private Stream<?> getPropertyStream(String name) {
         var property = getProperty(name);
         return (property instanceof List) ? ((List<?>) property).stream() : Stream.of(property);
-    }
-
-    @Override public String toString() {return annotationMirror.toString();}
-
-    @Override public boolean equals(Object that) {
-        if (this == that) return true;
-        if (!(that instanceof AnnotationWrapper)) return false;
-        return Objects.equals(annotationMirror, ((AnnotationWrapper) that).annotationMirror);
-    }
-
-    @Override public int hashCode() {
-        return Objects.hashCode(annotationMirror);
     }
 }
