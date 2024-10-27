@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.t1.exap.insight.ElementalKind.FIELD;
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.type.TypeKind.DECLARED;
 
@@ -22,7 +23,7 @@ public class Field extends Elemental {
     private final VariableElement field;
 
     public Field(Type declaringType, VariableElement field, Round round) {
-        super(round);
+        super(FIELD, round);
         this.declaringType = requireNonNull(declaringType);
         this.field = requireNonNull(field);
     }

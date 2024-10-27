@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.github.t1.exap.insight.ElementalKind.TYPE;
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.ElementKind.ENUM;
 import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
@@ -44,7 +45,7 @@ public class Type extends Elemental {
     private final TypeMirror typeMirror;
 
     protected Type(TypeMirror typeMirror, Round round) {
-        super(round);
+        super(TYPE, round);
         this.typeMirror = requireNonNull(typeMirror, "type");
     }
 

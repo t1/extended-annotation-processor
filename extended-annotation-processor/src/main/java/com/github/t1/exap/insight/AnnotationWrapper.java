@@ -45,7 +45,7 @@ public class AnnotationWrapper extends Elemental {
     private final AnnotationMirror annotationMirror;
 
     public AnnotationWrapper(AnnotationMirror annotationMirror, Round round) {
-        super(round);
+        super(ElementalKind.ANNOTATION, round);
         this.annotationMirror = requireNonNull(annotationMirror);
     }
 

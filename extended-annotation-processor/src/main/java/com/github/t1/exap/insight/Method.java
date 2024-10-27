@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.t1.exap.insight.ElementalKind.METHOD;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
@@ -19,7 +20,7 @@ public class Method extends Elemental implements Comparable<Method> {
     private final ExecutableElement method;
 
     public Method(Type declaringType, ExecutableElement method, Round round) {
-        super(round);
+        super(METHOD, round);
         this.declaringType = requireNonNull(declaringType);
         this.method = requireNonNull(method);
     }

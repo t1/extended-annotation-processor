@@ -3,6 +3,7 @@ package com.github.t1.exap.insight;
 import javax.lang.model.element.VariableElement;
 import java.util.Optional;
 
+import static com.github.t1.exap.insight.ElementalKind.PARAMETER;
 import static java.util.Objects.requireNonNull;
 
 public class Parameter extends Elemental {
@@ -10,7 +11,7 @@ public class Parameter extends Elemental {
     private final Method method;
 
     public Parameter(Method method, VariableElement param) {
-        super(method.round());
+        super(PARAMETER, method.round());
         this.method = requireNonNull(method);
         this.param = requireNonNull(param);
     }

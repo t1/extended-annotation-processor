@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.t1.exap.insight.ElementalKind.PACKAGE;
 import static java.util.Objects.requireNonNull;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
@@ -23,7 +24,7 @@ public class Package extends Elemental {
     private final Round round;
 
     public Package(PackageElement packageElement, Round round) {
-        super(round);
+        super(PACKAGE, round);
         this.packageElement = packageElement;
         this.round = round;
     }

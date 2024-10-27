@@ -31,13 +31,17 @@ import static javax.tools.Diagnostic.Kind.OTHER;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
 public abstract class Elemental {
+    private final ElementalKind kind;
     private final Round round;
     private final AnnotationWrapperBuilder annotationWrapperBuilder;
 
-    public Elemental(Round round) {
+    public Elemental(ElementalKind kind, Round round) {
+        this.kind = kind;
         this.round = requireNonNull(round);
         this.annotationWrapperBuilder = new AnnotationWrapperBuilder(round);
     }
+
+    public ElementalKind kind() {return kind;}
 
     public Round round() {return round;}
 
