@@ -172,7 +172,7 @@ class ReflectionType extends Type {
     private List<Method> getMethods(boolean isStatic) {
         List<Method> methods = new ArrayList<>();
         for (java.lang.reflect.Method method : rawType().getDeclaredMethods())
-            if (isStatic(method) == isStatic)
+            if (!method.isSynthetic() && isStatic(method) == isStatic)
                 methods.add(new ReflectionMethod(this, method));
         return methods;
     }
