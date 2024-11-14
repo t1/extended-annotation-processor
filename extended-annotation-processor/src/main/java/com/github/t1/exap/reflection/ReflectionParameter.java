@@ -49,7 +49,7 @@ class ReflectionParameter extends Parameter {
     public Type getType() {return ReflectionType.type(parameter.getParameterizedType());}
 
     @Override
-    protected boolean is(Modifier modifier) {return ReflectionModifiers.on(parameter.getModifiers()).is(modifier);}
+    public boolean is(Modifier modifier) {return ReflectionModifiers.on(parameter.getModifiers()).is(modifier);}
 
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {ENV.message(this, kind, message);}

@@ -58,7 +58,7 @@ class ReflectionMethod extends Method {
     public Type getReturnType() {return ReflectionType.type(method.getGenericReturnType());}
 
     @Override
-    protected boolean is(Modifier modifier) {return ReflectionModifiers.on(method.getModifiers()).is(modifier);}
+    public boolean is(Modifier modifier) {return ReflectionModifiers.on(method.getModifiers()).is(modifier);}
 
     @Override
     protected void message(Diagnostic.Kind kind, CharSequence message) {ENV.message(this, kind, message);}

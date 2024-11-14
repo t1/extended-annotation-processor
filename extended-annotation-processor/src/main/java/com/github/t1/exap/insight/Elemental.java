@@ -19,11 +19,18 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.DEFAULT;
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.NATIVE;
+import static javax.lang.model.element.Modifier.NON_SEALED;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PROTECTED;
 import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.SEALED;
 import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.element.Modifier.STRICTFP;
+import static javax.lang.model.element.Modifier.SYNCHRONIZED;
 import static javax.lang.model.element.Modifier.TRANSIENT;
+import static javax.lang.model.element.Modifier.VOLATILE;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 import static javax.tools.Diagnostic.Kind.NOTE;
@@ -77,11 +84,11 @@ public abstract class Elemental {
 
     public boolean isPackagePrivate() {return !isPublic() && !isProtected() && !isPrivate();}
 
-    public boolean isPrivate() {return is(PRIVATE);}
+    public boolean isPublic() {return is(PUBLIC);}
 
     public boolean isProtected() {return is(PROTECTED);}
 
-    public boolean isPublic() {return is(PUBLIC);}
+    public boolean isPrivate() {return is(PRIVATE);}
 
     public boolean isAbstract() {return is(ABSTRACT);}
 
@@ -89,9 +96,23 @@ public abstract class Elemental {
 
     public boolean isStatic() {return is(STATIC);}
 
+    public boolean isSealed() {return is(SEALED);}
+
+    public boolean isNonSealed() {return is(NON_SEALED);}
+
+    public boolean isFinal() {return is(FINAL);}
+
     public boolean isTransient() {return is(TRANSIENT);}
 
-    protected boolean is(Modifier modifier) {
+    public boolean isVolatile() {return is(VOLATILE);}
+
+    public boolean isSynchronized() {return is(SYNCHRONIZED);}
+
+    public boolean isNative() {return is(NATIVE);}
+
+    public boolean isStrictFp() {return is(STRICTFP);}
+
+    public boolean is(Modifier modifier) {
         return getElement().getModifiers().contains(modifier);
     }
 

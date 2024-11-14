@@ -64,7 +64,7 @@ class ReflectionType extends Type {
     }
 
     @Override
-    protected boolean is(Modifier modifier) {
+    public boolean is(Modifier modifier) {
         return ReflectionModifiers.on(rawType().getModifiers()).is(modifier);
     }
 
