@@ -325,6 +325,8 @@ public class Type extends Elemental {
     }
 
     public Package getPackage() {
-        return new Package(elements().getPackageOf(((DeclaredType) typeMirror).asElement()), round());
+        if (isKind(DECLARED))
+            return new Package(elements().getPackageOf(((DeclaredType) typeMirror).asElement()), round());
+        throw new RuntimeException("a " + kind() + " doesn't have a package: " + typeMirror);
     }
 }
