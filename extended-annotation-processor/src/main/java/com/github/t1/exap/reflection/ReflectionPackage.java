@@ -23,10 +23,9 @@ class ReflectionPackage extends Package {
         this.pkg = pack;
     }
 
-    @Override
-    public String getName() {
-        return (pkg == null) ? null : pkg.getName();
-    }
+    @Override public String getName() {return (pkg == null) ? null : pkg.getName();}
+
+    @Override public String name() {return getName();}
 
     @Override
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
@@ -34,9 +33,7 @@ class ReflectionPackage extends Package {
     }
 
     @Override
-    public List<AnnotationWrapper> getAnnotationWrappers() {
-        return ReflectionAnnotationWrapper.allOn(pkg);
-    }
+    public List<AnnotationWrapper> getAnnotationWrappers() {return ReflectionAnnotationWrapper.allOn(pkg);}
 
     @Override
     public <T extends Annotation> List<AnnotationWrapper> getAnnotationWrappers(Class<T> type) {

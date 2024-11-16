@@ -29,7 +29,7 @@ public class ImportGenerator {
     }
 
     private boolean isAutoImport(Type type) {
-        return type.getPackage() == null
+        return type.isPrimitive()
                || "java.lang".equals(type.getPackage().getName())
                || type.getPackage().equals(selfPackage);
     }

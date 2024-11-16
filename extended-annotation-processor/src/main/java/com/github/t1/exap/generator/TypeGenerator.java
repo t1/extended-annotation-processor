@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.github.t1.exap.generator.TypeKind.CLASS;
 import static com.github.t1.exap.generator.Visibility.PACKAGE_PRIVATE;
@@ -51,14 +52,17 @@ public class TypeGenerator implements AutoCloseable {
         return kind;
     }
 
-    /** You should only need to call this for types needed <em>in</em> your body */
-    public TypeGenerator addImport(String type) {
-        return addImport(round.type(type));
+    /// You should only need to call this for types needed _in_ your body... but you can also pass types that
+    /// don't have to be imported: primitives, classes from `java.lang`, or the same package.
+    public TypeGenerator addImport(String... types) {
+        Stream.of(types).map(round::type).forEach(imports::add);
+        return this;
     }
 
-    /** You should only need to call this for types needed <em>in</em> your body */
-    public TypeGenerator addImport(Type type) {
-        imports.add(type);
+    /// You should only need to call this for types needed _in_ your body... but you can also pass types that
+    /// don't have to be imported: primitives, classes from `java.lang`, or the same package.
+    public TypeGenerator addImport(Type... types) {
+        Stream.of(types).forEach(imports::add);
         return this;
     }
 

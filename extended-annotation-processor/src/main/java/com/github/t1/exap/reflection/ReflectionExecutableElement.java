@@ -13,24 +13,33 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 import static javax.lang.model.element.ElementKind.METHOD;
 
 class ReflectionExecutableElement implements ReflectionTypeMirror, ExecutableElement {
-    private final Method method;
+    private final Executable executable;
 
-    ReflectionExecutableElement(Method method) {this.method = method;}
+    ReflectionExecutableElement(Executable executable) {this.executable = executable;}
 
-    @Override public AnnotatedElement asAnnotatedElement() {return method;}
+    @Override public AnnotatedElement asAnnotatedElement() {return executable;}
 
     @Override public TypeMirror asType() {return null;}
 
-    @Override public ElementKind getKind() {return METHOD;}
+    @Override public ElementKind getKind() {
+        return switch (executable) {
+            case Method ignored -> METHOD;
+            case Constructor<?> ignored -> CONSTRUCTOR;
+        };
+    }
 
-    @Override public Set<Modifier> getModifiers() {return ReflectionModifiers.on(method.getModifiers()).toSet();}
+    @Override
+    public Set<Modifier> getModifiers() {return ReflectionModifiers.on(executable.getModifiers()).toSet();}
 
     @Override public List<? extends TypeParameterElement> getTypeParameters() {return List.of();}
 
@@ -48,7 +57,7 @@ class ReflectionExecutableElement implements ReflectionTypeMirror, ExecutableEle
 
     @Override public AnnotationValue getDefaultValue() {return null;}
 
-    @Override public Name getSimpleName() {return new ReflectionName(method.getName());}
+    @Override public Name getSimpleName() {return new ReflectionName(executable.getName());}
 
     @Override public Element getEnclosingElement() {return null;}
 

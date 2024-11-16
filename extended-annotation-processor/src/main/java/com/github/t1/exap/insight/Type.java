@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import static com.github.t1.exap.insight.ElementalKind.TYPE;
 import static java.util.Objects.requireNonNull;
+import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 import static javax.lang.model.element.ElementKind.ENUM;
 import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static javax.lang.model.element.ElementKind.FIELD;
@@ -106,6 +107,7 @@ public class Type extends Elemental {
      * If you want to use it as a source file name, you should replace the '.'s with '$'s.
      */
     public String getRelativeName() {
+        if (isKind(TYPEVAR) || isPrimitive()) return getSimpleName();
         var packageLength = getPackage().getName().length();
         if (packageLength > 0)
             ++packageLength; // for the final dot
@@ -200,7 +202,7 @@ public class Type extends Elemental {
                 return true;
             if (isVoid() || isPrimitive())
                 return false;
-            for (TypeMirror supertype : allTypes())
+            for (var supertype : allSuperTypes())
                 if (toRawString(supertype).equals(thatTypeName))
                     return true;
             return false;
@@ -216,9 +218,9 @@ public class Type extends Elemental {
         return string;
     }
 
-    private List<TypeMirror> allTypes() {
+    private List<TypeMirror> allSuperTypes() {
         Set<TypeMirror> result = new LinkedHashSet<>();
-        for (TypeMirror t = typeMirror; t.getKind() != TypeKind.NONE; t = superClass(t)) {
+        for (TypeMirror t = typeMirror; t.getKind() == DECLARED; t = superClass(t)) {
             result.add(t);
             addInterfaces(result, t);
         }
@@ -246,6 +248,7 @@ public class Type extends Elemental {
         return Stream.concat(this.interfaces(), superTypes().flatMap(Type::interfaces));
     }
 
+    /// @return all non-static methods, including those from super types
     public List<Method> getAllMethods() {
         List<Method> methods = new ArrayList<>(getMethods());
         if (hasSuperType())
@@ -253,8 +256,10 @@ public class Type extends Elemental {
         return methods;
     }
 
+    /// @return all non-static methods, including those from types it's nested in
     public List<Method> getMethods() {return getMethods(false);}
 
+    /// @return static methods, including those from types it's nested in
     public List<Method> getStaticMethods() {return getMethods(true);}
 
     private List<Method> getMethods(boolean isStatic) {
@@ -264,6 +269,15 @@ public class Type extends Elemental {
                 if (element.getModifiers().contains(STATIC) == isStatic)
                     if (element.getKind() == METHOD)
                         list.add(new Method(this, (ExecutableElement) element, round()));
+        return list;
+    }
+
+    public List<Method> getConstructors() {
+        List<Method> list = new ArrayList<>();
+        if (getElement() != null)
+            for (Element element : getElement().getEnclosedElements())
+                if (element.getKind() == CONSTRUCTOR)
+                    list.add(new Method(this, (ExecutableElement) element, round()));
         return list;
     }
 
@@ -327,6 +341,6 @@ public class Type extends Elemental {
     public Package getPackage() {
         if (isKind(DECLARED))
             return new Package(elements().getPackageOf(((DeclaredType) typeMirror).asElement()), round());
-        throw new RuntimeException("a " + kind() + " doesn't have a package: " + typeMirror);
+        throw new RuntimeException("the " + kind() + " [" + typeMirror + "] doesn't have a package");
     }
 }

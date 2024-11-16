@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     private static final Logger log = LoggerFactory.getLogger(ReflectionProcessingEnvironment.class);
@@ -83,6 +84,8 @@ public class ReflectionProcessingEnvironment implements ProcessingEnvironment {
     public Element element(TypeMirror type) {return new ReflectionTypeElement(type(type));}
 
     public Round round() {return DUMMY_ROUND;}
+
+    public Stream<Message> messages() {return getMessages().stream();}
 
     public List<Message> getMessages() {
         return messager.getMessages();

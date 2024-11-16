@@ -9,6 +9,7 @@ import com.github.t1.exap.insight.Type;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,15 +53,15 @@ class ReflectionType extends Type {
     }
 
     private Class<?> rawType() {
-        return isClass() ? asClass() : (Class<?>) asParameterizedType().getRawType();
-    }
-
-    private boolean isParameterizedType() {
-        return this.type instanceof ParameterizedType;
-    }
-
-    private ParameterizedType asParameterizedType() {
-        return (ParameterizedType) this.type;
+        var t = type;
+        while (true) {
+            switch (t) {
+                case Class<?> c -> {return c;}
+                case ParameterizedType p -> t = p.getRawType();
+                case GenericArrayType g -> t = g.getGenericComponentType();
+                case null, default -> throw new IllegalStateException("don't know how to get raw type from: " + type);
+            }
+        }
     }
 
     @Override
@@ -131,13 +132,13 @@ class ReflectionType extends Type {
 
     @Override
     public boolean isArray() {
-        return rawType().isArray();
+        return type instanceof GenericArrayType || (type instanceof Class<?> c && c.isArray());
     }
 
     @Override
     public Type elementType() {
-        if (isArray())
-            return ReflectionType.type(asClass().getComponentType());
+        if (type instanceof GenericArrayType g) return ReflectionType.type(g.getGenericComponentType());
+        if (type instanceof Class<?> c && c.isArray()) return ReflectionType.type(c.getComponentType());
         return null;
     }
 
@@ -149,8 +150,10 @@ class ReflectionType extends Type {
     @Override
     public List<Type> getTypeParameters() {
         List<Type> list = new ArrayList<>();
-        if (isParameterizedType())
-            for (java.lang.reflect.Type type : asParameterizedType().getActualTypeArguments())
+        var t = this.type;
+        if (t instanceof GenericArrayType g) t = g.getGenericComponentType();
+        if (t instanceof ParameterizedType p)
+            for (java.lang.reflect.Type type : p.getActualTypeArguments())
                 list.add(ReflectionType.type(type));
         return list;
     }

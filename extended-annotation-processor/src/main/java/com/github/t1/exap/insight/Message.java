@@ -4,6 +4,11 @@ import javax.tools.Diagnostic;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
+import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.Diagnostic.Kind.OTHER;
+import static javax.tools.Diagnostic.Kind.WARNING;
 
 public class Message {
     private final Elemental elemental;
@@ -17,6 +22,18 @@ public class Message {
     }
 
     public Diagnostic.Kind getKind() {return kind;}
+
+    public boolean isError() {return is(ERROR);}
+
+    public boolean isWarning() {return is(WARNING);}
+
+    public boolean isMandatory_warning() {return is(MANDATORY_WARNING);}
+
+    public boolean isNote() {return is(NOTE);}
+
+    public boolean isOther() {return is(OTHER);}
+
+    private boolean is(Diagnostic.Kind kind) {return getKind() == kind;}
 
     public Elemental getElemental() {return elemental;}
 

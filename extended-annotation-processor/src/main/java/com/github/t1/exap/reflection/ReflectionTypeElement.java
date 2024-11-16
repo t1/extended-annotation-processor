@@ -33,12 +33,18 @@ class ReflectionTypeElement implements TypeElement {
 
     @Override public List<? extends Element> getEnclosedElements() {
         return Stream.concat(
-                Stream.of(getReflectedClass().getDeclaredFields())
-                        .map(field -> new ReflectionField(type, field))
-                        .map(Field::getElement),
-                Stream.of(getReflectedClass().getDeclaredMethods())
-                        .map(method -> new ReflectionMethod(type, method))
-                        .map(Method::getElement))
+                        Stream.concat(
+                                Stream.empty(),
+                                Stream.of(getReflectedClass().getDeclaredConstructors())
+                                        .map(constructor -> new ReflectionConstructor(type, constructor))
+                                        .map(Method::getElement)),
+                        Stream.concat(
+                                Stream.of(getReflectedClass().getDeclaredFields())
+                                        .map(field -> new ReflectionField(type, field))
+                                        .map(Field::getElement),
+                                Stream.of(getReflectedClass().getDeclaredMethods())
+                                        .map(method -> new ReflectionMethod(type, method))
+                                        .map(Method::getElement)))
                 .collect(toList());
     }
 
@@ -67,12 +73,10 @@ class ReflectionTypeElement implements TypeElement {
     @Override public TypeMirror asType() {return type.getTypeMirror();}
 
     @Override public ElementKind getKind() {
-        switch (type.getKind()) {
-            case DECLARED:
-                return ElementKind.CLASS;
-            default:
-                throw new RuntimeException("unsupported type kind: " + type.getKind());
-        }
+        return switch (type.getKind()) {
+            case DECLARED -> ElementKind.CLASS;
+            default -> throw new RuntimeException("unsupported type kind: " + type.getKind());
+        };
     }
 
     @Override public Set<Modifier> getModifiers() {
