@@ -8,7 +8,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static javax.lang.model.type.TypeKind.DECLARED;
 
@@ -52,6 +54,8 @@ class ReflectionDeclaredTypeMirror implements ReflectionTypeMirror, DeclaredType
     }
 
     @Override public List<? extends TypeMirror> getTypeArguments() {
-        throw new UnsupportedOperationException();
+        if (type instanceof ParameterizedType p)
+            return Stream.of(p.getActualTypeArguments()).map(ReflectionDeclaredTypeMirror::new).toList();
+        return null;
     }
 }

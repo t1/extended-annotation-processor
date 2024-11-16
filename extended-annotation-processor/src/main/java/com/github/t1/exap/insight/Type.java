@@ -176,13 +176,19 @@ public class Type extends Elemental {
         return null;
     }
 
+    public boolean isParameterized() {
+        return isKind(DECLARED) && declaredType().getTypeArguments() != null;
+    }
+
     public List<Type> getTypeParameters() {
         List<Type> result = new ArrayList<>();
         if (isKind(DECLARED))
-            for (TypeMirror arg : ((DeclaredType) typeMirror).getTypeArguments())
+            for (TypeMirror arg : declaredType().getTypeArguments())
                 result.add(Type.of(arg, round()));
         return result;
     }
+
+    private DeclaredType declaredType() {return (DeclaredType) typeMirror;}
 
     public boolean isA(Type type) {
         // The following methods return false for, e.g., a List<String> and java.util.Collection<E>
@@ -340,7 +346,7 @@ public class Type extends Elemental {
 
     public Package getPackage() {
         if (isKind(DECLARED))
-            return new Package(elements().getPackageOf(((DeclaredType) typeMirror).asElement()), round());
+            return new Package(elements().getPackageOf(declaredType().asElement()), round());
         throw new RuntimeException("the " + kind() + " [" + typeMirror + "] doesn't have a package");
     }
 }
