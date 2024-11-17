@@ -177,7 +177,7 @@ public class Type extends Elemental {
     }
 
     public boolean isParameterized() {
-        return isKind(DECLARED) && declaredType().getTypeArguments() != null;
+        return isKind(DECLARED) && !declaredType().getTypeArguments().isEmpty();
     }
 
     public List<Type> getTypeParameters() {

@@ -56,6 +56,6 @@ class ReflectionDeclaredTypeMirror implements ReflectionTypeMirror, DeclaredType
     @Override public List<? extends TypeMirror> getTypeArguments() {
         if (type instanceof ParameterizedType p)
             return Stream.of(p.getActualTypeArguments()).map(ReflectionDeclaredTypeMirror::new).toList();
-        return null;
+        return List.of();
     }
 }
