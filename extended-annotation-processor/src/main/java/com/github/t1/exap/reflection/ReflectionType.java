@@ -11,6 +11,7 @@ import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,7 +60,9 @@ class ReflectionType extends Type {
                 case Class<?> c -> {return c;}
                 case ParameterizedType p -> t = p.getRawType();
                 case GenericArrayType g -> t = g.getGenericComponentType();
-                case null, default -> throw new IllegalStateException("don't know how to get raw type from: " + type);
+                case TypeVariable<?> v -> t = v.getBounds()[0];
+                case null, default -> throw new IllegalStateException(
+                        "don't know how to get raw type from: " + typeKind() + " " + type);
             }
         }
     }

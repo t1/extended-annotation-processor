@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static java.util.Arrays.asList;
+import static javax.lang.model.type.TypeKind.DECLARED;
 
 public class ImportGenerator {
     private static final List<String> ROOT_PACKAGES = asList("java", "javax", "org", "com");
@@ -29,7 +30,7 @@ public class ImportGenerator {
     }
 
     private boolean isAutoImport(Type type) {
-        return type.isPrimitive()
+        return type.isPrimitive() || !type.isKind(DECLARED)
                || "java.lang".equals(type.getPackage().getName())
                || type.getPackage().equals(selfPackage);
     }

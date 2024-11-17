@@ -73,9 +73,9 @@ class ReflectionTypeElement implements TypeElement {
     @Override public TypeMirror asType() {return type.getTypeMirror();}
 
     @Override public ElementKind getKind() {
-        return switch (type.getKind()) {
+        return switch (type.typeKind()) {
             case DECLARED -> ElementKind.CLASS;
-            default -> throw new RuntimeException("unsupported type kind: " + type.getKind());
+            default -> throw new RuntimeException("unsupported type kind: " + type.typeKind());
         };
     }
 

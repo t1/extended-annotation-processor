@@ -62,9 +62,9 @@ public class Type extends Elemental {
 
     private TypeElement asTypeElement(TypeMirror typeMirror) {return (TypeElement) types().asElement(typeMirror);}
 
-    public TypeKind getKind() {return typeMirror.getKind();}
+    public TypeKind typeKind() {return typeMirror.getKind();}
 
-    private boolean isKind(TypeKind kind) {return typeMirror.getKind() == kind;}
+    public boolean isKind(TypeKind kind) {return typeMirror.getKind() == kind;}
 
     public void accept(TypeVisitor scanner) {
         for (Method method : getMethods())

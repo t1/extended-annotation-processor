@@ -9,6 +9,8 @@ import javax.lang.model.type.TypeVisitor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -27,7 +29,13 @@ class ReflectionDeclaredTypeMirror implements ReflectionTypeMirror, DeclaredType
 
     @Override public AnnotatedElement asAnnotatedElement() {return (AnnotatedElement) type;}
 
-    @Override public TypeKind getKind() {return DECLARED;}
+    @Override public TypeKind getKind() {
+        return switch (type) {
+            case TypeVariable<?> ignored -> TypeKind.TYPEVAR;
+            case WildcardType ignored -> TypeKind.WILDCARD;
+            default -> DECLARED;
+        };
+    }
 
     @Override public <R, P> R accept(TypeVisitor<R, P> v, P p) {
         throw new UnsupportedOperationException("ReflectionDeclaredTypeMirror.accept");
